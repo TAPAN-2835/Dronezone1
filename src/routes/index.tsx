@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DroneZone — Drone Service Ecosystem" },
-      { name: "description", content: "Customer App, Different Roles , and Admin Console — unified in one platform." },
+      { name: "description", content: "Customer App, Service Provider Panel and Admin Console — unified in one platform." },
     ],
   }),
   component: Entry,
@@ -79,7 +79,7 @@ const workspaces = [
   },
   {
     to: "/app/dashboard" as const,
-    title: "Different Roles ",
+    title: "Service Provider Dashboard",
     icon: Wrench,
     desc: "Manage jobs, quotations, schedules and customer communication.",
     cta: "Enter Provider Workspace",
