@@ -76,10 +76,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DroneZone — Service Provider Portal" },
+      { title: "DroneZone — Different Roles " },
       { name: "description", content: "Manage drone service requests, quotations, schedules, and customer communication in one polished workspace." },
       { name: "author", content: "DroneZone" },
-      { property: "og:title", content: "DroneZone — Service Provider Portal" },
+      { property: "og:title", content: "DroneZone — Different Roles " },
       { property: "og:description", content: "Manage drone service requests, quotations, schedules, and customer communication." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
