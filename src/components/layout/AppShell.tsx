@@ -5,7 +5,6 @@ import {
   Inbox,
   Briefcase,
   FileText,
-  Calendar,
   MessageSquare,
   History,
   Bell,
@@ -28,7 +27,6 @@ const navItems = [
   { to: "/app/requests", label: "Job Requests", icon: Inbox },
   { to: "/app/active", label: "Active Jobs", icon: Briefcase },
   { to: "/app/quotations", label: "Quotations", icon: FileText },
-  { to: "/app/schedule", label: "Schedule", icon: Calendar },
   { to: "/app/chat", label: "Chat", icon: MessageSquare },
   { to: "/app/history", label: "Service History", icon: History },
   { to: "/app/notifications", label: "Notifications", icon: Bell },
@@ -39,8 +37,8 @@ const navItems = [
 const mobileNav = [
   { to: "/app/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/app/requests", label: "Jobs", icon: Inbox },
+  { to: "/app/active", label: "Active", icon: Briefcase },
   { to: "/app/chat", label: "Chat", icon: MessageSquare },
-  { to: "/app/schedule", label: "Plan", icon: Calendar },
   { to: "/app/profile", label: "Me", icon: User },
 ] as const;
 

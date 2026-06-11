@@ -6,7 +6,7 @@ export const adminStats = {
   active: 312,
   completedToday: 48,
   avgCompletion: "2.4 hrs",
-  openDisputes: 5,
+  openGrievances: 5,
 };
 
 export const adminRevenueTrend = [
@@ -32,19 +32,30 @@ export const topCategories = [
 ];
 
 export const adminRequests = [
-  { id: "REQ-1024", user: "Rohit Verma", issue: "Drone not starting", status: "New", priority: "High" },
-  { id: "REQ-1023", user: "Sneha Iyer", issue: "Propeller Replacement", status: "New", priority: "Medium" },
-  { id: "REQ-1022", user: "Amit Kumar", issue: "Battery issue", status: "In Progress", priority: "High" },
-  { id: "REQ-1021", user: "Vikram Shah", issue: "Camera calibration", status: "Completed", priority: "Low" },
-  { id: "REQ-1020", user: "Neha Joshi", issue: "GPS signal weak", status: "New", priority: "Medium" },
-  { id: "REQ-1019", user: "Karan Mehta", issue: "Firmware recovery", status: "In Progress", priority: "High" },
+  { id: "REQ-1024", user: "Rohit Verma", userId: "USR-1001", issue: "Drone not starting", status: "New", priority: "High", createdAt: "2026-06-02T09:30:00", location: "Koramangala, Bengaluru", drone: "DJI Mavic 3 Pro" },
+  { id: "REQ-1023", user: "Sneha Iyer", userId: "USR-1002", issue: "Propeller Replacement", status: "New", priority: "Medium", createdAt: "2026-06-01T14:00:00", location: "Whitefield, Bengaluru", drone: "DJI Mini 4 Pro" },
+  { id: "REQ-1022", user: "Amit Kumar", userId: "USR-1003", issue: "Battery issue", status: "In Progress", priority: "High", createdAt: "2026-05-28T11:00:00", location: "Gachibowli, Hyderabad", drone: "DJI Air 3" },
+  { id: "REQ-1021", user: "Vikram Shah", userId: "USR-1004", issue: "Camera calibration", status: "Completed", priority: "Low", createdAt: "2026-05-20T10:00:00", location: "Bandra, Mumbai", drone: "DJI Inspire 3" },
+  { id: "REQ-1020", user: "Neha Joshi", userId: "USR-1005", issue: "GPS signal weak", status: "New", priority: "Medium", createdAt: "2026-06-02T08:00:00", location: "Pune, Baner", drone: "Autel EVO II" },
+  { id: "REQ-1019", user: "Karan Mehta", userId: "USR-1001", issue: "Firmware recovery", status: "In Progress", priority: "High", createdAt: "2026-05-25T16:00:00", location: "Indiranagar, Bengaluru", drone: "DJI Mavic 3" },
+];
+
+export const adminJobs = [
+  { id: "REQ-1024", customer: "Rohit Verma", provider: "Rahul Sharma", issue: "Propeller Replacement", status: "In Progress", category: "Repair", createdAt: "2026-05-20T09:30:00", amount: 2950, paymentStatus: "Pending", amcStatus: "Covered" },
+  { id: "REQ-1022", customer: "Amit Kumar", provider: "Arjun Patel", issue: "Battery Issue", status: "In Progress", category: "Battery Services", createdAt: "2026-05-28T11:00:00", amount: 4800, paymentStatus: "Pending", amcStatus: "Not Covered" },
+  { id: "REQ-1021", customer: "Vikram Shah", provider: "Vikram Singh", issue: "Camera Calibration", status: "Completed", category: "Calibration", createdAt: "2026-05-15T10:00:00", amount: 1850, paymentStatus: "Paid", amcStatus: "Covered" },
+  { id: "REQ-1019", customer: "Karan Mehta", provider: "Rahul Sharma", issue: "Firmware Update", status: "In Progress", category: "Maintenance", createdAt: "2026-05-25T16:00:00", amount: 1200, paymentStatus: "Pending", amcStatus: "Expired" },
+  { id: "REQ-1018", customer: "Priya Nair", provider: "Neha Gupta", issue: "Motor Failure", status: "Completed", category: "Repair", createdAt: "2026-05-10T08:00:00", amount: 6200, paymentStatus: "Paid", amcStatus: "Not Covered" },
+  { id: "REQ-1017", customer: "Aditi Sharma", provider: "Arjun Patel", issue: "GPS Signal Loss", status: "New", category: "Repair", createdAt: "2026-06-01T12:00:00", amount: undefined, paymentStatus: "Not Applicable", amcStatus: "Covered" },
+  { id: "REQ-1016", customer: "Sneha Iyer", provider: "Rahul Sharma", issue: "Annual Service", status: "Completed", category: "Maintenance", createdAt: "2026-04-28T09:00:00", amount: 3500, paymentStatus: "Paid", amcStatus: "Covered" },
+  { id: "REQ-1015", customer: "Arjun Reddy", provider: "Vikram Singh", issue: "Propeller Replacement", status: "Rejected", category: "Repair", createdAt: "2026-05-05T14:00:00", amount: undefined, paymentStatus: "Not Applicable", amcStatus: "Expired" },
 ];
 
 export const providerApplications = [
-  { provider: "Ramesh Kumar", business: "SkyHigh Drones", submitted: "12 May 2026", status: "Pending" },
-  { provider: "Arjun Patel", business: "AeroFly Services", submitted: "11 May 2026", status: "Pending" },
-  { provider: "Vikrant Singh", business: "DroneTech India", submitted: "10 May 2026", status: "In Review" },
-  { provider: "Prakash Nair", business: "DroneWorks", submitted: "09 May 2026", status: "Pending" },
+  { id: "PRV-2001", provider: "Ramesh Kumar", business: "SkyHigh Drones", submitted: "12 May 2026", status: "Pending", email: "ramesh@skyhigh.com", phone: "+91 98765 11111", city: "Bengaluru" },
+  { id: "PRV-2002", provider: "Arjun Patel", business: "AeroFly Services", submitted: "11 May 2026", status: "Pending", email: "arjun@aerofly.com", phone: "+91 98201 22222", city: "Mumbai" },
+  { id: "PRV-2003", provider: "Vikrant Singh", business: "DroneTech India", submitted: "10 May 2026", status: "In Review", email: "vikrant@dronetech.com", phone: "+91 97400 33333", city: "Hyderabad" },
+  { id: "PRV-2004", provider: "Prakash Nair", business: "DroneWorks", submitted: "09 May 2026", status: "Pending", email: "prakash@droneworks.com", phone: "+91 99102 44444", city: "Chennai" },
 ];
 
 export const providerDocs = [
@@ -55,13 +66,38 @@ export const providerDocs = [
   { name: "Address Proof", status: "Verified" },
 ];
 
-export const disputes = [
-  { id: "DISP-1005", raisedBy: "SkyHigh Drones", against: "Rohit Verma", issue: "Service quality", status: "Open" },
-  { id: "DISP-1004", raisedBy: "Sneha Iyer", against: "AeroFly Services", issue: "Overcharging", status: "In Progress" },
-  { id: "DISP-1003", raisedBy: "Amit Kumar", against: "DroneTech India", issue: "Delay in service", status: "Open" },
-  { id: "DISP-1002", raisedBy: "Vikram Shah", against: "DroneWorks", issue: "Poor support", status: "Resolved" },
-  { id: "DISP-1001", raisedBy: "Neha Joshi", against: "DroneWorks", issue: "Incomplete work", status: "Resolved" },
+export type GrievanceStatus = "Open" | "In Progress" | "Resolved" | "Closed";
+export type GrievancePriority = "Low" | "Medium" | "High" | "Critical";
+
+export interface Grievance {
+  id: string;
+  raisedBy: string;
+  raisedByType: "customer" | "provider";
+  raisedById?: string;
+  against: string;
+  againstType: "customer" | "provider";
+  jobId?: string;
+  category: string;
+  priority: GrievancePriority;
+  description: string;
+  issue: string;
+  status: GrievanceStatus;
+  createdAt: string;
+  resolvedAt?: string;
+}
+
+export const grievances: Grievance[] = [
+  { id: "GRV-1005", raisedBy: "SkyHigh Drones", raisedByType: "provider", raisedById: "PRV-2001", against: "Rohit Verma", againstType: "customer", jobId: "REQ-1024", category: "Service Quality", priority: "High", description: "Customer refused to pay after service completion despite signed quotation.", issue: "Payment dispute after service", status: "Open", createdAt: "2026-05-28T10:00:00" },
+  { id: "GRV-1004", raisedBy: "Sneha Iyer", raisedByType: "customer", raisedById: "USR-1002", against: "AeroFly Services", againstType: "provider", jobId: "REQ-1023", category: "Billing", priority: "Medium", description: "Charged ₹800 extra for travel without prior approval.", issue: "Overcharging", status: "In Progress", createdAt: "2026-05-25T14:00:00" },
+  { id: "GRV-1003", raisedBy: "Amit Kumar", raisedByType: "customer", raisedById: "USR-1003", against: "DroneTech India", againstType: "provider", jobId: "REQ-1022", category: "Delay", priority: "High", description: "Engineer arrived 3 hours late without notification.", issue: "Delay in service", status: "Open", createdAt: "2026-05-22T09:00:00" },
+  { id: "GRV-1002", raisedBy: "Vikram Shah", raisedByType: "customer", raisedById: "USR-1004", against: "DroneWorks", againstType: "provider", jobId: "REQ-1021", category: "Support", priority: "Low", description: "No follow-up after repair. Issue recurred within a week.", issue: "Poor support", status: "Resolved", createdAt: "2026-05-15T11:00:00", resolvedAt: "2026-05-18T16:00:00" },
+  { id: "GRV-1001", raisedBy: "Neha Joshi", raisedByType: "customer", raisedById: "USR-1005", against: "DroneWorks", againstType: "provider", jobId: "REQ-1018", category: "Quality", priority: "Medium", description: "Gimbal issue not fully resolved. Drone still unstable.", issue: "Incomplete work", status: "Resolved", createdAt: "2026-05-10T08:00:00", resolvedAt: "2026-05-14T12:00:00" },
 ];
+
+/** @deprecated Use grievances instead */
+export const disputes = grievances;
+
+export const grievanceCategories = ["Service Quality", "Billing", "Delay", "Support", "Quality", "Safety", "Other"];
 
 export const categories = [
   { name: "Maintenance", desc: "General maintenance services", active: true },
@@ -88,9 +124,9 @@ export const campaigns = [
 ];
 
 export const adminUsers = [
-  { id: "USR-1001", name: "Rohit Verma", email: "rohit@email.com", joined: "Mar 2024", requests: 12 },
-  { id: "USR-1002", name: "Sneha Iyer", email: "sneha@email.com", joined: "Apr 2024", requests: 8 },
-  { id: "USR-1003", name: "Amit Kumar", email: "amit@email.com", joined: "May 2024", requests: 15 },
-  { id: "USR-1004", name: "Vikram Shah", email: "vikram@email.com", joined: "Jun 2024", requests: 5 },
-  { id: "USR-1005", name: "Neha Joshi", email: "neha@email.com", joined: "Jul 2024", requests: 9 },
+  { id: "USR-1001", name: "Rohit Verma", email: "rohit@email.com", phone: "+91 98765 43210", joined: "Mar 2024", requests: 12, city: "Bengaluru", amcPlan: "Premium AMC" },
+  { id: "USR-1002", name: "Sneha Iyer", email: "sneha@email.com", phone: "+91 90420 78890", joined: "Apr 2024", requests: 8, city: "Bengaluru", amcPlan: "Basic AMC" },
+  { id: "USR-1003", name: "Amit Kumar", email: "amit@email.com", phone: "+91 98201 55678", joined: "May 2024", requests: 15, city: "Hyderabad", amcPlan: "None" },
+  { id: "USR-1004", name: "Vikram Shah", email: "vikram@email.com", phone: "+91 97400 66781", joined: "Jun 2024", requests: 5, city: "Mumbai", amcPlan: "Premium AMC" },
+  { id: "USR-1005", name: "Neha Joshi", email: "neha@email.com", phone: "+91 99102 87654", joined: "Jul 2024", requests: 9, city: "Pune", amcPlan: "Standard AMC" },
 ];

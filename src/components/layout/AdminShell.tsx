@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   X,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -25,9 +26,10 @@ const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/providers", label: "Service Providers", icon: Wrench },
+  { to: "/admin/jobs", label: "Jobs", icon: Briefcase },
   { to: "/admin/requests", label: "Requests", icon: Inbox },
   { to: "/admin/categories", label: "Services & Models", icon: Layers },
-  { to: "/admin/disputes", label: "Disputes", icon: AlertOctagon },
+  { to: "/admin/grievances", label: "Grievances", icon: AlertOctagon },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/marketing", label: "Marketing", icon: Megaphone },
   { to: "/admin/profile", label: "Settings", icon: Settings },

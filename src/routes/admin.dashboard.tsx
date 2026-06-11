@@ -88,7 +88,7 @@ function Dashboard() {
           { label: "Active Jobs", value: adminStats.active },
           { label: "Completed Today", value: adminStats.completedToday },
           { label: "Avg. Completion", value: adminStats.avgCompletion },
-          { label: "Open Disputes", value: adminStats.openDisputes },
+          { label: "Open Grievances", value: adminStats.openGrievances },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-4">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">{s.label}</div>

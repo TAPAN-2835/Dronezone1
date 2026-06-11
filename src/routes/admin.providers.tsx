@@ -1,16 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { providerApplications, providerDocs } from "@/data/admin";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/providers")({
   head: () => ({ meta: [{ title: "Providers — DroneZone Admin" }] }),
   component: () => (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold sm:text-3xl">Provider Applications</h1>
+      <h1 className="font-display text-2xl font-bold sm:text-3xl">Service Providers</h1>
       <div className="grid gap-6 lg:grid-cols-3">
-
-        {/* Applications table */}
         <div className="overflow-hidden rounded-xl border bg-card lg:col-span-2">
-          {/* Desktop table */}
           <div className="hidden overflow-x-auto sm:block">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
@@ -24,7 +22,7 @@ export const Route = createFileRoute("/admin/providers")({
               </thead>
               <tbody>
                 {providerApplications.map((p) => (
-                  <tr key={p.provider} className="border-t hover:bg-muted/20 transition-colors">
+                  <tr key={p.id} className="border-t hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-semibold">{p.provider}</td>
                     <td className="px-4 py-3 text-muted-foreground">{p.business}</td>
                     <td className="px-4 py-3 text-muted-foreground">{p.submitted}</td>
@@ -34,7 +32,9 @@ export const Route = createFileRoute("/admin/providers")({
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button className="rounded-lg border px-3 py-1 text-xs font-semibold hover:bg-accent">Review</button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to="/admin/providers/$id" params={{ id: p.id }}>View Details</Link>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -42,10 +42,9 @@ export const Route = createFileRoute("/admin/providers")({
             </table>
           </div>
 
-          {/* Mobile card stack */}
           <div className="divide-y sm:hidden">
             {providerApplications.map((p) => (
-              <div key={p.provider} className="p-4">
+              <Link key={p.id} to="/admin/providers/$id" params={{ id: p.id }} className="block p-4 hover:bg-accent/30">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="font-semibold">{p.provider}</div>
@@ -55,16 +54,12 @@ export const Route = createFileRoute("/admin/providers")({
                     {p.status}
                   </span>
                 </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{p.submitted}</span>
-                  <button className="rounded-lg border px-3 py-1 text-xs font-semibold hover:bg-accent">Review</button>
-                </div>
-              </div>
+                <div className="mt-2 text-xs text-muted-foreground">{p.submitted}</div>
+              </Link>
             ))}
           </div>
         </div>
 
-        {/* Documents required sidebar */}
         <div className="rounded-xl border bg-card p-5">
           <div className="font-display font-semibold">Documents Required</div>
           <ul className="mt-3 space-y-2">
@@ -75,10 +70,6 @@ export const Route = createFileRoute("/admin/providers")({
               </li>
             ))}
           </ul>
-          <div className="mt-5 grid grid-cols-2 gap-2">
-            <button className="h-10 rounded-lg bg-success text-xs font-semibold text-success-foreground">Approve</button>
-            <button className="h-10 rounded-lg bg-destructive text-xs font-semibold text-destructive-foreground">Reject</button>
-          </div>
         </div>
       </div>
     </div>

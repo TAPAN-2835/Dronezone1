@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Circle, MapPin, MessageSquare, Phone } from "lucide-react";
+import { Check, Circle, MapPin, MessageSquare, Phone, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { jobs, stages, type JobStatus } from "@/data/demo";
+import { jobs, stages } from "@/data/demo";
 import { useState } from "react";
 
 export const Route = createFileRoute("/app/active")({
@@ -32,7 +33,17 @@ function Active() {
 
   return (
     <>
-      <PageHeader title="Active Jobs" description="Track ongoing repairs and update workflow status." />
+      <PageHeader
+        title="Active Jobs"
+        description="Track ongoing repairs and update workflow status."
+        actions={
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/app/jobs/$id" params={{ id: selected.id }}>
+              View full details <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         <Card className="lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto">
@@ -54,6 +65,7 @@ function Active() {
                 </div>
                 <div className="mt-1 truncate text-sm font-semibold">{j.issue}</div>
                 <div className="mt-0.5 truncate text-xs text-muted-foreground">{j.customer.name}</div>
+                <JobAgeBadge createdAt={j.createdAt} className="mt-1.5" />
               </button>
             ))}
           </CardContent>
@@ -64,23 +76,32 @@ function Active() {
             <CardContent className="p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-xs text-muted-foreground">{selected.id}</span>
                     <StatusBadge status={selected.status} />
+                    <JobAgeBadge createdAt={selected.createdAt} />
                   </div>
                   <h2 className="mt-1 font-display text-xl font-semibold">{selected.issue}</h2>
                   <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                     <MapPin className="h-3.5 w-3.5" /> {selected.location}
                   </div>
+                  {selected.assignedEngineer && (
+                    <div className="mt-1 text-xs text-muted-foreground">Engineer: {selected.assignedEngineer}</div>
+                  )}
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline">
-                    <Phone className="h-4 w-4" /> Call
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={`tel:${selected.customer.phone.replace(/\s/g, "")}`}>
+                      <Phone className="h-4 w-4" /> Call
+                    </a>
                   </Button>
                   <Button size="sm" variant="outline" asChild>
                     <Link to="/app/chat">
                       <MessageSquare className="h-4 w-4" /> Chat
                     </Link>
+                  </Button>
+                  <Button size="sm" asChild>
+                    <Link to="/app/jobs/$id" params={{ id: selected.id }}>Details</Link>
                   </Button>
                 </div>
               </div>
@@ -119,25 +140,15 @@ function Active() {
                       </span>
                       <div className="flex items-center justify-between">
                         <div>
-                          <div
-                            className={`text-sm font-semibold ${
-                              done || current ? "text-foreground" : "text-muted-foreground"
-                            }`}
-                          >
+                          <div className={`text-sm font-semibold ${done || current ? "text-foreground" : "text-muted-foreground"}`}>
                             {s.label}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {done
-                              ? `Completed · May 12, 10:${10 + i * 5} AM`
-                              : current
-                                ? "In progress"
-                                : "Pending"}
+                            {done ? "Completed" : current ? "In progress" : "Pending"}
                           </div>
                         </div>
                         {current && i < stages.length - 1 && (
-                          <Button size="sm" variant="outline">
-                            Update status
-                          </Button>
+                          <Button size="sm" variant="outline">Update status</Button>
                         )}
                       </div>
                     </li>
@@ -146,9 +157,7 @@ function Active() {
               </ol>
 
               <div className="mt-6 flex flex-wrap gap-2 border-t pt-5">
-                <Button>
-                  <Check className="h-4 w-4" /> Mark as completed
-                </Button>
+                <Button><Check className="h-4 w-4" /> Mark as completed</Button>
                 <Button variant="outline">Move to next stage</Button>
               </div>
             </CardContent>

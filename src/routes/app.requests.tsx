@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Search, Filter, MapPin, Clock, Check, X } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -98,9 +99,10 @@ function Requests() {
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-xs text-muted-foreground">{j.id}</span>
                       <StatusBadge status={j.status} />
+                      <JobAgeBadge createdAt={j.createdAt} />
                     </div>
                     <h3 className="mt-1 truncate font-display text-base font-semibold">{j.issue}</h3>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -121,9 +123,15 @@ function Requests() {
                 </div>
 
                 <div className="mt-4 flex items-center gap-2 border-t pt-4">
-                  <Button asChild size="sm" variant="outline" className="flex-1 sm:flex-none">
-                    <Link to="/app/requests/$id" params={{ id: j.id }}>View details</Link>
-                  </Button>
+                  {j.status === "new" ? (
+                    <Button asChild size="sm" className="flex-1 sm:flex-none">
+                      <Link to="/app/requests/$id" params={{ id: j.id }}>Review request</Link>
+                    </Button>
+                  ) : (
+                    <Button asChild size="sm" variant="outline" className="flex-1 sm:flex-none">
+                      <Link to="/app/jobs/$id" params={{ id: j.id }}>View details</Link>
+                    </Button>
+                  )}
                   {j.status === "new" && (
                     <>
                       <Button

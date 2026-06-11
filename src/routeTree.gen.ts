@@ -40,12 +40,24 @@ import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProvidersRouteImport } from './routes/admin.providers'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminMarketingRouteImport } from './routes/admin.marketing'
+import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
+import { Route as AdminGrievancesRouteImport } from './routes/admin.grievances'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as CustomerRequestsIdRouteImport } from './routes/customer.requests.$id'
+import { Route as CustomerProfileSectionRouteImport } from './routes/customer.profile.$section'
+import { Route as CustomerGrievancesNewRouteImport } from './routes/customer.grievances.new'
 import { Route as AppRequestsIdRouteImport } from './routes/app.requests.$id'
+import { Route as AppJobsIdRouteImport } from './routes/app.jobs.$id'
+import { Route as AppGrievancesNewRouteImport } from './routes/app.grievances.new'
+import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
+import { Route as AdminRequestsIdRouteImport } from './routes/admin.requests.$id'
+import { Route as AdminProvidersIdRouteImport } from './routes/admin.providers.$id'
+import { Route as AdminJobsIdRouteImport } from './routes/admin.jobs.$id'
+import { Route as AdminGrievancesNewRouteImport } from './routes/admin.grievances.new'
+import { Route as AdminGrievancesIdRouteImport } from './routes/admin.grievances.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -202,6 +214,16 @@ const AdminMarketingRoute = AdminMarketingRouteImport.update({
   path: '/marketing',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminJobsRoute = AdminJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGrievancesRoute = AdminGrievancesRouteImport.update({
+  id: '/grievances',
+  path: '/grievances',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDisputesRoute = AdminDisputesRouteImport.update({
   id: '/disputes',
   path: '/disputes',
@@ -227,10 +249,60 @@ const CustomerRequestsIdRoute = CustomerRequestsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => CustomerRequestsRoute,
 } as any)
+const CustomerProfileSectionRoute = CustomerProfileSectionRouteImport.update({
+  id: '/$section',
+  path: '/$section',
+  getParentRoute: () => CustomerProfileRoute,
+} as any)
+const CustomerGrievancesNewRoute = CustomerGrievancesNewRouteImport.update({
+  id: '/grievances/new',
+  path: '/grievances/new',
+  getParentRoute: () => CustomerRoute,
+} as any)
 const AppRequestsIdRoute = AppRequestsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => AppRequestsRoute,
+} as any)
+const AppJobsIdRoute = AppJobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGrievancesNewRoute = AppGrievancesNewRouteImport.update({
+  id: '/grievances/new',
+  path: '/grievances/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
+const AdminRequestsIdRoute = AdminRequestsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminRequestsRoute,
+} as any)
+const AdminProvidersIdRoute = AdminProvidersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminProvidersRoute,
+} as any)
+const AdminJobsIdRoute = AdminJobsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminJobsRoute,
+} as any)
+const AdminGrievancesNewRoute = AdminGrievancesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminGrievancesRoute,
+} as any)
+const AdminGrievancesIdRoute = AdminGrievancesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminGrievancesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -243,11 +315,13 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/grievances': typeof AdminGrievancesRouteWithChildren
+  '/admin/jobs': typeof AdminJobsRouteWithChildren
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/profile': typeof AdminProfileRoute
-  '/admin/providers': typeof AdminProvidersRoute
-  '/admin/requests': typeof AdminRequestsRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/providers': typeof AdminProvidersRouteWithChildren
+  '/admin/requests': typeof AdminRequestsRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/app/active': typeof AppActiveRoute
   '/app/chat': typeof AppChatRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -266,10 +340,20 @@ export interface FileRoutesByFullPath {
   '/customer/new-request': typeof CustomerNewRequestRoute
   '/customer/notifications': typeof CustomerNotificationsRoute
   '/customer/onboarding': typeof CustomerOnboardingRoute
-  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/profile': typeof CustomerProfileRouteWithChildren
   '/customer/rate': typeof CustomerRateRoute
   '/customer/requests': typeof CustomerRequestsRouteWithChildren
+  '/admin/grievances/$id': typeof AdminGrievancesIdRoute
+  '/admin/grievances/new': typeof AdminGrievancesNewRoute
+  '/admin/jobs/$id': typeof AdminJobsIdRoute
+  '/admin/providers/$id': typeof AdminProvidersIdRoute
+  '/admin/requests/$id': typeof AdminRequestsIdRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
+  '/app/grievances/new': typeof AppGrievancesNewRoute
+  '/app/jobs/$id': typeof AppJobsIdRoute
   '/app/requests/$id': typeof AppRequestsIdRoute
+  '/customer/grievances/new': typeof CustomerGrievancesNewRoute
+  '/customer/profile/$section': typeof CustomerProfileSectionRoute
   '/customer/requests/$id': typeof CustomerRequestsIdRoute
 }
 export interface FileRoutesByTo {
@@ -282,11 +366,13 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/grievances': typeof AdminGrievancesRouteWithChildren
+  '/admin/jobs': typeof AdminJobsRouteWithChildren
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/profile': typeof AdminProfileRoute
-  '/admin/providers': typeof AdminProvidersRoute
-  '/admin/requests': typeof AdminRequestsRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/providers': typeof AdminProvidersRouteWithChildren
+  '/admin/requests': typeof AdminRequestsRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/app/active': typeof AppActiveRoute
   '/app/chat': typeof AppChatRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -305,10 +391,20 @@ export interface FileRoutesByTo {
   '/customer/new-request': typeof CustomerNewRequestRoute
   '/customer/notifications': typeof CustomerNotificationsRoute
   '/customer/onboarding': typeof CustomerOnboardingRoute
-  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/profile': typeof CustomerProfileRouteWithChildren
   '/customer/rate': typeof CustomerRateRoute
   '/customer/requests': typeof CustomerRequestsRouteWithChildren
+  '/admin/grievances/$id': typeof AdminGrievancesIdRoute
+  '/admin/grievances/new': typeof AdminGrievancesNewRoute
+  '/admin/jobs/$id': typeof AdminJobsIdRoute
+  '/admin/providers/$id': typeof AdminProvidersIdRoute
+  '/admin/requests/$id': typeof AdminRequestsIdRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
+  '/app/grievances/new': typeof AppGrievancesNewRoute
+  '/app/jobs/$id': typeof AppJobsIdRoute
   '/app/requests/$id': typeof AppRequestsIdRoute
+  '/customer/grievances/new': typeof CustomerGrievancesNewRoute
+  '/customer/profile/$section': typeof CustomerProfileSectionRoute
   '/customer/requests/$id': typeof CustomerRequestsIdRoute
 }
 export interface FileRoutesById {
@@ -322,11 +418,13 @@ export interface FileRoutesById {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/grievances': typeof AdminGrievancesRouteWithChildren
+  '/admin/jobs': typeof AdminJobsRouteWithChildren
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/profile': typeof AdminProfileRoute
-  '/admin/providers': typeof AdminProvidersRoute
-  '/admin/requests': typeof AdminRequestsRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/providers': typeof AdminProvidersRouteWithChildren
+  '/admin/requests': typeof AdminRequestsRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/app/active': typeof AppActiveRoute
   '/app/chat': typeof AppChatRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -345,10 +443,20 @@ export interface FileRoutesById {
   '/customer/new-request': typeof CustomerNewRequestRoute
   '/customer/notifications': typeof CustomerNotificationsRoute
   '/customer/onboarding': typeof CustomerOnboardingRoute
-  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/profile': typeof CustomerProfileRouteWithChildren
   '/customer/rate': typeof CustomerRateRoute
   '/customer/requests': typeof CustomerRequestsRouteWithChildren
+  '/admin/grievances/$id': typeof AdminGrievancesIdRoute
+  '/admin/grievances/new': typeof AdminGrievancesNewRoute
+  '/admin/jobs/$id': typeof AdminJobsIdRoute
+  '/admin/providers/$id': typeof AdminProvidersIdRoute
+  '/admin/requests/$id': typeof AdminRequestsIdRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
+  '/app/grievances/new': typeof AppGrievancesNewRoute
+  '/app/jobs/$id': typeof AppJobsIdRoute
   '/app/requests/$id': typeof AppRequestsIdRoute
+  '/customer/grievances/new': typeof CustomerGrievancesNewRoute
+  '/customer/profile/$section': typeof CustomerProfileSectionRoute
   '/customer/requests/$id': typeof CustomerRequestsIdRoute
 }
 export interface FileRouteTypes {
@@ -363,6 +471,8 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/dashboard'
     | '/admin/disputes'
+    | '/admin/grievances'
+    | '/admin/jobs'
     | '/admin/marketing'
     | '/admin/profile'
     | '/admin/providers'
@@ -389,7 +499,17 @@ export interface FileRouteTypes {
     | '/customer/profile'
     | '/customer/rate'
     | '/customer/requests'
+    | '/admin/grievances/$id'
+    | '/admin/grievances/new'
+    | '/admin/jobs/$id'
+    | '/admin/providers/$id'
+    | '/admin/requests/$id'
+    | '/admin/users/$id'
+    | '/app/grievances/new'
+    | '/app/jobs/$id'
     | '/app/requests/$id'
+    | '/customer/grievances/new'
+    | '/customer/profile/$section'
     | '/customer/requests/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -402,6 +522,8 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/dashboard'
     | '/admin/disputes'
+    | '/admin/grievances'
+    | '/admin/jobs'
     | '/admin/marketing'
     | '/admin/profile'
     | '/admin/providers'
@@ -428,7 +550,17 @@ export interface FileRouteTypes {
     | '/customer/profile'
     | '/customer/rate'
     | '/customer/requests'
+    | '/admin/grievances/$id'
+    | '/admin/grievances/new'
+    | '/admin/jobs/$id'
+    | '/admin/providers/$id'
+    | '/admin/requests/$id'
+    | '/admin/users/$id'
+    | '/app/grievances/new'
+    | '/app/jobs/$id'
     | '/app/requests/$id'
+    | '/customer/grievances/new'
+    | '/customer/profile/$section'
     | '/customer/requests/$id'
   id:
     | '__root__'
@@ -441,6 +573,8 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/dashboard'
     | '/admin/disputes'
+    | '/admin/grievances'
+    | '/admin/jobs'
     | '/admin/marketing'
     | '/admin/profile'
     | '/admin/providers'
@@ -467,7 +601,17 @@ export interface FileRouteTypes {
     | '/customer/profile'
     | '/customer/rate'
     | '/customer/requests'
+    | '/admin/grievances/$id'
+    | '/admin/grievances/new'
+    | '/admin/jobs/$id'
+    | '/admin/providers/$id'
+    | '/admin/requests/$id'
+    | '/admin/users/$id'
+    | '/app/grievances/new'
+    | '/app/jobs/$id'
     | '/app/requests/$id'
+    | '/customer/grievances/new'
+    | '/customer/profile/$section'
     | '/customer/requests/$id'
   fileRoutesById: FileRoutesById
 }
@@ -698,6 +842,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/jobs': {
+      id: '/admin/jobs'
+      path: '/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AdminJobsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/grievances': {
+      id: '/admin/grievances'
+      path: '/grievances'
+      fullPath: '/admin/grievances'
+      preLoaderRoute: typeof AdminGrievancesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/disputes': {
       id: '/admin/disputes'
       path: '/disputes'
@@ -733,6 +891,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerRequestsIdRouteImport
       parentRoute: typeof CustomerRequestsRoute
     }
+    '/customer/profile/$section': {
+      id: '/customer/profile/$section'
+      path: '/$section'
+      fullPath: '/customer/profile/$section'
+      preLoaderRoute: typeof CustomerProfileSectionRouteImport
+      parentRoute: typeof CustomerProfileRoute
+    }
+    '/customer/grievances/new': {
+      id: '/customer/grievances/new'
+      path: '/grievances/new'
+      fullPath: '/customer/grievances/new'
+      preLoaderRoute: typeof CustomerGrievancesNewRouteImport
+      parentRoute: typeof CustomerRoute
+    }
     '/app/requests/$id': {
       id: '/app/requests/$id'
       path: '/$id'
@@ -740,19 +912,139 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRequestsIdRouteImport
       parentRoute: typeof AppRequestsRoute
     }
+    '/app/jobs/$id': {
+      id: '/app/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/app/jobs/$id'
+      preLoaderRoute: typeof AppJobsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/grievances/new': {
+      id: '/app/grievances/new'
+      path: '/grievances/new'
+      fullPath: '/app/grievances/new'
+      preLoaderRoute: typeof AppGrievancesNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/admin/users/$id': {
+      id: '/admin/users/$id'
+      path: '/$id'
+      fullPath: '/admin/users/$id'
+      preLoaderRoute: typeof AdminUsersIdRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
+    '/admin/requests/$id': {
+      id: '/admin/requests/$id'
+      path: '/$id'
+      fullPath: '/admin/requests/$id'
+      preLoaderRoute: typeof AdminRequestsIdRouteImport
+      parentRoute: typeof AdminRequestsRoute
+    }
+    '/admin/providers/$id': {
+      id: '/admin/providers/$id'
+      path: '/$id'
+      fullPath: '/admin/providers/$id'
+      preLoaderRoute: typeof AdminProvidersIdRouteImport
+      parentRoute: typeof AdminProvidersRoute
+    }
+    '/admin/jobs/$id': {
+      id: '/admin/jobs/$id'
+      path: '/$id'
+      fullPath: '/admin/jobs/$id'
+      preLoaderRoute: typeof AdminJobsIdRouteImport
+      parentRoute: typeof AdminJobsRoute
+    }
+    '/admin/grievances/new': {
+      id: '/admin/grievances/new'
+      path: '/new'
+      fullPath: '/admin/grievances/new'
+      preLoaderRoute: typeof AdminGrievancesNewRouteImport
+      parentRoute: typeof AdminGrievancesRoute
+    }
+    '/admin/grievances/$id': {
+      id: '/admin/grievances/$id'
+      path: '/$id'
+      fullPath: '/admin/grievances/$id'
+      preLoaderRoute: typeof AdminGrievancesIdRouteImport
+      parentRoute: typeof AdminGrievancesRoute
+    }
   }
 }
+
+interface AdminGrievancesRouteChildren {
+  AdminGrievancesIdRoute: typeof AdminGrievancesIdRoute
+  AdminGrievancesNewRoute: typeof AdminGrievancesNewRoute
+}
+
+const AdminGrievancesRouteChildren: AdminGrievancesRouteChildren = {
+  AdminGrievancesIdRoute: AdminGrievancesIdRoute,
+  AdminGrievancesNewRoute: AdminGrievancesNewRoute,
+}
+
+const AdminGrievancesRouteWithChildren = AdminGrievancesRoute._addFileChildren(
+  AdminGrievancesRouteChildren,
+)
+
+interface AdminJobsRouteChildren {
+  AdminJobsIdRoute: typeof AdminJobsIdRoute
+}
+
+const AdminJobsRouteChildren: AdminJobsRouteChildren = {
+  AdminJobsIdRoute: AdminJobsIdRoute,
+}
+
+const AdminJobsRouteWithChildren = AdminJobsRoute._addFileChildren(
+  AdminJobsRouteChildren,
+)
+
+interface AdminProvidersRouteChildren {
+  AdminProvidersIdRoute: typeof AdminProvidersIdRoute
+}
+
+const AdminProvidersRouteChildren: AdminProvidersRouteChildren = {
+  AdminProvidersIdRoute: AdminProvidersIdRoute,
+}
+
+const AdminProvidersRouteWithChildren = AdminProvidersRoute._addFileChildren(
+  AdminProvidersRouteChildren,
+)
+
+interface AdminRequestsRouteChildren {
+  AdminRequestsIdRoute: typeof AdminRequestsIdRoute
+}
+
+const AdminRequestsRouteChildren: AdminRequestsRouteChildren = {
+  AdminRequestsIdRoute: AdminRequestsIdRoute,
+}
+
+const AdminRequestsRouteWithChildren = AdminRequestsRoute._addFileChildren(
+  AdminRequestsRouteChildren,
+)
+
+interface AdminUsersRouteChildren {
+  AdminUsersIdRoute: typeof AdminUsersIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersIdRoute: AdminUsersIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
+  AdminGrievancesRoute: typeof AdminGrievancesRouteWithChildren
+  AdminJobsRoute: typeof AdminJobsRouteWithChildren
   AdminMarketingRoute: typeof AdminMarketingRoute
   AdminProfileRoute: typeof AdminProfileRoute
-  AdminProvidersRoute: typeof AdminProvidersRoute
-  AdminRequestsRoute: typeof AdminRequestsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
+  AdminProvidersRoute: typeof AdminProvidersRouteWithChildren
+  AdminRequestsRoute: typeof AdminRequestsRouteWithChildren
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -760,11 +1052,13 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDisputesRoute: AdminDisputesRoute,
+  AdminGrievancesRoute: AdminGrievancesRouteWithChildren,
+  AdminJobsRoute: AdminJobsRouteWithChildren,
   AdminMarketingRoute: AdminMarketingRoute,
   AdminProfileRoute: AdminProfileRoute,
-  AdminProvidersRoute: AdminProvidersRoute,
-  AdminRequestsRoute: AdminRequestsRoute,
-  AdminUsersRoute: AdminUsersRoute,
+  AdminProvidersRoute: AdminProvidersRouteWithChildren,
+  AdminRequestsRoute: AdminRequestsRouteWithChildren,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -792,6 +1086,8 @@ interface AppRouteChildren {
   AppRequestsRoute: typeof AppRequestsRouteWithChildren
   AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppGrievancesNewRoute: typeof AppGrievancesNewRoute
+  AppJobsIdRoute: typeof AppJobsIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -805,9 +1101,23 @@ const AppRouteChildren: AppRouteChildren = {
   AppRequestsRoute: AppRequestsRouteWithChildren,
   AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppGrievancesNewRoute: AppGrievancesNewRoute,
+  AppJobsIdRoute: AppJobsIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface CustomerProfileRouteChildren {
+  CustomerProfileSectionRoute: typeof CustomerProfileSectionRoute
+}
+
+const CustomerProfileRouteChildren: CustomerProfileRouteChildren = {
+  CustomerProfileSectionRoute: CustomerProfileSectionRoute,
+}
+
+const CustomerProfileRouteWithChildren = CustomerProfileRoute._addFileChildren(
+  CustomerProfileRouteChildren,
+)
 
 interface CustomerRequestsRouteChildren {
   CustomerRequestsIdRoute: typeof CustomerRequestsIdRoute
@@ -829,9 +1139,10 @@ interface CustomerRouteChildren {
   CustomerNewRequestRoute: typeof CustomerNewRequestRoute
   CustomerNotificationsRoute: typeof CustomerNotificationsRoute
   CustomerOnboardingRoute: typeof CustomerOnboardingRoute
-  CustomerProfileRoute: typeof CustomerProfileRoute
+  CustomerProfileRoute: typeof CustomerProfileRouteWithChildren
   CustomerRateRoute: typeof CustomerRateRoute
   CustomerRequestsRoute: typeof CustomerRequestsRouteWithChildren
+  CustomerGrievancesNewRoute: typeof CustomerGrievancesNewRoute
 }
 
 const CustomerRouteChildren: CustomerRouteChildren = {
@@ -843,9 +1154,10 @@ const CustomerRouteChildren: CustomerRouteChildren = {
   CustomerNewRequestRoute: CustomerNewRequestRoute,
   CustomerNotificationsRoute: CustomerNotificationsRoute,
   CustomerOnboardingRoute: CustomerOnboardingRoute,
-  CustomerProfileRoute: CustomerProfileRoute,
+  CustomerProfileRoute: CustomerProfileRouteWithChildren,
   CustomerRateRoute: CustomerRateRoute,
   CustomerRequestsRoute: CustomerRequestsRouteWithChildren,
+  CustomerGrievancesNewRoute: CustomerGrievancesNewRoute,
 }
 
 const CustomerRouteWithChildren = CustomerRoute._addFileChildren(

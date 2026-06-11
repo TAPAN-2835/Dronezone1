@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bell, Inbox, IndianRupee, BellRing, Settings as SettingsIcon, Check } from "lucide-react";
+import { Bell, Inbox, IndianRupee, BellRing, Settings as SettingsIcon, Check, AlertOctagon } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ const cats = [
   { id: "request", label: "Requests", icon: Inbox },
   { id: "payment", label: "Payments", icon: IndianRupee },
   { id: "reminder", label: "Reminders", icon: BellRing },
+  { id: "grievance", label: "Grievances", icon: AlertOctagon },
   { id: "system", label: "System", icon: SettingsIcon },
 ] as const;
 
@@ -24,6 +25,7 @@ const iconByCat = {
   payment: IndianRupee,
   reminder: BellRing,
   system: SettingsIcon,
+  grievance: AlertOctagon,
 };
 
 function Notifications() {
@@ -37,10 +39,7 @@ function Notifications() {
         title="Notifications"
         description="Stay on top of new requests, payments, and reminders."
         actions={
-          <Button
-            variant="outline"
-            onClick={() => setItems((x) => x.map((n) => ({ ...n, read: true })))}
-          >
+          <Button variant="outline" onClick={() => setItems((x) => x.map((n) => ({ ...n, read: true })))}>
             <Check className="h-4 w-4" /> Mark all read
           </Button>
         }
@@ -74,17 +73,13 @@ function Notifications() {
       <Card>
         <CardContent className="divide-y p-0">
           {visible.map((n) => {
-            const Icon = iconByCat[n.category];
-            return (
-              <div
-                key={n.id}
-                className={`flex items-start gap-4 p-4 transition hover:bg-muted/30 ${
-                  !n.read ? "bg-primary/5" : ""
-                }`}
-              >
+            const Icon = iconByCat[n.category as keyof typeof iconByCat] ?? Bell;
+            const content = (
+              <>
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                   n.category === "payment" ? "bg-success/15 text-success"
                     : n.category === "request" ? "bg-primary/10 text-primary"
+                    : n.category === "grievance" ? "bg-destructive/10 text-destructive"
                     : n.category === "reminder" ? "bg-warning/15 text-[oklch(0.45_0.15_75)]"
                     : "bg-muted text-muted-foreground"
                 }`}>
@@ -98,6 +93,21 @@ function Notifications() {
                   <div className="mt-0.5 text-sm text-muted-foreground">{n.body}</div>
                   <div className="mt-1 text-xs text-muted-foreground">{n.time}</div>
                 </div>
+              </>
+            );
+
+            return n.href ? (
+              <Link
+                key={n.id}
+                to={n.href}
+                onClick={() => setItems((x) => x.map((item) => item.id === n.id ? { ...item, read: true } : item))}
+                className={`flex items-start gap-4 p-4 transition hover:bg-muted/30 ${!n.read ? "bg-primary/5" : ""}`}
+              >
+                {content}
+              </Link>
+            ) : (
+              <div key={n.id} className={`flex items-start gap-4 p-4 ${!n.read ? "bg-primary/5" : ""}`}>
+                {content}
               </div>
             );
           })}

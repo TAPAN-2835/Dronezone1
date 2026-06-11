@@ -1,17 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, User, MapPin, Plane, CreditCard, History, Bell, HelpCircle, LogOut } from "lucide-react";
+import { ChevronRight, User, MapPin, Plane, CreditCard, History, Bell, HelpCircle, LogOut, Building2, Award, FileText, Shield, AlertOctagon } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customer } from "@/data/customer";
-import { toast } from "sonner";
+
+const iconMap = {
+  User, MapPin, Plane, CreditCard, History, Bell, HelpCircle, Building2, Award, FileText, Shield, AlertOctagon,
+};
 
 const items = [
-  { icon: User, label: "Personal Information" },
-  { icon: MapPin, label: "Saved Locations" },
-  { icon: Plane, label: "My Drones" },
-  { icon: CreditCard, label: "Payment Methods" },
-  { icon: History, label: "Service History", to: "/customer/requests" as const },
-  { icon: Bell, label: "Notification Preferences" },
-  { icon: HelpCircle, label: "Help & Support" },
+  { icon: "User" as const, label: "Personal Details", section: "personal" as const },
+  { icon: "Building2" as const, label: "Business Details", section: "business" as const },
+  { icon: "Award" as const, label: "Certifications", section: "certifications" as const },
+  { icon: "MapPin" as const, label: "Service Areas", section: "areas" as const },
+  { icon: "FileText" as const, label: "Documents", section: "documents" as const },
+  { icon: "CreditCard" as const, label: "Bank Details", section: "bank" as const },
+  { icon: "Shield" as const, label: "AMC Preferences", section: "amc-prefs" as const },
+  { icon: "Bell" as const, label: "Notification Preferences", section: "notifications" as const },
+  { icon: "History" as const, label: "Service History", to: "/customer/requests" as const },
+  { icon: "AlertOctagon" as const, label: "Raise Grievance", to: "/customer/grievances/new" as const },
+  { icon: "HelpCircle" as const, label: "Help & Support", section: "support" as const },
 ];
 
 export const Route = createFileRoute("/customer/profile")({
@@ -28,25 +35,21 @@ export const Route = createFileRoute("/customer/profile")({
         </div>
         <div className="mt-4 divide-y rounded-2xl border bg-card">
           {items.map((it) => {
+            const Icon = iconMap[it.icon];
             const content = (
               <div className="flex items-center gap-3 px-4 py-3.5">
-                <it.icon className="h-4 w-4 text-muted-foreground" />
+                <Icon className="h-4 w-4 text-muted-foreground" />
                 <span className="flex-1 text-sm font-medium">{it.label}</span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </div>
             );
-            return it.to ? (
-              <Link key={it.label} to={it.to}>
+            if ("to" in it && it.to) {
+              return <Link key={it.label} to={it.to}>{content}</Link>;
+            }
+            return (
+              <Link key={it.label} to="/customer/profile/$section" params={{ section: it.section! }}>
                 {content}
               </Link>
-            ) : (
-              <button
-                key={it.label}
-                onClick={() => toast.info(`${it.label} is currently read-only in demo mode.`)}
-                className="w-full text-left hover:bg-muted/30 transition-colors"
-              >
-                {content}
-              </button>
             );
           })}
         </div>
