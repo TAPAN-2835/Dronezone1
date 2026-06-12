@@ -93,11 +93,11 @@ export const customerRequests: CustomerRequest[] = [
 ];
 
 export const customerNotifications = [
-  { id: "n1", category: "request" as const, title: "Your request REQ-1024 has been assigned", body: "Rahul Kumar will be in touch shortly.", time: "10 min ago", read: false },
-  { id: "n2", category: "request" as const, title: "Engineer is on the way", body: "Estimated arrival: 15 minutes.", time: "1 hr ago", read: false },
-  { id: "n3", category: "payment" as const, title: "Payment of ₹2,950 was successful", body: "Invoice #INV-2045 has been generated.", time: "Yesterday", read: true },
-  { id: "n4", category: "review" as const, title: "Please rate your recent service", body: "Help us improve by sharing your experience.", time: "Yesterday", read: true },
-  { id: "n5", category: "amc" as const, title: "AMC renewal coming up", body: "Your Premium AMC expires on 25 Dec 2026.", time: "3 days ago", read: true },
+  { id: "n1", category: "request" as const, title: "Your request REQ-1024 has been assigned", body: "Rahul Kumar will be in touch shortly.", time: "10 min ago", read: false, to: "/customer/requests/REQ-1024" },
+  { id: "n2", category: "request" as const, title: "Engineer is on the way", body: "Estimated arrival: 15 minutes.", time: "1 hr ago", read: false, to: "/customer/requests/REQ-1024" },
+  { id: "n3", category: "payment" as const, title: "Payment of ₹2,950 was successful", body: "Invoice #INV-2045 has been generated.", time: "Yesterday", read: true, to: "/customer/invoices" },
+  { id: "n4", category: "review" as const, title: "Please rate your recent service", body: "Help us improve by sharing your experience.", time: "Yesterday", read: true, to: "/customer/rate" },
+  { id: "n5", category: "amc" as const, title: "AMC renewal coming up", body: "Your Premium AMC expires on 25 Dec 2026.", time: "3 days ago", read: true, to: "/customer/amc" },
 ];
 
 export const invoice = {
@@ -123,6 +123,57 @@ export const amc = {
   visitsTotal: 4,
   benefits: ["Unlimited Repairs", "2 Free Services", "Priority Support", "Free Inspection"],
 };
+
+export const amcPlans = [
+  {
+    id: "basic",
+    name: "Basic AMC",
+    price: 4999,
+    period: "per year",
+    visits: 2,
+    recommended: false,
+    benefits: [
+      "2 Scheduled Visits",
+      "Basic Diagnostics",
+      "10% Repair Discount",
+      "Email Support",
+    ],
+  },
+  {
+    id: "premium",
+    name: "Premium AMC",
+    price: 9999,
+    period: "per year",
+    visits: 4,
+    recommended: true,
+    benefits: [
+      "4 Scheduled Visits",
+      "Unlimited Repairs",
+      "Priority Support",
+      "Free Inspection",
+      "2 Free Services",
+      "Firmware Updates",
+    ],
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise AMC",
+    price: 19999,
+    period: "per year",
+    visits: 12,
+    recommended: false,
+    benefits: [
+      "12 Scheduled Visits",
+      "Unlimited Repairs",
+      "24/7 Dedicated Support",
+      "Free Inspection",
+      "Free Parts Replacement",
+      "Firmware Updates",
+      "Fleet Management",
+      "On-Site Service",
+    ],
+  },
+];
 
 export const ratingCriteria = ["Service Quality", "Timeliness", "Professionalism", "Value for Money"];
 
