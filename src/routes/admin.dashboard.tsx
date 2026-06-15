@@ -12,7 +12,7 @@ export const Route = createFileRoute("/admin/dashboard")({
 const cards = [
   { label: "Total Users", value: adminStats.totalUsers.toLocaleString("en-IN"), delta: "+12.5%", icon: Users },
   { label: "Service Providers", value: adminStats.providers, delta: "+8.4%", icon: Wrench },
-  { label: "Total Requests", value: adminStats.requests.toLocaleString("en-IN"), delta: "+15.3%", icon: Inbox },
+  { label: "Total Resolved Requests", value: adminStats.requests.toLocaleString("en-IN"), delta: "+15.3%", icon: Inbox },
   { label: "Total Revenue", value: inr(adminStats.revenue), delta: "+18.7%", icon: IndianRupee },
 ];
 
@@ -42,6 +42,33 @@ function Dashboard() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pending Requests Bottlenecks */}
+      <div className="rounded-xl border border-warning/30 bg-warning/5 p-4 sm:p-5">
+        <div className="mb-4 font-display text-base font-semibold text-warning-foreground">Operational Bottlenecks (Pending)</div>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+          <div className="border-l-2 border-warning pl-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Total Pending</div>
+            <div className="mt-1 font-display text-2xl font-bold">142</div>
+          </div>
+          <div className="border-l-2 border-warning/50 pl-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Awaiting Customer</div>
+            <div className="mt-1 font-display text-xl font-semibold">45</div>
+          </div>
+          <div className="border-l-2 border-warning/50 pl-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Awaiting Provider</div>
+            <div className="mt-1 font-display text-xl font-semibold">68</div>
+          </div>
+          <div className="border-l-2 border-warning/50 pl-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Quotation Pending</div>
+            <div className="mt-1 font-display text-xl font-semibold">21</div>
+          </div>
+          <div className="border-l-2 border-warning/50 pl-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Timeline Revisions</div>
+            <div className="mt-1 font-display text-xl font-semibold">8</div>
+          </div>
+        </div>
       </div>
 
       {/* Chart + Recent Requests */}

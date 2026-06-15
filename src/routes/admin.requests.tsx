@@ -3,6 +3,8 @@ import { adminRequests } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 
+const activeRequests = adminRequests.filter((r) => !["Completed", "Resolved", "Archived", "Closed"].includes(r.status));
+
 const priorityClass = (p: string) =>
   p === "High" ? "text-destructive" : p === "Medium" ? "text-warning" : "text-muted-foreground";
 
@@ -27,7 +29,7 @@ export const Route = createFileRoute("/admin/requests")({
               </tr>
             </thead>
             <tbody>
-              {adminRequests.map((r) => (
+              {activeRequests.map((r) => (
                 <tr key={r.id} className="border-t hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-semibold">{r.id}</td>
                   <td className="px-4 py-3">
@@ -54,7 +56,7 @@ export const Route = createFileRoute("/admin/requests")({
       </div>
 
       <div className="space-y-3 sm:hidden">
-        {adminRequests.map((r) => (
+        {activeRequests.map((r) => (
           <Link key={r.id} to="/admin/requests/$id" params={{ id: r.id }} className="block rounded-xl border bg-card p-4 hover:bg-accent/30">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">

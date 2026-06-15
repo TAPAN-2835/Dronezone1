@@ -52,7 +52,41 @@ function AdminRequestDetail() {
             <div><span className="text-muted-foreground">Submitted: </span>{new Date(req.createdAt).toLocaleString("en-IN", { dateStyle: "full", timeStyle: "short" })}</div>
           </CardContent>
         </Card>
+        
         <Card>
+          <CardHeader><CardTitle className="text-sm">Workflow Status</CardTitle></CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Current Stage</div>
+                <div className="mt-1 font-semibold">{req.status}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Waiting For</div>
+                <div className="mt-1 font-semibold text-warning">{req.status === "New" ? "Provider Action" : req.status === "In Progress" ? "Customer Approval" : "None"}</div>
+              </div>
+            </div>
+            
+            <div className="pt-2">
+              <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">Workflow Progress</div>
+              <div className="flex items-center gap-1 text-xs">
+                <span className="font-semibold text-primary">Submitted</span>
+                <span className="text-muted-foreground">→</span>
+                <span className={req.status === "New" ? "font-semibold text-primary" : "text-muted-foreground"}>Review</span>
+                <span className="text-muted-foreground">→</span>
+                <span className={req.status === "In Progress" ? "font-semibold text-primary" : "text-muted-foreground"}>Quotation</span>
+                <span className="text-muted-foreground">→</span>
+                <span className="text-muted-foreground">Approval</span>
+                <span className="text-muted-foreground">→</span>
+                <span className="text-muted-foreground">Active Job</span>
+                <span className="text-muted-foreground">→</span>
+                <span className={req.status === "Completed" ? "font-semibold text-primary" : "text-muted-foreground"}>Resolved</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
           <CardHeader><CardTitle className="text-sm">Actions</CardTitle></CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             <Button asChild variant="outline"><Link to="/admin/jobs/$id" params={{ id: req.id }}>View as Job</Link></Button>

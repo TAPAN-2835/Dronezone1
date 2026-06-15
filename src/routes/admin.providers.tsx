@@ -27,7 +27,7 @@ export const Route = createFileRoute("/admin/providers")({
                     <td className="px-4 py-3 text-muted-foreground">{p.business}</td>
                     <td className="px-4 py-3 text-muted-foreground">{p.submitted}</td>
                     <td className="px-4 py-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${p.status === "Pending" ? "bg-warning/15 text-[oklch(0.45_0.15_75)]" : "bg-primary/10 text-primary"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${p.status === "Pending" ? "bg-warning/15 text-[oklch(0.45_0.15_75)]" : p.status === "Rejected" ? "bg-destructive/15 text-destructive" : p.status === "In Review" ? "bg-primary/10 text-primary" : "bg-success/15 text-success"}`}>
                         {p.status}
                       </span>
                     </td>
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/admin/providers")({
                     <div className="font-semibold">{p.provider}</div>
                     <div className="truncate text-xs text-muted-foreground">{p.business}</div>
                   </div>
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${p.status === "Pending" ? "bg-warning/15 text-[oklch(0.45_0.15_75)]" : "bg-primary/10 text-primary"}`}>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${p.status === "Pending" ? "bg-warning/15 text-[oklch(0.45_0.15_75)]" : p.status === "Rejected" ? "bg-destructive/15 text-destructive" : p.status === "In Review" ? "bg-primary/10 text-primary" : "bg-success/15 text-success"}`}>
                     {p.status}
                   </span>
                 </div>
