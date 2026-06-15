@@ -36,7 +36,9 @@ export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: Gr
           className="mt-1.5 flex h-10 w-full rounded-lg border bg-card px-3 text-sm"
         >
           {grievanceCategories.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
       </div>
@@ -50,19 +52,34 @@ export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: Gr
           className="mt-1.5 flex h-10 w-full rounded-lg border bg-card px-3 text-sm"
         >
           {["Low", "Medium", "High", "Critical"].map((p) => (
-            <option key={p} value={p}>{p}</option>
+            <option key={p} value={p}>
+              {p}
+            </option>
           ))}
         </select>
       </div>
 
       <div>
         <Label htmlFor="against">Against (party name)</Label>
-        <Input id="against" value={against} onChange={(e) => setAgainst(e.target.value)} placeholder="Name of customer or provider" className="mt-1.5" required />
+        <Input
+          id="against"
+          value={against}
+          onChange={(e) => setAgainst(e.target.value)}
+          placeholder="Name of customer or provider"
+          className="mt-1.5"
+          required
+        />
       </div>
 
       <div>
         <Label htmlFor="jobId">Related Job ID (optional)</Label>
-        <Input id="jobId" value={jobId} onChange={(e) => setJobId(e.target.value)} placeholder="e.g. REQ-1024" className="mt-1.5" />
+        <Input
+          id="jobId"
+          value={jobId}
+          onChange={(e) => setJobId(e.target.value)}
+          placeholder="e.g. REQ-1024"
+          className="mt-1.5"
+        />
       </div>
 
       <div>
@@ -85,7 +102,9 @@ export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: Gr
 
       <input type="hidden" value={raisedByType} />
 
-      <Button type="submit" className="w-full">Submit Grievance</Button>
+      <Button type="submit" className="w-full">
+        Submit Grievance
+      </Button>
     </form>
   );
 }

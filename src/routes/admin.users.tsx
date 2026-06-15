@@ -31,7 +31,9 @@ export const Route = createFileRoute("/admin/users")({
                   <td className="px-4 py-3 text-right font-semibold">{u.requests}</td>
                   <td className="px-4 py-3 text-right">
                     <Button variant="outline" size="sm" asChild>
-                      <Link to="/admin/users/$id" params={{ id: u.id }}>View Details</Link>
+                      <Link to="/admin/users/$id" params={{ id: u.id }}>
+                        View Details
+                      </Link>
                     </Button>
                   </td>
                 </tr>
@@ -43,7 +45,12 @@ export const Route = createFileRoute("/admin/users")({
 
       <div className="space-y-3 sm:hidden">
         {adminUsers.map((u) => (
-          <Link key={u.id} to="/admin/users/$id" params={{ id: u.id }} className="block rounded-xl border bg-card p-4 hover:bg-accent/30">
+          <Link
+            key={u.id}
+            to="/admin/users/$id"
+            params={{ id: u.id }}
+            className="block rounded-xl border bg-card p-4 hover:bg-accent/30"
+          >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="font-semibold">{u.name}</div>

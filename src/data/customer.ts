@@ -6,7 +6,17 @@ export interface CustomerRequest {
   drone: string;
   issue: string;
   description: string;
-  status: "draft" | "submitted" | "review" | "quotation_pending" | "awaiting_approval" | "active_job" | "resolved" | "feedback_submitted" | "closed" | string;
+  status:
+    | "draft"
+    | "submitted"
+    | "review"
+    | "quotation_pending"
+    | "awaiting_approval"
+    | "active_job"
+    | "resolved"
+    | "feedback_submitted"
+    | "closed"
+    | string;
   createdAt: string;
   scheduledAt: string;
   location: string;
@@ -73,7 +83,8 @@ export const customerRequests: CustomerRequest[] = [
     drone: "DJI Mavic 3 Pro",
     issue: "Propeller Issue",
     description: "One of the propellers is vibrating abnormally during flight.",
-    originalDescription: "One of the propellers is vibrating abnormally. Noticed after a minor collision with a tree branch. Drone still flies but vibration is concerning.",
+    originalDescription:
+      "One of the propellers is vibrating abnormally. Noticed after a minor collision with a tree branch. Drone still flies but vibration is concerning.",
     status: "review",
     createdAt: "20 May 2026, 09:30 AM",
     scheduledAt: "20 May 2026, 11:00 AM",
@@ -91,7 +102,8 @@ export const customerRequests: CustomerRequest[] = [
     drone: "DJI Mini 4 Pro",
     issue: "Battery Not Charging",
     description: "Battery shows red indicator and won't charge past 20%.",
-    originalDescription: "Battery shows red indicator and won't charge past 20%. Tried different charger and cable.",
+    originalDescription:
+      "Battery shows red indicator and won't charge past 20%. Tried different charger and cable.",
     status: "resolved",
     createdAt: "10 Apr 2026, 02:00 PM",
     scheduledAt: "11 Apr 2026, 10:00 AM",
@@ -99,9 +111,7 @@ export const customerRequests: CustomerRequest[] = [
     urgent: false,
     provider: { name: "Arjun Patel", phone: "+91 98201 55678", rating: 4.7 },
     amount: 2950,
-    attachments: [
-      { id: "ca4", name: "Battery Photo", type: "image" },
-    ],
+    attachments: [{ id: "ca4", name: "Battery Photo", type: "image" }],
   },
   {
     id: "REQ-0987",
@@ -143,12 +153,65 @@ export interface CustomerNotification {
 }
 
 export const customerNotifications: CustomerNotification[] = [
-  { id: "n1", category: "request", title: "Your request REQ-1024 has been assigned", body: "Rahul Kumar will be in touch shortly.", time: "10 min ago", read: false, href: "/customer/requests/REQ-1024", relatedId: "REQ-1024" },
-  { id: "n2", category: "request", title: "Engineer is on the way", body: "Estimated arrival: 15 minutes.", time: "1 hr ago", read: false, href: "/customer/requests/REQ-1024", relatedId: "REQ-1024" },
-  { id: "n3", category: "payment", title: "Payment of ₹2,950 was successful", body: "Invoice #INV-2045 has been generated.", time: "Yesterday", read: true, href: "/customer/invoices", relatedId: "INV-2045" },
-  { id: "n4", category: "review", title: "Please rate your recent service", body: "Help us improve by sharing your experience.", time: "Yesterday", read: true, href: "/customer/rate", relatedId: "REQ-1023" },
-  { id: "n5", category: "amc", title: "AMC renewal coming up", body: "Your Premium AMC expires on 25 Dec 2026.", time: "3 days ago", read: true, href: "/customer/amc" },
-  { id: "n6", category: "grievance", title: "Grievance GRV-1004 updated", body: "Admin is reviewing your billing grievance.", time: "2 days ago", read: true, href: "/customer/grievances/new", relatedId: "GRV-1004" },
+  {
+    id: "n1",
+    category: "request",
+    title: "Your request REQ-1024 has been assigned",
+    body: "Rahul Kumar will be in touch shortly.",
+    time: "10 min ago",
+    read: false,
+    href: "/customer/requests/REQ-1024",
+    relatedId: "REQ-1024",
+  },
+  {
+    id: "n2",
+    category: "request",
+    title: "Engineer is on the way",
+    body: "Estimated arrival: 15 minutes.",
+    time: "1 hr ago",
+    read: false,
+    href: "/customer/requests/REQ-1024",
+    relatedId: "REQ-1024",
+  },
+  {
+    id: "n3",
+    category: "payment",
+    title: "Payment of ₹2,950 was successful",
+    body: "Invoice #INV-2045 has been generated.",
+    time: "Yesterday",
+    read: true,
+    href: "/customer/invoices",
+    relatedId: "INV-2045",
+  },
+  {
+    id: "n4",
+    category: "review",
+    title: "Please rate your recent service",
+    body: "Help us improve by sharing your experience.",
+    time: "Yesterday",
+    read: true,
+    href: "/customer/rate",
+    relatedId: "REQ-1023",
+  },
+  {
+    id: "n5",
+    category: "amc",
+    title: "AMC renewal coming up",
+    body: "Your Premium AMC expires on 25 Dec 2026.",
+    time: "3 days ago",
+    read: true,
+    href: "/customer/amc",
+  },
+  {
+    id: "n6",
+    category: "grievance",
+    title: "Grievance GRV-1004 updated",
+    body: "Admin is reviewing your billing grievance.",
+    time: "2 days ago",
+    read: true,
+    href: "/customer/grievances/new",
+    relatedId: "GRV-1004",
+  },
 ];
 
 export const invoice = {
@@ -191,7 +254,13 @@ export const amcPlans: AmcPlan[] = [
     price: 8999,
     duration: "12 months",
     visits: 4,
-    benefits: ["4 Free Services", "20% Repair Discount", "Priority Support", "Free Pickup & Drop", "Annual Inspection"],
+    benefits: [
+      "4 Free Services",
+      "20% Repair Discount",
+      "Priority Support",
+      "Free Pickup & Drop",
+      "Annual Inspection",
+    ],
     popular: true,
   },
   {
@@ -200,7 +269,14 @@ export const amcPlans: AmcPlan[] = [
     price: 14999,
     duration: "12 months",
     visits: 6,
-    benefits: ["6 Free Services", "Unlimited Repairs", "Priority Support", "Free Pickup & Drop", "Spare Parts Discount", "Dedicated Engineer"],
+    benefits: [
+      "6 Free Services",
+      "Unlimited Repairs",
+      "Priority Support",
+      "Free Pickup & Drop",
+      "Spare Parts Discount",
+      "Dedicated Engineer",
+    ],
   },
 ];
 
@@ -212,10 +288,22 @@ export const amc = {
   visitsUsed: 2,
   visitsTotal: 6,
   autoRenewal: true,
-  benefits: ["Unlimited Repairs", "6 Free Services", "Priority Support", "Free Inspection", "Spare Parts Discount", "Dedicated Engineer"],
+  benefits: [
+    "Unlimited Repairs",
+    "6 Free Services",
+    "Priority Support",
+    "Free Inspection",
+    "Spare Parts Discount",
+    "Dedicated Engineer",
+  ],
 };
 
-export const ratingCriteria = ["Service Quality", "Timeliness", "Professionalism", "Value for Money"];
+export const ratingCriteria = [
+  "Service Quality",
+  "Timeliness",
+  "Professionalism",
+  "Value for Money",
+];
 
 export const chatMessages = [
   { from: "provider" as const, text: "Hi John, I am on the way", time: "10:30 AM" },

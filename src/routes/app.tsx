@@ -7,7 +7,5 @@ export const Route = createFileRoute("/app")({
       throw redirect({ to: "/app/dashboard" });
     }
   },
-  component: () => (
-    <AppShell />
-  ),
+  component: () => <AppShell />,
 });

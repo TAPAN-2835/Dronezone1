@@ -1,5 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, User, Building2, Award, MapPin, FileText, CreditCard, Shield, Bell, HelpCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Building2,
+  Award,
+  MapPin,
+  FileText,
+  CreditCard,
+  Shield,
+  Bell,
+  HelpCircle,
+} from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customer, type ProfileSectionId } from "@/data/customer";
 import { Switch } from "@/components/ui/switch";
@@ -37,7 +48,10 @@ function ProfileSection() {
   return (
     <CustomerShell title={meta.title} showBack>
       <div className="px-5 py-5">
-        <Link to="/customer/profile" className="mb-4 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+        <Link
+          to="/customer/profile"
+          className="mb-4 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-3.5 w-3.5" /> Profile
         </Link>
 
@@ -72,17 +86,26 @@ function ProfileSection() {
 
         {section === "areas" && (
           <div className="rounded-2xl border bg-card p-4">
-            <div className="mb-3 text-xs font-semibold uppercase text-muted-foreground">Saved Locations</div>
+            <div className="mb-3 text-xs font-semibold uppercase text-muted-foreground">
+              Saved Locations
+            </div>
             {customer.addresses.map((a) => (
               <div key={a.label} className="mb-3 text-sm">
                 <div className="font-semibold">{a.label}</div>
                 <div className="text-muted-foreground">{a.address}</div>
               </div>
             ))}
-            <div className="mt-4 text-xs font-semibold uppercase text-muted-foreground">Service Areas</div>
+            <div className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
+              Service Areas
+            </div>
             <div className="mt-2 flex flex-wrap gap-2">
               {customer.serviceAreas.map((a) => (
-                <span key={a} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">{a}</span>
+                <span
+                  key={a}
+                  className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                >
+                  {a}
+                </span>
               ))}
             </div>
           </div>
@@ -93,7 +116,11 @@ function ProfileSection() {
             {customer.documents.map((d) => (
               <div key={d.name} className="flex items-center justify-between p-4 text-sm">
                 <span>{d.name}</span>
-                <span className={`text-xs font-semibold ${d.status === "Verified" ? "text-success" : "text-warning"}`}>{d.status}</span>
+                <span
+                  className={`text-xs font-semibold ${d.status === "Verified" ? "text-success" : "text-warning"}`}
+                >
+                  {d.status}
+                </span>
               </div>
             ))}
           </div>
@@ -143,11 +170,15 @@ function ProfileSection() {
 
         {section === "personal" && (
           <div className="mt-4 rounded-2xl border bg-card p-4">
-            <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">My Drones</div>
+            <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
+              My Drones
+            </div>
             {customer.drones.map((d) => (
               <div key={d.serial} className="border-t py-3 first:border-0 first:pt-0 text-sm">
                 <div className="font-semibold">{d.model}</div>
-                <div className="text-xs text-muted-foreground">{d.serial} · {d.purchaseDate} · Warranty: {d.warranty}</div>
+                <div className="text-xs text-muted-foreground">
+                  {d.serial} · {d.purchaseDate} · Warranty: {d.warranty}
+                </div>
               </div>
             ))}
           </div>

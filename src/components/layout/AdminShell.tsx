@@ -65,7 +65,9 @@ function AdminSidebarContent({ pathname, onNavigate }: AdminSidebarContentProps)
               onClick={onNavigate}
               className={cn(
                 "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
-                active ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/5 hover:text-white",
+                active
+                  ? "bg-white/10 text-white"
+                  : "text-white/65 hover:bg-white/5 hover:text-white",
               )}
             >
               {active && (
@@ -167,7 +169,9 @@ export function AdminShell() {
           </button>
           <div className="flex items-center gap-2.5 rounded-lg border bg-card px-2 py-1.5">
             <Avatar className="h-7 w-7">
-              <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">AD</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                AD
+              </AvatarFallback>
             </Avatar>
             <div className="hidden sm:block">
               <div className="text-xs font-semibold leading-tight">Admin</div>

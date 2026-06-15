@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
-  MapPin,
   Phone,
   MessageSquare,
   Calendar,
@@ -22,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { jobs, quotations, inr } from "@/data/demo";
-import { getMapEmbedUrl, getMapSearchUrl } from "@/lib/map-utils";
 
 export const Route = createFileRoute("/app/jobs/$id")({
   head: ({ params }) => ({ meta: [{ title: `Job ${params.id} — DroneZone` }] }),
@@ -122,7 +120,10 @@ function JobDetails() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarFallback className="bg-primary/10 font-semibold text-primary">
-                    {job.customer.name.split(" ").map((p) => p[0]).join("")}
+                    {job.customer.name
+                      .split(" ")
+                      .map((p) => p[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -131,7 +132,13 @@ function JobDetails() {
                 </div>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <Field label="Request date" value={new Date(job.createdAt).toLocaleString("en-IN", { dateStyle: "full", timeStyle: "short" })} />
+                <Field
+                  label="Request date"
+                  value={new Date(job.createdAt).toLocaleString("en-IN", {
+                    dateStyle: "full",
+                    timeStyle: "short",
+                  })}
+                />
                 <Field label="Current status" value={job.status.replace("_", " ")} />
                 <Field label="Assigned engineer" value={job.assignedEngineer ?? "Not assigned"} />
                 <Field label="Service category" value={job.serviceCategory ?? "—"} />
@@ -172,7 +179,10 @@ function JobDetails() {
               <CardContent>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {job.attachments.map((a) => (
-                    <div key={a.id} className="flex aspect-video flex-col items-center justify-center rounded-lg border bg-muted/40 p-3 text-center">
+                    <div
+                      key={a.id}
+                      className="flex aspect-video flex-col items-center justify-center rounded-lg border bg-muted/40 p-3 text-center"
+                    >
                       <Paperclip className="h-5 w-5 text-muted-foreground" />
                       <span className="mt-2 text-xs font-medium">{a.name}</span>
                     </div>
@@ -198,7 +208,10 @@ function JobDetails() {
                       </span>
                       <div className="text-sm font-semibold">{event.label}</div>
                       <div className="text-xs text-muted-foreground">
-                        {new Date(event.timestamp).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                        {new Date(event.timestamp).toLocaleString("en-IN", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
                       </div>
                     </li>
                   ))}
@@ -230,14 +243,47 @@ function JobDetails() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Parts</span><span>{inr(quote.partsCost)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Labour</span><span>{inr(quote.laborCost)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Travel</span><span>{inr(quote.travelCost)}</span></div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Hardware Cost</span>
+                  <span>{inr(quote.hardwareCost)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Labour</span>
+                  <span>{inr(quote.laborCost)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span>{inr(quote.shippingCost)}</span>
+                </div>
+                {quote.discountPercent > 0 && (
+                  <div className="flex justify-between text-success">
+                    <span>Discount ({quote.discountPercent}%)</span>
+                    <span>
+                      −{" "}
+                      {inr(
+                        Math.round(
+                          ((quote.hardwareCost + quote.laborCost + quote.shippingCost) *
+                            quote.discountPercent) /
+                            100,
+                        ),
+                      )}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t pt-2 font-semibold">
                   <span>Total (incl. GST)</span>
-                  <span>{inr(quote.partsCost + quote.laborCost + quote.travelCost - quote.discount + Math.round((quote.partsCost + quote.laborCost + quote.travelCost - quote.discount) * quote.gstPercent / 100))}</span>
+                  <span>
+                    {(() => {
+                      const sub = quote.hardwareCost + quote.laborCost + quote.shippingCost;
+                      const disc = Math.round((sub * quote.discountPercent) / 100);
+                      const after = sub - disc;
+                      return inr(after + Math.round((after * quote.gstPercent) / 100));
+                    })()}
+                  </span>
                 </div>
-                <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium capitalize text-primary">{quote.status}</span>
+                <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium capitalize text-primary">
+                  {quote.status.replace("_", " ")}
+                </span>
               </CardContent>
             </Card>
           )}
@@ -248,7 +294,7 @@ function JobDetails() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2 text-sm">
-                <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                <span className="mt-0.5 text-muted-foreground font-medium">•</span>
                 {job.location}
               </div>
             </CardContent>

@@ -14,7 +14,11 @@ const iconMap = {
 export const Route = createFileRoute("/customer/notifications")({
   head: () => ({ meta: [{ title: "Notifications — DroneZone" }] }),
   component: () => (
-    <CustomerShell title="Notifications" showBack rightSlot={<button className="text-xs font-semibold text-primary">Mark all read</button>}>
+    <CustomerShell
+      title="Notifications"
+      showBack
+      rightSlot={<button className="text-xs font-semibold text-primary">Mark all read</button>}
+    >
       <div className="px-4 py-3">
         {customerNotifications.map((n) => {
           const Icon = iconMap[n.category];

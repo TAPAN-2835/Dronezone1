@@ -14,11 +14,15 @@ export const Route = createFileRoute("/admin/marketing")({
           {/* Campaign Analytics */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="rounded-xl border bg-card p-4">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">Emails Sent</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Emails Sent
+              </div>
               <div className="mt-1 font-display text-2xl font-bold">14,200</div>
             </div>
             <div className="rounded-xl border bg-card p-4">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">Delivery Rate</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Delivery Rate
+              </div>
               <div className="mt-1 font-display text-2xl font-bold text-success">98.2%</div>
             </div>
             <div className="rounded-xl border bg-card p-4">
@@ -26,7 +30,9 @@ export const Route = createFileRoute("/admin/marketing")({
               <div className="mt-1 font-display text-2xl font-bold">42.5%</div>
             </div>
             <div className="rounded-xl border bg-card p-4">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">Click Rate</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Click Rate
+              </div>
               <div className="mt-1 font-display text-2xl font-bold">12.8%</div>
             </div>
           </div>
@@ -52,7 +58,9 @@ export const Route = createFileRoute("/admin/marketing")({
                       <td className="px-4 py-3 text-muted-foreground">{c.audience}</td>
                       <td className="px-4 py-3 text-muted-foreground">{c.sent}</td>
                       <td className="px-4 py-3">
-                        <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">{c.status}</span>
+                        <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
+                          {c.status}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -68,9 +76,13 @@ export const Route = createFileRoute("/admin/marketing")({
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="font-semibold truncate">{c.name}</div>
-                    <div className="text-xs text-muted-foreground">{c.type} · {c.audience}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {c.type} · {c.audience}
+                    </div>
                   </div>
-                  <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">{c.status}</span>
+                  <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
+                    {c.status}
+                  </span>
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">Sent: {c.sent}</div>
               </div>
@@ -80,15 +92,24 @@ export const Route = createFileRoute("/admin/marketing")({
 
         {/* Create campaign form */}
         <div className="rounded-xl border bg-card p-4 sm:p-5 h-fit">
-          <div className="font-display font-semibold text-lg border-b pb-3 mb-4">Create New Campaign</div>
+          <div className="font-display font-semibold text-lg border-b pb-3 mb-4">
+            Create New Campaign
+          </div>
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase">Campaign Name</label>
-              <input placeholder="e.g. Summer Promo" className="mt-1 h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15" />
+              <label className="text-xs font-semibold text-muted-foreground uppercase">
+                Campaign Name
+              </label>
+              <input
+                placeholder="e.g. Summer Promo"
+                className="mt-1 h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+              />
             </div>
-            
+
             <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase">Campaign Type</label>
+              <label className="text-xs font-semibold text-muted-foreground uppercase">
+                Campaign Type
+              </label>
               <select className="mt-1 h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:border-primary/40">
                 <option>Promotion</option>
                 <option>Discount</option>
@@ -98,7 +119,9 @@ export const Route = createFileRoute("/admin/marketing")({
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase">Recipients</label>
+              <label className="text-xs font-semibold text-muted-foreground uppercase">
+                Recipients
+              </label>
               <select className="mt-1 h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:border-primary/40">
                 <option>Select Existing Users (All)</option>
                 <option>Select Existing Users (Active)</option>
@@ -108,12 +131,19 @@ export const Route = createFileRoute("/admin/marketing")({
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase">Email Subject</label>
-              <input placeholder="Subject Line" className="mt-1 h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15" />
+              <label className="text-xs font-semibold text-muted-foreground uppercase">
+                Email Subject
+              </label>
+              <input
+                placeholder="Subject Line"
+                className="mt-1 h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+              />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase">Message Content</label>
+              <label className="text-xs font-semibold text-muted-foreground uppercase">
+                Message Content
+              </label>
               <textarea
                 rows={5}
                 placeholder="Write your email body here..."

@@ -24,9 +24,11 @@ function Rate() {
         <div className="text-xs uppercase tracking-wide text-muted-foreground">REQ-1024</div>
         <div className="mt-1 font-display text-lg font-semibold">Overall Rating</div>
         <div className="mt-4 flex justify-center gap-1.5">
-          {[1,2,3,4,5].map((n) => (
+          {[1, 2, 3, 4, 5].map((n) => (
             <button key={n} onClick={() => setRating(n)}>
-              <Star className={`h-9 w-9 ${n <= rating ? "fill-warning text-warning" : "text-muted-foreground/40"}`} />
+              <Star
+                className={`h-9 w-9 ${n <= rating ? "fill-warning text-warning" : "text-muted-foreground/40"}`}
+              />
             </button>
           ))}
         </div>
@@ -39,7 +41,7 @@ function Rate() {
             return (
               <button
                 key={c}
-                onClick={() => setTags((t) => active ? t.filter((x) => x !== c) : [...t, c])}
+                onClick={() => setTags((t) => (active ? t.filter((x) => x !== c) : [...t, c]))}
                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${active ? "border-primary bg-primary/10 text-primary" : "bg-card text-muted-foreground"}`}
               >
                 {c}
@@ -50,10 +52,18 @@ function Rate() {
       </div>
       <div>
         <div className="mb-2 text-sm font-semibold">Your Feedback</div>
-        <textarea rows={4} placeholder="Share your experience…" defaultValue="Great service! The issue was resolved quickly." className="w-full rounded-xl border bg-card p-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15" />
+        <textarea
+          rows={4}
+          placeholder="Share your experience…"
+          defaultValue="Great service! The issue was resolved quickly."
+          className="w-full rounded-xl border bg-card p-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+        />
       </div>
       <button
-        onClick={() => { toast.success("Thank you for your feedback!"); nav({ to: "/customer/dashboard" }); }}
+        onClick={() => {
+          toast.success("Thank you for your feedback!");
+          nav({ to: "/customer/dashboard" });
+        }}
         className="h-12 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
       >
         Submit Review

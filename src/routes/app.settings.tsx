@@ -13,7 +13,10 @@ export const Route = createFileRoute("/app/settings")({
 function Settings() {
   return (
     <>
-      <PageHeader title="Settings" description="Preferences, notifications, and account security." />
+      <PageHeader
+        title="Settings"
+        description="Preferences, notifications, and account security."
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Section icon={Bell} title="Notifications">
@@ -52,7 +55,15 @@ function Settings() {
   );
 }
 
-function Section({ icon: Icon, title, children }: { icon: typeof Bell; title: string; children: React.ReactNode }) {
+function Section({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: typeof Bell;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <Card>
       <CardHeader>
@@ -81,7 +92,9 @@ function Row({ label, value, cta }: { label: string; value?: string; cta: string
         <div className="text-sm font-medium">{label}</div>
         {value && <div className="text-xs text-muted-foreground">{value}</div>}
       </div>
-      <Button variant="ghost" size="sm" className="text-primary">{cta}</Button>
+      <Button variant="ghost" size="sm" className="text-primary">
+        {cta}
+      </Button>
     </div>
   );
 }

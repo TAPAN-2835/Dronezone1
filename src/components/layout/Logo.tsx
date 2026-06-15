@@ -19,8 +19,12 @@ export function Logo({
       />
       {withText && (
         <div className="leading-tight">
-          <div className="font-display text-base font-bold tracking-tight text-foreground">DroneZone</div>
-          <div className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{tagline}</div>
+          <div className="font-display text-base font-bold tracking-tight text-foreground">
+            DroneZone
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+            {tagline}
+          </div>
         </div>
       )}
     </div>

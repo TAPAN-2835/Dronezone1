@@ -16,10 +16,18 @@ export const Route = createFileRoute("/app/requests")({
   component: Requests,
 });
 
-const tabs: { id: "all" | "new" | "accepted" | "rejected"; label: string; filter: (s: JobStatus) => boolean }[] = [
+const tabs: {
+  id: "all" | "new" | "accepted" | "rejected";
+  label: string;
+  filter: (s: JobStatus) => boolean;
+}[] = [
   { id: "all", label: "All", filter: () => true },
   { id: "new", label: "New", filter: (s) => s === "new" },
-  { id: "accepted", label: "Accepted", filter: (s) => ["accepted", "in_progress", "en_route", "on_site", "testing"].includes(s) },
+  {
+    id: "accepted",
+    label: "Accepted",
+    filter: (s) => ["accepted", "in_progress", "en_route", "on_site", "testing"].includes(s),
+  },
   { id: "rejected", label: "Rejected", filter: (s) => s === "rejected" || s === "cancelled" },
 ];
 
@@ -45,7 +53,9 @@ function Requests() {
   const counts = {
     all: jobs.length,
     new: jobs.filter((j) => j.status === "new").length,
-    accepted: jobs.filter((j) => ["accepted", "in_progress", "en_route", "on_site", "testing"].includes(j.status)).length,
+    accepted: jobs.filter((j) =>
+      ["accepted", "in_progress", "en_route", "on_site", "testing"].includes(j.status),
+    ).length,
     rejected: jobs.filter((j) => j.status === "rejected" || j.status === "cancelled").length,
   } as const;
 
@@ -77,7 +87,9 @@ function Requests() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`relative whitespace-nowrap rounded-md px-3 py-1.5 font-medium transition ${
-                tab === t.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                tab === t.id
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {t.label}
@@ -104,7 +116,9 @@ function Requests() {
                       <StatusBadge status={j.status} />
                       <JobAgeBadge createdAt={j.createdAt} />
                     </div>
-                    <h3 className="mt-1 truncate font-display text-base font-semibold">{j.issue}</h3>
+                    <h3 className="mt-1 truncate font-display text-base font-semibold">
+                      {j.issue}
+                    </h3>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />
@@ -112,7 +126,10 @@ function Requests() {
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" />
-                        {new Date(j.scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                        {new Date(j.scheduledAt).toLocaleString("en-IN", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
                       </span>
                     </div>
                     <div className="mt-3 text-sm">
@@ -125,11 +142,15 @@ function Requests() {
                 <div className="mt-4 flex items-center gap-2 border-t pt-4">
                   {j.status === "new" ? (
                     <Button asChild size="sm" className="flex-1 sm:flex-none">
-                      <Link to="/app/requests/$id" params={{ id: j.id }}>Review request</Link>
+                      <Link to="/app/requests/$id" params={{ id: j.id }}>
+                        Review request
+                      </Link>
                     </Button>
                   ) : (
                     <Button asChild size="sm" variant="outline" className="flex-1 sm:flex-none">
-                      <Link to="/app/jobs/$id" params={{ id: j.id }}>View details</Link>
+                      <Link to="/app/jobs/$id" params={{ id: j.id }}>
+                        View details
+                      </Link>
                     </Button>
                   )}
                   {j.status === "new" && (

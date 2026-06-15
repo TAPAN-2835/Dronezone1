@@ -6,7 +6,6 @@ export const Route = createFileRoute("/admin/profile")({
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">My Profile</h1>
       <div className="grid gap-6 lg:grid-cols-3">
-
         {/* Main profile card */}
         <div className="rounded-xl border bg-card p-5 sm:p-6 lg:col-span-2">
           {/* Avatar + name row — wraps gracefully */}
@@ -36,7 +35,9 @@ export const Route = createFileRoute("/admin/profile")({
         {/* Security sidebar */}
         <div className="rounded-xl border bg-card p-5 sm:p-6">
           <div className="font-display font-semibold">Security</div>
-          <p className="mt-2 text-sm text-muted-foreground">Manage password and two-factor authentication.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Manage password and two-factor authentication.
+          </p>
           <button className="mt-4 h-10 w-full rounded-lg border text-sm font-semibold hover:bg-accent transition-colors">
             Change Password
           </button>

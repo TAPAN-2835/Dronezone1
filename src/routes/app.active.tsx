@@ -64,7 +64,9 @@ function Active() {
                   <StatusBadge status={j.status} />
                 </div>
                 <div className="mt-1 truncate text-sm font-semibold">{j.issue}</div>
-                <div className="mt-0.5 truncate text-xs text-muted-foreground">{j.customer.name}</div>
+                <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {j.customer.name}
+                </div>
                 <JobAgeBadge createdAt={j.createdAt} className="mt-1.5" />
               </button>
             ))}
@@ -86,7 +88,9 @@ function Active() {
                     <MapPin className="h-3.5 w-3.5" /> {selected.location}
                   </div>
                   {selected.assignedEngineer && (
-                    <div className="mt-1 text-xs text-muted-foreground">Engineer: {selected.assignedEngineer}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Engineer: {selected.assignedEngineer}
+                    </div>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -101,7 +105,9 @@ function Active() {
                     </Link>
                   </Button>
                   <Button size="sm" asChild>
-                    <Link to="/app/jobs/$id" params={{ id: selected.id }}>Details</Link>
+                    <Link to="/app/jobs/$id" params={{ id: selected.id }}>
+                      Details
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -128,7 +134,9 @@ function Active() {
                               : "border-border bg-card text-muted-foreground"
                         }`}
                       >
-                        {done ? <Check className="h-3.5 w-3.5" /> : current ? (
+                        {done ? (
+                          <Check className="h-3.5 w-3.5" />
+                        ) : current ? (
                           <motion.span
                             animate={{ scale: [1, 1.4, 1] }}
                             transition={{ duration: 1.4, repeat: Infinity }}
@@ -140,7 +148,9 @@ function Active() {
                       </span>
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className={`text-sm font-semibold ${done || current ? "text-foreground" : "text-muted-foreground"}`}>
+                          <div
+                            className={`text-sm font-semibold ${done || current ? "text-foreground" : "text-muted-foreground"}`}
+                          >
                             {s.label}
                           </div>
                           <div className="text-xs text-muted-foreground">
@@ -148,7 +158,9 @@ function Active() {
                           </div>
                         </div>
                         {current && i < stages.length - 1 && (
-                          <Button size="sm" variant="outline">Update status</Button>
+                          <Button size="sm" variant="outline">
+                            Update status
+                          </Button>
                         )}
                       </div>
                     </li>
@@ -157,7 +169,9 @@ function Active() {
               </ol>
 
               <div className="mt-6 flex flex-wrap gap-2 border-t pt-5">
-                <Button><Check className="h-4 w-4" /> Mark as completed</Button>
+                <Button>
+                  <Check className="h-4 w-4" /> Mark as completed
+                </Button>
                 <Button variant="outline">Move to next stage</Button>
               </div>
             </CardContent>

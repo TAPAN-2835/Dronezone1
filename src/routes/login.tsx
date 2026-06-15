@@ -56,7 +56,8 @@ function LoginPage() {
             Run your drone service business — end to end.
           </h2>
           <p className="text-white/70">
-            Manage requests, send quotations, track active jobs, and chat with customers in one workspace.
+            Manage requests, send quotations, track active jobs, and chat with customers in one
+            workspace.
           </p>
           <ul className="space-y-3 text-sm">
             {[
@@ -90,7 +91,9 @@ function LoginPage() {
             <Logo />
           </div>
           <h1 className="font-display text-3xl font-semibold tracking-tight">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">Login to continue managing your services.</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Login to continue managing your services.
+          </p>
 
           <div className="mt-6 inline-flex rounded-lg border bg-card p-1 text-sm">
             <button
@@ -132,7 +135,13 @@ function LoginPage() {
                 <Label htmlFor="phone">Mobile number</Label>
                 <div className="relative">
                   <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input id="phone" type="tel" placeholder="+91 98765 43210" className="h-11 pl-9" required />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+91 98765 43210"
+                    className="h-11 pl-9"
+                    required
+                  />
                 </div>
               </div>
             )}
@@ -142,7 +151,9 @@ function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <button
                   type="button"
-                  onClick={() => toast.info("Demo mode: Password reset instructions have been sent.")}
+                  onClick={() =>
+                    toast.info("Demo mode: Password reset instructions have been sent.")
+                  }
                   className="text-xs font-medium text-primary hover:underline cursor-pointer"
                 >
                   Forgot password?
@@ -173,8 +184,15 @@ function LoginPage() {
               <Checkbox defaultChecked /> Remember me for 30 days
             </label>
 
-            <Button type="submit" size="lg" className="h-11 w-full text-sm font-semibold" disabled={loading}>
-              {loading ? "Signing in…" : (
+            <Button
+              type="submit"
+              size="lg"
+              className="h-11 w-full text-sm font-semibold"
+              disabled={loading}
+            >
+              {loading ? (
+                "Signing in…"
+              ) : (
                 <>
                   Login <ArrowRight className="ml-1 h-4 w-4" />
                 </>
@@ -189,7 +207,7 @@ function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
+            <Link to="/app/signup" className="font-semibold text-primary hover:underline">
               Sign up
             </Link>
           </p>

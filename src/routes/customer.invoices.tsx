@@ -21,7 +21,9 @@ function Invoice() {
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Invoice</div>
             <div className="mt-0.5 font-display text-xl font-bold">#{invoice.id}</div>
           </div>
-          <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">{invoice.status}</span>
+          <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
+            {invoice.status}
+          </span>
         </div>
         <div className="mt-4 flex justify-between text-sm">
           <span className="text-muted-foreground">Date</span>
@@ -59,5 +61,10 @@ function Invoice() {
 }
 
 function Row({ label, value }: { label: string; value: string }) {
-  return <div className="flex justify-between"><span className="text-muted-foreground">{label}</span><span>{value}</span></div>;
+  return (
+    <div className="flex justify-between">
+      <span className="text-muted-foreground">{label}</span>
+      <span>{value}</span>
+    </div>
+  );
 }

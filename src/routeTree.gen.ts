@@ -25,6 +25,8 @@ import { Route as CustomerInvoicesRouteImport } from './routes/customer.invoices
 import { Route as CustomerDashboardRouteImport } from './routes/customer.dashboard'
 import { Route as CustomerChatRouteImport } from './routes/customer.chat'
 import { Route as CustomerAmcRouteImport } from './routes/customer.amc'
+import { Route as AppVerificationRouteImport } from './routes/app.verification'
+import { Route as AppSignupRouteImport } from './routes/app.signup'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppScheduleRouteImport } from './routes/app.schedule'
 import { Route as AppRequestsRouteImport } from './routes/app.requests'
@@ -138,6 +140,16 @@ const CustomerAmcRoute = CustomerAmcRouteImport.update({
   id: '/amc',
   path: '/amc',
   getParentRoute: () => CustomerRoute,
+} as any)
+const AppVerificationRoute = AppVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSignupRoute = AppSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
@@ -332,6 +344,8 @@ export interface FileRoutesByFullPath {
   '/app/requests': typeof AppRequestsRouteWithChildren
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/signup': typeof AppSignupRoute
+  '/app/verification': typeof AppVerificationRoute
   '/customer/amc': typeof CustomerAmcRoute
   '/customer/chat': typeof CustomerChatRoute
   '/customer/dashboard': typeof CustomerDashboardRoute
@@ -383,6 +397,8 @@ export interface FileRoutesByTo {
   '/app/requests': typeof AppRequestsRouteWithChildren
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/signup': typeof AppSignupRoute
+  '/app/verification': typeof AppVerificationRoute
   '/customer/amc': typeof CustomerAmcRoute
   '/customer/chat': typeof CustomerChatRoute
   '/customer/dashboard': typeof CustomerDashboardRoute
@@ -435,6 +451,8 @@ export interface FileRoutesById {
   '/app/requests': typeof AppRequestsRouteWithChildren
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/signup': typeof AppSignupRoute
+  '/app/verification': typeof AppVerificationRoute
   '/customer/amc': typeof CustomerAmcRoute
   '/customer/chat': typeof CustomerChatRoute
   '/customer/dashboard': typeof CustomerDashboardRoute
@@ -488,6 +506,8 @@ export interface FileRouteTypes {
     | '/app/requests'
     | '/app/schedule'
     | '/app/settings'
+    | '/app/signup'
+    | '/app/verification'
     | '/customer/amc'
     | '/customer/chat'
     | '/customer/dashboard'
@@ -539,6 +559,8 @@ export interface FileRouteTypes {
     | '/app/requests'
     | '/app/schedule'
     | '/app/settings'
+    | '/app/signup'
+    | '/app/verification'
     | '/customer/amc'
     | '/customer/chat'
     | '/customer/dashboard'
@@ -590,6 +612,8 @@ export interface FileRouteTypes {
     | '/app/requests'
     | '/app/schedule'
     | '/app/settings'
+    | '/app/signup'
+    | '/app/verification'
     | '/customer/amc'
     | '/customer/chat'
     | '/customer/dashboard'
@@ -736,6 +760,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/customer/amc'
       preLoaderRoute: typeof CustomerAmcRouteImport
       parentRoute: typeof CustomerRoute
+    }
+    '/app/verification': {
+      id: '/app/verification'
+      path: '/verification'
+      fullPath: '/app/verification'
+      preLoaderRoute: typeof AppVerificationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/signup': {
+      id: '/app/signup'
+      path: '/signup'
+      fullPath: '/app/signup'
+      preLoaderRoute: typeof AppSignupRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/settings': {
       id: '/app/settings'
@@ -1086,6 +1124,8 @@ interface AppRouteChildren {
   AppRequestsRoute: typeof AppRequestsRouteWithChildren
   AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppSignupRoute: typeof AppSignupRoute
+  AppVerificationRoute: typeof AppVerificationRoute
   AppGrievancesNewRoute: typeof AppGrievancesNewRoute
   AppJobsIdRoute: typeof AppJobsIdRoute
 }
@@ -1101,6 +1141,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppRequestsRoute: AppRequestsRouteWithChildren,
   AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppSignupRoute: AppSignupRoute,
+  AppVerificationRoute: AppVerificationRoute,
   AppGrievancesNewRoute: AppGrievancesNewRoute,
   AppJobsIdRoute: AppJobsIdRoute,
 }

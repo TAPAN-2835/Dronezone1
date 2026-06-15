@@ -8,7 +8,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DroneZone — Drone Service Ecosystem" },
-      { name: "description", content: "Customer App, Service Provider Panel and Admin Console — unified in one platform." },
+      {
+        name: "description",
+        content:
+          "Customer App, Service Provider Panel and Admin Console — unified in one platform.",
+      },
     ],
   }),
   component: Entry,
@@ -113,12 +117,15 @@ function Selector() {
       </header>
 
       <div className="mt-12 max-w-3xl sm:mt-20">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Welcome to DroneZone</div>
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+          Welcome to DroneZone
+        </div>
         <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-5xl">
           Choose your workspace
         </h1>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-          A complete drone service ecosystem. Pick the experience you want to explore — every workspace is one click away.
+          A complete drone service ecosystem. Pick the experience you want to explore — every
+          workspace is one click away.
         </p>
       </div>
 
@@ -137,11 +144,15 @@ function Selector() {
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${w.accent}`} />
-                <div className={`mb-5 inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${w.accent} text-white shadow`}>
+                <div
+                  className={`mb-5 inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${w.accent} text-white shadow`}
+                >
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-display text-xl font-semibold tracking-tight">{w.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{w.desc}</p>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  {w.desc}
+                </p>
                 <div className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
                   {w.cta}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -153,10 +164,16 @@ function Selector() {
       </div>
 
       <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6 text-xs text-muted-foreground sm:mt-14">
-        <div>© {new Date().getFullYear()} DroneZone · Built for the modern drone services industry.</div>
+        <div>
+          © {new Date().getFullYear()} DroneZone · Built for the modern drone services industry.
+        </div>
         <div className="flex items-center gap-4">
-          <Link to="/login" className="hover:text-foreground">Provider Sign In</Link>
-          <Link to="/customer/onboarding" className="hover:text-foreground">Customer Onboarding</Link>
+          <Link to="/login" className="hover:text-foreground">
+            Provider Sign In
+          </Link>
+          <Link to="/customer/onboarding" className="hover:text-foreground">
+            Customer Onboarding
+          </Link>
         </div>
       </footer>
     </motion.div>

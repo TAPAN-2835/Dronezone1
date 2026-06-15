@@ -10,9 +10,14 @@ export const Route = createFileRoute("/app/grievances/new")({
   component: () => (
     <>
       <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2">
-        <Link to="/app/dashboard"><ArrowLeft className="h-4 w-4" /> Dashboard</Link>
+        <Link to="/app/dashboard">
+          <ArrowLeft className="h-4 w-4" /> Dashboard
+        </Link>
       </Button>
-      <PageHeader title="Raise Grievance" description="Report an issue with a customer, job, or platform service." />
+      <PageHeader
+        title="Raise Grievance"
+        description="Report an issue with a customer, job, or platform service."
+      />
       <Card className="max-w-lg">
         <CardContent className="p-6">
           <GrievanceForm raisedByType="provider" onSuccess={() => window.history.back()} />

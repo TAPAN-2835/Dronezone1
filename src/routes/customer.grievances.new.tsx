@@ -8,7 +8,9 @@ export const Route = createFileRoute("/customer/grievances/new")({
   component: () => (
     <CustomerShell title="Raise Grievance" showBack>
       <div className="px-5 py-5">
-        <p className="mb-4 text-sm text-muted-foreground">Report an issue with a service provider, job, or billing.</p>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Report an issue with a service provider, job, or billing.
+        </p>
         <GrievanceForm raisedByType="customer" onSuccess={() => window.history.back()} />
       </div>
     </CustomerShell>

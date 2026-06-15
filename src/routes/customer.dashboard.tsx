@@ -18,7 +18,9 @@ function Home() {
     <div className="space-y-5 px-5 pb-6 pt-4">
       <div>
         <div className="text-sm text-muted-foreground">Good morning,</div>
-        <h1 className="font-display text-2xl font-bold tracking-tight">Hello, {customer.name.split(" ")[0]} 👋</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">
+          Hello, {customer.name.split(" ")[0]} 👋
+        </h1>
       </div>
 
       <Link
@@ -40,23 +42,31 @@ function Home() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">My AMC</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              My AMC
+            </span>
           </div>
-          <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">Active</span>
+          <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">
+            Active
+          </span>
         </div>
         <div className="mt-3 flex items-end justify-between">
           <div>
             <div className="font-display text-lg font-semibold">{amc.plan}</div>
             <div className="text-xs text-muted-foreground">Valid till {amc.validTill}</div>
           </div>
-          <Link to="/customer/amc" className="text-xs font-semibold text-primary">View Details</Link>
+          <Link to="/customer/amc" className="text-xs font-semibold text-primary">
+            View Details
+          </Link>
         </div>
       </div>
 
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">Recent Requests</h2>
-          <Link to="/customer/requests" className="text-xs font-semibold text-primary">View all</Link>
+          <Link to="/customer/requests" className="text-xs font-semibold text-primary">
+            View all
+          </Link>
         </div>
         <div className="space-y-2">
           {recent.map((r) => (
@@ -90,7 +100,9 @@ function StatusPill({ status }: { status: string }) {
     resolved: { label: "Resolved", cls: "bg-success/15 text-success" },
   };
   const s = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
-  return <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${s.cls}`}>{s.label}</span>;
+  return (
+    <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${s.cls}`}>{s.label}</span>
+  );
 }
 
 export { StatusPill };

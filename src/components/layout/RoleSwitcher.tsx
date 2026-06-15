@@ -66,13 +66,13 @@ export function RoleSwitcher() {
                       "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-xs font-medium transition-colors text-left",
                       r.active
                         ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                        : "text-foreground hover:bg-muted"
+                        : "text-foreground hover:bg-muted",
                     )}
                   >
                     <div
                       className={cn(
                         "grid h-6 w-6 place-items-center rounded-md shrink-0",
-                        r.active ? "bg-white/20 text-white" : r.color
+                        r.active ? "bg-white/20 text-white" : r.color,
                       )}
                     >
                       <Icon className="h-3.5 w-3.5" />

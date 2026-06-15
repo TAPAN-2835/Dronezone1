@@ -1,5 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck, Building2, CreditCard, MapPin, Award, Star, Edit, Phone, Mail } from "lucide-react";
+import {
+  BadgeCheck,
+  Building2,
+  CreditCard,
+  MapPin,
+  Award,
+  Star,
+  Edit,
+  Phone,
+  Mail,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +29,9 @@ function Profile() {
         title="Profile"
         description="Your service provider identity, certifications, and payouts."
         actions={
-          <Button variant="outline"><Edit className="h-4 w-4" /> Edit profile</Button>
+          <Button variant="outline">
+            <Edit className="h-4 w-4" /> Edit profile
+          </Button>
         }
       />
 
@@ -28,7 +40,9 @@ function Profile() {
         <CardContent className="-mt-12 p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
             <Avatar className="h-24 w-24 ring-4 ring-card">
-              <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">RS</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
+                RS
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
@@ -39,15 +53,28 @@ function Profile() {
                   </span>
                 )}
               </div>
-              <div className="text-sm text-muted-foreground">{provider.business.name} · Member since {provider.joinedAt}</div>
+              <div className="text-sm text-muted-foreground">
+                {provider.business.name} · Member since {provider.joinedAt}
+              </div>
               <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1"><Mail className="h-3.5 w-3.5" /> {provider.email}</span>
-                <span className="inline-flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {provider.phone}</span>
+                <span className="inline-flex items-center gap-1">
+                  <Mail className="h-3.5 w-3.5" /> {provider.email}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Phone className="h-3.5 w-3.5" /> {provider.phone}
+                </span>
               </div>
             </div>
             <div className="flex gap-6 sm:gap-8">
               <Stat label="Jobs done" value={String(provider.totalJobs)} />
-              <Stat label="Rating" value={<><Star className="inline h-4 w-4 fill-warning text-warning" /> {provider.rating}</>} />
+              <Stat
+                label="Rating"
+                value={
+                  <>
+                    <Star className="inline h-4 w-4 fill-warning text-warning" /> {provider.rating}
+                  </>
+                }
+              />
               <Stat label="On-time" value="98%" />
             </div>
           </div>
@@ -70,7 +97,10 @@ function Profile() {
         <Section title="Service areas" icon={MapPin}>
           <div className="flex flex-wrap gap-1.5">
             {provider.serviceAreas.map((a) => (
-              <span key={a} className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+              <span
+                key={a}
+                className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+              >
                 {a}
               </span>
             ))}
@@ -100,7 +130,15 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function Section({ title, icon: Icon, children }: { title: string; icon: typeof Building2; children: React.ReactNode }) {
+function Section({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: typeof Building2;
+  children: React.ReactNode;
+}) {
   return (
     <Card>
       <CardHeader>

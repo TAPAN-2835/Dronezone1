@@ -55,16 +55,27 @@ function AdminJobs() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold sm:text-3xl">Jobs Master</h1>
-        <p className="text-sm text-muted-foreground">Central jobs management — search, filter, and review all jobs</p>
+        <p className="text-sm text-muted-foreground">
+          Central jobs management — search, filter, and review all jobs
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search by ID, customer, provider, issue…" value={q} onChange={(e) => setQ(e.target.value)} className="h-10 pl-9" />
+          <Input
+            placeholder="Search by ID, customer, provider, issue…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="h-10 pl-9"
+          />
         </div>
         <div className="flex flex-wrap gap-2">
-          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="h-10 rounded-lg border bg-card px-3 text-sm">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="h-10 rounded-lg border bg-card px-3 text-sm"
+          >
             <option value="date">Sort: Date</option>
             <option value="aging">Sort: Aging</option>
             <option value="status">Sort: Status</option>
@@ -75,7 +86,11 @@ function AdminJobs() {
       <div className="flex flex-wrap gap-2">
         <span className="text-xs font-medium text-muted-foreground self-center">Status:</span>
         {statuses.map((s) => (
-          <button key={s} onClick={() => setStatusFilter(s)} className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${statusFilter === s ? "bg-primary text-primary-foreground" : "border bg-card text-muted-foreground"}`}>
+          <button
+            key={s}
+            onClick={() => setStatusFilter(s)}
+            className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${statusFilter === s ? "bg-primary text-primary-foreground" : "border bg-card text-muted-foreground"}`}
+          >
             {s}
           </button>
         ))}
@@ -84,7 +99,11 @@ function AdminJobs() {
       <div className="flex flex-wrap gap-2">
         <span className="text-xs font-medium text-muted-foreground self-center">Aging:</span>
         {(["all", "fresh", "moderate", "stale", "critical"] as const).map((a) => (
-          <button key={a} onClick={() => setAgeFilter(a)} className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${ageFilter === a ? "bg-primary text-primary-foreground" : "border bg-card text-muted-foreground"}`}>
+          <button
+            key={a}
+            onClick={() => setAgeFilter(a)}
+            className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${ageFilter === a ? "bg-primary text-primary-foreground" : "border bg-card text-muted-foreground"}`}
+          >
             {a === "all" ? "All" : a}
           </button>
         ))}
@@ -111,11 +130,21 @@ function AdminJobs() {
                 <td className="px-4 py-3">{j.customer}</td>
                 <td className="px-4 py-3">{j.provider}</td>
                 <td className="px-4 py-3 text-muted-foreground">{j.issue}</td>
-                <td className="px-4 py-3"><span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{j.status}</span></td>
-                <td className="px-4 py-3"><JobAgeBadge createdAt={j.createdAt} /></td>
+                <td className="px-4 py-3">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    {j.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <JobAgeBadge createdAt={j.createdAt} />
+                </td>
                 <td className="px-4 py-3 text-xs">{j.paymentStatus}</td>
                 <td className="px-4 py-3 text-right">
-                  <Button variant="outline" size="sm" asChild><Link to="/admin/jobs/$id" params={{ id: j.id }}>View Details</Link></Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/admin/jobs/$id" params={{ id: j.id }}>
+                      View Details
+                    </Link>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -125,10 +154,17 @@ function AdminJobs() {
 
       <div className="space-y-3 sm:hidden">
         {filtered.map((j) => (
-          <Link key={j.id} to="/admin/jobs/$id" params={{ id: j.id }} className="block rounded-xl border bg-card p-4">
+          <Link
+            key={j.id}
+            to="/admin/jobs/$id"
+            params={{ id: j.id }}
+            className="block rounded-xl border bg-card p-4"
+          >
             <div className="flex justify-between gap-2">
               <div className="font-semibold">{j.id}</div>
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{j.status}</span>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                {j.status}
+              </span>
             </div>
             <div className="mt-1 text-sm">{j.issue}</div>
             <div className="mt-2 flex items-center justify-between">
@@ -140,7 +176,9 @@ function AdminJobs() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground">No jobs match your filters.</div>
+        <div className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground">
+          No jobs match your filters.
+        </div>
       )}
     </div>
   );

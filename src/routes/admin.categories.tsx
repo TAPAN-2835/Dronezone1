@@ -17,14 +17,22 @@ export const Route = createFileRoute("/admin/categories")({
             title="Most Frequently Serviced Models"
             items={[
               { a: "DJI Mavic 3", b: "Service Count: 142 | Freq: High", c: "Last: 12 May 2026" },
-              { a: "DJI Mini 4 Pro", b: "Service Count: 89 | Freq: Medium", c: "Last: 10 May 2026" },
+              {
+                a: "DJI Mini 4 Pro",
+                b: "Service Count: 89 | Freq: Medium",
+                c: "Last: 10 May 2026",
+              },
               { a: "DJI Air 3", b: "Service Count: 65 | Freq: Medium", c: "Last: 05 May 2026" },
             ]}
           />
           <Section
             title="Previously Worked-On Models"
             items={[
-              { a: "DJI Phantom 4 RTK", b: "Service Count: 24 | Freq: Low", c: "Last: 18 Apr 2026" },
+              {
+                a: "DJI Phantom 4 RTK",
+                b: "Service Count: 24 | Freq: Low",
+                c: "Last: 18 Apr 2026",
+              },
               { a: "Autel EVO II Pro", b: "Service Count: 18 | Freq: Low", c: "Last: 02 Apr 2026" },
             ]}
           />
