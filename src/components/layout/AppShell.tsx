@@ -26,7 +26,7 @@ const navItems = [
   { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/app/requests", label: "Job Requests", icon: Inbox },
   { to: "/app/active", label: "Active Jobs", icon: Briefcase },
-  { to: "/app/quotations", label: "Quotations", icon: FileText },
+  { to: "/app/quotations", label: "Quotation History", icon: FileText },
   { to: "/app/chat", label: "Chat", icon: MessageSquare },
   { to: "/app/history", label: "Service History", icon: History },
   { to: "/app/notifications", label: "Notifications", icon: Bell },

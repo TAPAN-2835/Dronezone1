@@ -189,7 +189,7 @@ function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
+            <Link to="/app/signup" className="font-semibold text-primary hover:underline">
               Sign up
             </Link>
           </p>

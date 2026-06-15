@@ -1,17 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Download, TrendingUp, IndianRupee, CheckCircle2 } from "lucide-react";
+import { Search, Download, TrendingUp, IndianRupee, CheckCircle2, Star, Clock, Timer } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { jobs, inr } from "@/data/demo";
+import { jobs, inr, ratingLabels } from "@/data/demo";
 
 export const Route = createFileRoute("/app/history")({
   head: () => ({ meta: [{ title: "Service History — DroneZone" }] }),
   component: History,
 });
+
+function getDelay(job: (typeof jobs)[number]): { days: number; label: string; color: string } {
+  if (!job.completedAt || !job.requestedCompletionDate) return { days: 0, label: "On Time", color: "text-success" };
+  const completed = new Date(job.completedAt);
+  const requested = new Date(job.requestedCompletionDate);
+  const diffMs = completed.getTime() - requested.getTime();
+  const diffDays = Math.max(0, Math.ceil(diffMs / 86400000));
+  if (diffDays === 0) return { days: 0, label: "On Time", color: "text-success" };
+  return { days: diffDays, label: `${diffDays} Day${diffDays > 1 ? "s" : ""} Delay`, color: "text-destructive" };
+}
+
+function RatingStars({ rating }: { rating: number }) {
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          className={`h-3.5 w-3.5 ${i < rating ? "fill-warning text-warning" : "text-muted-foreground/30"}`}
+        />
+      ))}
+    </span>
+  );
+}
 
 function History() {
   const [q, setQ] = useState("");
@@ -32,6 +54,13 @@ function History() {
   const totalRevenue = completed.reduce((s, j) => s + (j.amount ?? 0), 0);
   const avg = completed.length ? Math.round(totalRevenue / completed.length) : 0;
 
+  const onTimeCount = completed.filter((j) => getDelay(j).days === 0).length;
+  const onTimeRate = completed.length ? Math.round((onTimeCount / completed.length) * 100) : 0;
+
+  const avgRating = completed.filter((j) => j.customerRating).length > 0
+    ? (completed.reduce((s, j) => s + (j.customerRating ?? 0), 0) / completed.filter((j) => j.customerRating).length).toFixed(1)
+    : "—";
+
   return (
     <>
       <PageHeader
@@ -47,8 +76,8 @@ function History() {
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat icon={CheckCircle2} label="Completed jobs" value={String(completed.length)} tone="success" />
         <Stat icon={IndianRupee} label="Lifetime revenue" value={inr(totalRevenue)} tone="primary" />
-        <Stat icon={TrendingUp} label="Avg ticket size" value={inr(avg)} tone="primary" />
-        <Stat icon={CheckCircle2} label="Customer rating" value="4.8 / 5" tone="success" />
+        <Stat icon={Star} label="Avg rating" value={`${avgRating} / 5`} tone="success" />
+        <Stat icon={Timer} label="On-time rate" value={`${onTimeRate}%`} tone={onTimeRate >= 80 ? "success" : "danger"} />
       </div>
 
       <Card>
@@ -68,34 +97,57 @@ function History() {
           </div>
         </div>
         <CardContent className="overflow-x-auto p-0">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[820px] text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 text-left font-medium">Job</th>
                 <th className="px-4 py-3 text-left font-medium">Customer</th>
                 <th className="px-4 py-3 text-left font-medium">Date</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
+                <th className="px-4 py-3 text-left font-medium">Customer Rating</th>
+                <th className="px-4 py-3 text-left font-medium">Timeline</th>
                 <th className="px-4 py-3 text-right font-medium">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y">
-              {completed.map((j) => (
-                <tr key={j.id} className="hover:bg-muted/30">
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{j.issue}</div>
-                    <div className="font-mono text-xs text-muted-foreground">{j.id} · {j.drone.model}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{j.customer.name}</div>
-                    <div className="text-xs text-muted-foreground">{j.location}</div>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {new Date(j.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
-                  </td>
-                  <td className="px-4 py-3"><StatusBadge status={j.status} /></td>
-                  <td className="px-4 py-3 text-right font-semibold">{j.amount ? inr(j.amount) : "—"}</td>
-                </tr>
-              ))}
+              {completed.map((j) => {
+                const delay = getDelay(j);
+                return (
+                  <tr key={j.id} className="hover:bg-muted/30">
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{j.issue}</div>
+                      <div className="font-mono text-xs text-muted-foreground">{j.id} · {j.drone.model}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{j.customer.name}</div>
+                      <div className="text-xs text-muted-foreground">{j.location}</div>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {new Date(j.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                    </td>
+                    <td className="px-4 py-3">
+                      {j.customerRating ? (
+                        <div className="space-y-0.5">
+                          <RatingStars rating={j.customerRating} />
+                          <div className="text-xs font-medium text-muted-foreground">{j.customerRatingLabel}</div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No rating</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        delay.days === 0
+                          ? "bg-success/15 text-success"
+                          : "bg-destructive/10 text-destructive"
+                      }`}>
+                        {delay.days === 0 ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                        {delay.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold">{j.amount ? inr(j.amount) : "—"}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           {completed.length === 0 && (
@@ -107,8 +159,8 @@ function History() {
   );
 }
 
-function Stat({ icon: Icon, label, value, tone }: { icon: typeof CheckCircle2; label: string; value: string; tone: "primary" | "success" }) {
-  const toneClass = tone === "success" ? "bg-success/15 text-success" : "bg-primary/10 text-primary";
+function Stat({ icon: Icon, label, value, tone }: { icon: typeof CheckCircle2; label: string; value: string; tone: "primary" | "success" | "danger" }) {
+  const toneClass = tone === "success" ? "bg-success/15 text-success" : tone === "danger" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary";
   return (
     <Card>
       <CardContent className="flex items-center gap-3 p-4">

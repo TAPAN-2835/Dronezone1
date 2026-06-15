@@ -230,14 +230,17 @@ function JobDetails() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Parts</span><span>{inr(quote.partsCost)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Hardware Cost</span><span>{inr(quote.hardwareCost)}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Labour</span><span>{inr(quote.laborCost)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Travel</span><span>{inr(quote.travelCost)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>{inr(quote.shippingCost)}</span></div>
+                {quote.discountPercent > 0 && (
+                  <div className="flex justify-between text-success"><span>Discount ({quote.discountPercent}%)</span><span>− {inr(Math.round((quote.hardwareCost + quote.laborCost + quote.shippingCost) * quote.discountPercent / 100))}</span></div>
+                )}
                 <div className="flex justify-between border-t pt-2 font-semibold">
                   <span>Total (incl. GST)</span>
-                  <span>{inr(quote.partsCost + quote.laborCost + quote.travelCost - quote.discount + Math.round((quote.partsCost + quote.laborCost + quote.travelCost - quote.discount) * quote.gstPercent / 100))}</span>
+                  <span>{(() => { const sub = quote.hardwareCost + quote.laborCost + quote.shippingCost; const disc = Math.round(sub * quote.discountPercent / 100); const after = sub - disc; return inr(after + Math.round(after * quote.gstPercent / 100)); })()}</span>
                 </div>
-                <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium capitalize text-primary">{quote.status}</span>
+                <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium capitalize text-primary">{quote.status.replace("_", " ")}</span>
               </CardContent>
             </Card>
           )}

@@ -2,6 +2,8 @@ export type JobStatus = "new" | "accepted" | "en_route" | "on_site" | "in_progre
 
 export type PaymentStatus = "pending" | "paid" | "partial" | "refunded" | "not_applicable";
 export type AmcCoverage = "covered" | "not_covered" | "expired";
+export type TimelineStatus = "original" | "proposed" | "customer_pending" | "approved";
+export type VerificationStatus = "pending" | "approved" | "rejected" | "documents_required";
 
 export interface JobAttachment {
   id: string;
@@ -36,18 +38,29 @@ export interface Job {
   notes?: string;
   paymentStatus?: PaymentStatus;
   amcStatus?: AmcCoverage;
+  /* --- NEW: timeline negotiation --- */
+  requestedCompletionDate?: string;
+  proposedCompletionDate?: string;
+  additionalDays?: number;
+  timelineNotes?: string;
+  timelineStatus?: TimelineStatus;
+  /* --- NEW: rating & completion --- */
+  customerRating?: number;
+  customerRatingLabel?: string;
+  completedAt?: string;
+  feedbackSubmitted?: boolean;
 }
 
 export interface Quotation {
   id: string;
   jobId: string;
-  partsCost: number;
+  hardwareCost: number;
   laborCost: number;
-  travelCost: number;
-  discount: number;
+  shippingCost: number;
+  discountPercent: number;
   gstPercent: number;
   notes?: string;
-  status: "draft" | "sent" | "accepted" | "rejected";
+  status: "draft" | "sent" | "accepted" | "rejected" | "customer_review" | "revision_requested";
   sentAt?: string;
 }
 
@@ -114,6 +127,8 @@ const customers = [
 const categories = ["Repair", "Maintenance", "Battery Services", "Calibration", "Firmware"];
 const engineers = ["Rahul Sharma", "Arjun Patel", "Vikram Singh", "Neha Gupta"];
 
+const ratingLabels: Record<number, string> = { 5: "Excellent", 4: "Very Good", 3: "Good", 2: "Satisfactory", 1: "Poor" };
+
 function pad(n: number) { return String(n).padStart(4, "0"); }
 
 const today = new Date("2026-06-02T10:00:00");
@@ -163,6 +178,21 @@ export const jobs: Job[] = Array.from({ length: 24 }).map((_, i) => {
   const dayOffset = status === "completed" ? -(i + 1) : status === "new" ? -Math.min(i, 5) : -Math.floor(i / 3);
   const createdAt = isoOffset(dayOffset, 9 + (i % 8), (i * 7) % 60);
   const isActive = ["accepted", "en_route", "on_site", "in_progress", "testing"].includes(status);
+
+  // Requested completion = scheduled + 1-3 days
+  const reqDate = new Date(isoOffset(dayOffset + 1 + (i % 3), 23, 59));
+  const requestedCompletionDate = reqDate.toISOString();
+
+  // For some jobs, provider proposed a different date
+  const hasProposal = isActive && i % 3 === 0;
+  const addDays = hasProposal ? 1 + (i % 2) : 0;
+  const proposedDate = hasProposal ? new Date(reqDate.getTime() + addDays * 86400000).toISOString() : undefined;
+
+  // Customer rating for completed jobs
+  const rating = status === "completed" ? 3 + (i % 3) : undefined; // 3, 4, or 5
+  const delayDays = status === "completed" ? (i % 4 === 0 ? 0 : i % 4 === 1 ? 1 : i % 4 === 2 ? 0 : 2) : undefined;
+  const completedAt = status === "completed" ? isoOffset(dayOffset + 1 + (delayDays ?? 0), 17, 0) : undefined;
+
   return {
     id: `REQ-${pad(1024 + i)}`,
     customer: cust,
@@ -191,6 +221,16 @@ export const jobs: Job[] = Array.from({ length: 24 }).map((_, i) => {
     notes: isActive ? "Customer prefers morning visit. Gate code: 4521." : undefined,
     paymentStatus: status === "completed" ? "paid" : status === "new" ? "not_applicable" : "pending",
     amcStatus: i % 4 === 0 ? "covered" : i % 4 === 1 ? "not_covered" : "expired",
+    /* NEW fields */
+    requestedCompletionDate,
+    proposedCompletionDate: proposedDate,
+    additionalDays: hasProposal ? addDays : undefined,
+    timelineNotes: hasProposal ? "Need additional time for parts sourcing." : undefined,
+    timelineStatus: hasProposal ? "customer_pending" : status === "new" ? "original" : "approved",
+    customerRating: rating,
+    customerRatingLabel: rating ? ratingLabels[rating] : undefined,
+    completedAt,
+    feedbackSubmitted: status === "completed" ? i % 2 === 0 : false,
   };
 });
 
@@ -199,10 +239,10 @@ export const quotations: Quotation[] = jobs
   .map((j, i) => ({
     id: `QT-${pad(2001 + i)}`,
     jobId: j.id,
-    partsCost: 1500 + (i % 5) * 400,
+    hardwareCost: 1500 + (i % 5) * 400,
     laborCost: 800 + (i % 4) * 200,
-    travelCost: 300 + (i % 3) * 100,
-    discount: i % 4 === 0 ? 200 : 0,
+    shippingCost: 300 + (i % 3) * 100,
+    discountPercent: i % 4 === 0 ? 10 : i % 3 === 0 ? 5 : 0,
     gstPercent: 18,
     status: j.status === "completed" ? "accepted" : i % 2 === 0 ? "sent" : "draft",
     sentAt: isoOffset(-i - 1, 14, 0),
@@ -267,6 +307,7 @@ export const provider = {
   totalJobs: 184,
   joinedAt: "Jan 2024",
   verified: true,
+  verificationStatus: "approved" as VerificationStatus,
   business: {
     name: "SkyFix Drone Services",
     gst: "29AAACS1234A1Z5",
@@ -320,3 +361,5 @@ export function statusTone(s: JobStatus): "blue" | "green" | "amber" | "red" | "
 export function inr(n: number) {
   return "₹" + n.toLocaleString("en-IN");
 }
+
+export { ratingLabels };
