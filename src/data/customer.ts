@@ -6,7 +6,7 @@ export interface CustomerRequest {
   drone: string;
   issue: string;
   description: string;
-  status: "submitted" | "assigned" | "en_route" | "inspecting" | "repairing" | "testing" | "completed";
+  status: "draft" | "submitted" | "review" | "quotation_pending" | "awaiting_approval" | "active_job" | "resolved" | "feedback_submitted" | "closed" | string;
   createdAt: string;
   scheduledAt: string;
   location: string;
@@ -18,13 +18,15 @@ export interface CustomerRequest {
 }
 
 export const trackingStages = [
-  { key: "submitted", label: "Request Submitted" },
-  { key: "assigned", label: "Provider Assigned" },
-  { key: "en_route", label: "Engineer En Route" },
-  { key: "inspecting", label: "Inspection Started" },
-  { key: "repairing", label: "Repair In Progress" },
-  { key: "testing", label: "Testing" },
-  { key: "completed", label: "Completed" },
+  { key: "draft", label: "Draft" },
+  { key: "submitted", label: "Submitted" },
+  { key: "review", label: "Review" },
+  { key: "quotation_pending", label: "Quotation Pending" },
+  { key: "awaiting_approval", label: "Awaiting Customer Approval" },
+  { key: "active_job", label: "Active Job" },
+  { key: "resolved", label: "Resolved" },
+  { key: "feedback_submitted", label: "Feedback Submitted" },
+  { key: "closed", label: "Closed" },
 ] as const;
 
 export const customer = {
@@ -72,7 +74,7 @@ export const customerRequests: CustomerRequest[] = [
     issue: "Propeller Issue",
     description: "One of the propellers is vibrating abnormally during flight.",
     originalDescription: "One of the propellers is vibrating abnormally. Noticed after a minor collision with a tree branch. Drone still flies but vibration is concerning.",
-    status: "repairing",
+    status: "review",
     createdAt: "20 May 2026, 09:30 AM",
     scheduledAt: "20 May 2026, 11:00 AM",
     location: "Koramangala, Bengaluru",
@@ -90,7 +92,7 @@ export const customerRequests: CustomerRequest[] = [
     issue: "Battery Not Charging",
     description: "Battery shows red indicator and won't charge past 20%.",
     originalDescription: "Battery shows red indicator and won't charge past 20%. Tried different charger and cable.",
-    status: "completed",
+    status: "resolved",
     createdAt: "10 Apr 2026, 02:00 PM",
     scheduledAt: "11 Apr 2026, 10:00 AM",
     location: "Whitefield, Bengaluru",
@@ -107,7 +109,7 @@ export const customerRequests: CustomerRequest[] = [
     issue: "Camera Calibration",
     description: "Gimbal drift on yaw axis affecting video quality.",
     originalDescription: "Gimbal drift on yaw axis. Footage is unusable for client deliverables.",
-    status: "completed",
+    status: "resolved",
     createdAt: "5 Mar 2026",
     scheduledAt: "6 Mar 2026",
     location: "Indiranagar, Bengaluru",
@@ -120,7 +122,7 @@ export const customerRequests: CustomerRequest[] = [
     issue: "General Checkup",
     description: "Annual maintenance and firmware update.",
     originalDescription: "Annual maintenance and firmware update requested as part of AMC plan.",
-    status: "completed",
+    status: "resolved",
     createdAt: "12 Feb 2026",
     scheduledAt: "13 Feb 2026",
     location: "Koramangala, Bengaluru",

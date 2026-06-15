@@ -20,14 +20,14 @@ function RequestsRoute() {
 }
 
 function RequestsList() {
-  const [tab, setTab] = useState<"all" | "active" | "completed">("all");
+  const [tab, setTab] = useState<"all" | "active" | "resolved">("all");
   const filtered = customerRequests.filter((r) =>
-    tab === "all" ? true : tab === "completed" ? r.status === "completed" : r.status !== "completed"
+    tab === "all" ? true : tab === "resolved" ? r.status === "resolved" : r.status !== "resolved"
   );
   return (
     <div className="px-5 py-4">
       <div className="mb-4 inline-flex rounded-xl border bg-card p-1 text-xs">
-        {(["all", "active", "completed"] as const).map((t) => (
+        {(["all", "active", "resolved"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}

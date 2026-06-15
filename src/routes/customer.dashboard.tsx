@@ -87,7 +87,7 @@ function StatusPill({ status }: { status: string }) {
     inspecting: { label: "Inspecting", cls: "bg-warning/15 text-[oklch(0.45_0.15_75)]" },
     repairing: { label: "In Progress", cls: "bg-warning/15 text-[oklch(0.45_0.15_75)]" },
     testing: { label: "Testing", cls: "bg-warning/15 text-[oklch(0.45_0.15_75)]" },
-    completed: { label: "Completed", cls: "bg-success/15 text-success" },
+    resolved: { label: "Resolved", cls: "bg-success/15 text-success" },
   };
   const s = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
   return <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${s.cls}`}>{s.label}</span>;

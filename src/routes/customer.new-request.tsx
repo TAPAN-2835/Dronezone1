@@ -55,8 +55,8 @@ function NewRequest() {
       <Field label="Location" icon={<MapPin className="h-4 w-4" />}>
         <input defaultValue="Koramangala, Bengaluru" className="h-12 w-full rounded-xl border bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15" />
       </Field>
-      <Field label="Preferred Date & Time" icon={<Calendar className="h-4 w-4" />}>
-        <input defaultValue="25 May 2026, 10:00 AM" className="h-12 w-full rounded-xl border bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15" />
+      <Field label="Expected Completion Date" icon={<Calendar className="h-4 w-4" />}>
+        <input type="date" defaultValue="2026-05-25" className="h-12 w-full rounded-xl border bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15" />
       </Field>
       <label className="flex items-center gap-3 rounded-xl border bg-card p-3">
         <input type="checkbox" checked={urgent} onChange={(e) => setUrgent(e.target.checked)} className="h-4 w-4 accent-primary" />

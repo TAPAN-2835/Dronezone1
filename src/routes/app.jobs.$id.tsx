@@ -251,19 +251,6 @@ function JobDetails() {
                 <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
                 {job.location}
               </div>
-              <div className="overflow-hidden rounded-lg border">
-                <iframe
-                  title="Job location"
-                  src={getMapEmbedUrl(job.location, job.city)}
-                  className="h-36 w-full border-0"
-                  loading="lazy"
-                />
-              </div>
-              <Button variant="outline" size="sm" className="w-full" asChild>
-                <a href={getMapSearchUrl(job.location, job.city)} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4" /> Open in Maps
-                </a>
-              </Button>
             </CardContent>
           </Card>
 
