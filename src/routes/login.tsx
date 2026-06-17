@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -27,14 +28,45 @@ function LoginPage() {
   const [password, setPassword] = useState("Drone@123");
   const [loading, setLoading] = useState(false);
 
+  const { login } = useAuth();
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      if ((email === "provider@dronezone.com" && password === "Drone@123") || mode === "mobile") {
-        toast.success("Welcome back, Rahul");
+      if (mode === "mobile") {
+        toast.success("Welcome back");
         navigate({ to: "/app/dashboard" });
-      } else {
+        return;
+      }
+      try {
+        const user = login(email);
+
+        if (user.status === "Pending Verification") {
+          toast.error("Access Denied", {
+            description:
+              "Your account is currently under verification. You will receive an email once verification is completed.",
+          });
+          setLoading(false);
+        } else if (user.status === "Rejected") {
+          toast.error("Access Denied", {
+            description:
+              "Your verification request was rejected. Please contact support or resubmit valid documents.",
+          });
+          setLoading(false);
+        } else if (user.status === "Additional Documents Required") {
+          toast.error("Access Denied", {
+            description:
+              "Additional documents are required before your account can be approved. Please resubmit.",
+          });
+          setLoading(false);
+        } else if (user.status === "Approved") {
+          toast.success(`Welcome back, ${user.fullName.split(" ")[0]}`);
+          navigate({ to: "/app/dashboard" });
+        } else {
+          setLoading(false);
+        }
+      } catch (_err: unknown) {
         toast.error("Invalid credentials. Use the demo credentials.");
         setLoading(false);
       }
@@ -207,7 +239,7 @@ function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link to="/app/signup" className="font-semibold text-primary hover:underline">
+            <Link to="/signup" className="font-semibold text-primary hover:underline">
               Sign up
             </Link>
           </p>
