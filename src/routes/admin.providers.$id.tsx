@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin/providers/$id")({
 
 function ProviderDetail() {
   const { id } = Route.useParams();
-  const { providers, updateProviderStatus } = useAuth();
+  const { providers, updateProviderStatus, updateProviderClass } = useAuth();
 
   // Also check original mock if not found in auth store
   const mockProvider = providerApplications.find((p) => p.id === id);
@@ -31,8 +31,14 @@ function ProviderDetail() {
         submitted: new Date(storeProvider.createdAt).toLocaleDateString(),
         experience: storeProvider.experienceDetails,
         categories: storeProvider.serviceCategories,
+        equipment: storeProvider.equipment || [],
+        providerClass: storeProvider.providerClass || "Pending",
       }
-    : mockProvider;
+    : {
+        ...mockProvider,
+        equipment: [],
+        providerClass: "Pending",
+      };
 
   const providerGrievances = grievances.filter(
     (g) => g.raisedById === id || g.against === provider?.business,
@@ -80,6 +86,9 @@ function ProviderDetail() {
             >
               {provider.status}
             </span>
+            <span className="rounded-full bg-primary/10 text-primary font-semibold px-3 py-1 text-xs">
+              {provider.providerClass}
+            </span>
             <span className="rounded-full bg-muted px-3 py-1 text-xs">{provider.id}</span>
           </div>
         </div>
@@ -122,6 +131,34 @@ function ProviderDetail() {
           </Button>
         </div>
       </div>
+
+      {storeProvider && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Assign Provider Class</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              {["Class 1", "Class 2", "Class 3"].map((cls) => (
+                <Button
+                  key={cls}
+                  size="sm"
+                  variant={provider.providerClass === cls ? "default" : "outline"}
+                  onClick={() => {
+                    updateProviderClass(provider.id, cls as "Class 1" | "Class 2" | "Class 3");
+                    toast.success(`Assigned ${cls} to ${provider.provider}`);
+                  }}
+                >
+                  {cls}
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              Assign classification based on equipment capabilities and verified documentation.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
@@ -182,6 +219,26 @@ function ProviderDetail() {
             </div>
           </CardContent>
         </Card>
+
+        {storeProvider && provider.equipment.length > 0 && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-sm">Equipment & Tools</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {provider.equipment.map((eq: any, i: number) => (
+                  <div key={i} className="flex flex-col gap-2 rounded-lg border p-3 bg-muted/20">
+                    <div className="font-medium text-sm">{eq.name}</div>
+                    {eq.image && (
+                      <img src={eq.image} alt={eq.name} className="h-24 w-full object-cover rounded" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="lg:col-span-2">
           <CardHeader>

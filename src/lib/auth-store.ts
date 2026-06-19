@@ -6,6 +6,11 @@ export type VerificationStatus =
   | "Rejected"
   | "Additional Documents Required";
 
+export interface ProviderEquipment {
+  name: string;
+  image: string;
+}
+
 export interface ProviderUser {
   id: string;
   fullName: string;
@@ -20,6 +25,8 @@ export interface ProviderUser {
   experienceDetails: string;
   status: VerificationStatus;
   createdAt: string;
+  equipment?: ProviderEquipment[];
+  providerClass?: "Class 1" | "Class 2" | "Class 3" | "Pending";
 }
 
 const STORAGE_KEY = "dronezone_providers";
@@ -40,6 +47,11 @@ const DEMO_USER: ProviderUser = {
   experienceDetails: "5 years",
   status: "Approved",
   createdAt: new Date().toISOString(),
+  equipment: [
+    { name: "DJI Mavic 3 Pro", image: "https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&w=400&q=80" },
+    { name: "Fluke Multimeter", image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=400&q=80" }
+  ],
+  providerClass: "Class 1"
 };
 
 export function getStoredProviders(): ProviderUser[] {
@@ -89,7 +101,7 @@ export function useAuth() {
 
   const currentUser = providers.find((p) => p.email === currentUserEmail) || null;
 
-  const registerProvider = (providerData: Omit<ProviderUser, "id" | "status" | "createdAt">) => {
+  const registerProvider = (providerData: Omit<ProviderUser, "id" | "status" | "createdAt" | "providerClass">) => {
     const allProviders = getStoredProviders();
     if (allProviders.find((p) => p.email === providerData.email)) {
       throw new Error("Email already registered");
@@ -99,6 +111,7 @@ export function useAuth() {
       ...providerData,
       id: `PRV-${1000 + allProviders.length}`,
       status: "Pending Verification",
+      providerClass: "Pending",
       createdAt: new Date().toISOString(),
     };
 
@@ -128,6 +141,12 @@ export function useAuth() {
     saveStoredProviders(updated);
   };
 
+  const updateProviderClass = (id: string, providerClass: "Class 1" | "Class 2" | "Class 3" | "Pending") => {
+    const allProviders = getStoredProviders();
+    const updated = allProviders.map((p) => (p.id === id ? { ...p, providerClass } : p));
+    saveStoredProviders(updated);
+  };
+
   return {
     providers,
     currentUser,
@@ -135,5 +154,6 @@ export function useAuth() {
     login,
     logout,
     updateProviderStatus,
+    updateProviderClass,
   };
 }

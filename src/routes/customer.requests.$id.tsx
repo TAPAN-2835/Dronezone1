@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Phone, MessageSquare, MapPin, Check, Paperclip, Clock, ExternalLink } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customerRequests, trackingStages } from "@/data/customer";
-import { getMapEmbedUrl, getMapSearchUrl } from "@/lib/map-utils";
 
 export const Route = createFileRoute("/customer/requests/$id")({
   head: () => ({ meta: [{ title: "Request Details — DroneZone" }] }),
@@ -19,9 +18,6 @@ function Tracking() {
   const req = customerRequests.find((r) => r.id === id) ?? customerRequests[0];
   const currentIdx = trackingStages.findIndex((s) => s.key === req.status);
 
-  const [dateChangeStatus, setDateChangeStatus] = useState<"pending" | "accepted" | "rejected">(
-    "pending",
-  );
   const hasDateChangeRequest = req.id === "REQ-1024"; // Mock for Demo Workflow
 
   return (
@@ -52,12 +48,9 @@ function Tracking() {
         </div>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3.5 w-3.5" />
-          Expected Completion:{" "}
-          {hasDateChangeRequest && dateChangeStatus === "accepted"
-            ? "22 May 2026, 05:00 PM"
-            : req.scheduledAt || "Pending"}
+          Expected Completion: {hasDateChangeRequest ? "22 May 2026" : req.scheduledAt || "Pending"}
         </div>
-        {hasDateChangeRequest && dateChangeStatus === "accepted" && (
+        {hasDateChangeRequest && (
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
             Original Completion: {req.scheduledAt}
@@ -65,11 +58,11 @@ function Tracking() {
         )}
       </div>
 
-      {hasDateChangeRequest && dateChangeStatus === "pending" && (
+      {hasDateChangeRequest && (
         <div className="rounded-2xl border-2 border-warning/50 bg-warning/10 p-5 shadow-sm">
           <div className="flex items-center gap-2 text-warning">
             <Clock className="h-5 w-5" />
-            <span className="font-semibold">Date Change Request</span>
+            <span className="font-semibold">Timeline Update Notification</span>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -77,35 +70,17 @@ function Tracking() {
               <div className="font-medium line-through opacity-70">{req.scheduledAt}</div>
             </div>
             <div>
-              <div className="text-xs text-muted-foreground">Proposed Timeline</div>
-              <div className="font-medium">22 May 2026, 05:00 PM</div>
+              <div className="text-xs text-muted-foreground">New Timeline</div>
+              <div className="font-medium">22 May 2026</div>
             </div>
           </div>
           <div className="mt-3 rounded-lg bg-card/50 p-3 text-sm">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Difference
-            </div>
-            <div>+2 Days</div>
-            <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Provider Notes
             </div>
             <p className="italic">
               "Spare parts need to be ordered from the central warehouse, causing a slight delay."
             </p>
-          </div>
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={() => setDateChangeStatus("accepted")}
-              className="flex-1 rounded-xl bg-primary py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => setDateChangeStatus("rejected")}
-              className="flex-1 rounded-xl bg-destructive py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 transition"
-            >
-              Reject
-            </button>
           </div>
         </div>
       )}
@@ -176,7 +151,7 @@ function Tracking() {
             <div className="flex-1">
               <div className="font-semibold">{req.provider.name}</div>
               <div className="text-xs text-muted-foreground">
-                Field Engineer · ★ {req.provider.rating}
+                <span className="font-medium text-primary">Class 1 Provider</span> · ★ {req.provider.rating}
               </div>
             </div>
             <a

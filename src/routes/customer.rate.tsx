@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
+import { Textarea } from "@/components/ui/textarea";
 import { ratingCriteria } from "@/data/customer";
 import { toast } from "sonner";
 
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/customer/rate")({
 function Rate() {
   const [rating, setRating] = useState(5);
   const [tags, setTags] = useState<string[]>(["Service Quality", "Professionalism"]);
+  const [comment, setComment] = useState("Great service! The issue was resolved quickly.");
   const nav = useNavigate();
   return (
     <div className="space-y-5 px-5 py-5">
@@ -52,11 +54,12 @@ function Rate() {
       </div>
       <div>
         <div className="mb-2 text-sm font-semibold">Your Feedback</div>
-        <textarea
+        <Textarea
           rows={4}
           placeholder="Share your experience…"
-          defaultValue="Great service! The issue was resolved quickly."
-          className="w-full rounded-xl border bg-card p-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          className="w-full rounded-xl bg-card p-3 text-sm focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
         />
       </div>
       <button

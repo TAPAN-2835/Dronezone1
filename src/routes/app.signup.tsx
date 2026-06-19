@@ -38,7 +38,8 @@ const steps = [
   { id: 1, label: "Personal Info", icon: User },
   { id: 2, label: "Address & Business", icon: Building2 },
   { id: 3, label: "Certifications", icon: Award },
-  { id: 4, label: "Review & Submit", icon: FileCheck },
+  { id: 4, label: "Equipment & Tools", icon: Shield },
+  { id: 5, label: "Review & Submit", icon: FileCheck },
 ];
 
 function SignUpPage() {
@@ -65,6 +66,11 @@ function SignUpPage() {
   const [idProof, setIdProof] = useState("");
   const [dgca, setDgca] = useState("");
   const [businessDoc, setBusinessDoc] = useState("");
+
+  /* Step 4 */
+  const [equipment, setEquipment] = useState<{name: string, image: string}[]>([]);
+  const [newEquipName, setNewEquipName] = useState("");
+  const [newEquipImage, setNewEquipImage] = useState("");
 
   const certOptions = [
     "DGCA Certified Pilot",
@@ -149,13 +155,13 @@ function SignUpPage() {
           {/* Mobile progress bar */}
           <div className="mb-6 lg:hidden">
             <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-              <span>Step {step} of 4</span>
+              <span>Step {step} of 5</span>
               <span>{steps[step - 1].label}</span>
             </div>
             <div className="h-1.5 rounded-full bg-muted">
               <div
                 className="h-full rounded-full bg-primary transition-all duration-500"
-                style={{ width: `${(step / 4) * 100}%` }}
+                style={{ width: `${(step / 5) * 100}%` }}
               />
             </div>
           </div>
@@ -164,13 +170,15 @@ function SignUpPage() {
             {step === 1 && "Create your account"}
             {step === 2 && "Address & Business"}
             {step === 3 && "Certifications & Documents"}
-            {step === 4 && "Review & Submit"}
+            {step === 4 && "Equipment & Tools"}
+            {step === 5 && "Review & Submit"}
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             {step === 1 && "Enter your personal details to get started."}
             {step === 2 && "Tell us where you operate."}
             {step === 3 && "Upload your credentials for verification."}
-            {step === 4 && "Verify your information before submitting."}
+            {step === 4 && "List your drone equipment and tools."}
+            {step === 5 && "Verify your information before submitting."}
           </p>
 
           <div className="mt-6 space-y-4">
@@ -368,6 +376,47 @@ function SignUpPage() {
 
             {step === 4 && (
               <div className="space-y-4">
+                {equipment.map((eq, i) => (
+                  <div key={i} className="flex justify-between items-center bg-muted/30 p-2 rounded border">
+                    <span className="font-medium text-sm">{eq.name}</span>
+                    <span className="text-xs text-success">{eq.image ? "Image attached" : ""}</span>
+                  </div>
+                ))}
+                <div className="flex gap-2 items-center">
+                  <Input 
+                    placeholder="Equipment Name (e.g. DJI Mavic 3)" 
+                    value={newEquipName} 
+                    onChange={e => setNewEquipName(e.target.value)} 
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="shrink-0"
+                    onClick={() => {
+                      setNewEquipImage("simulated-upload.jpg");
+                      toast.success("Simulated equipment image upload");
+                    }}
+                  >
+                    <Upload className="h-4 w-4 mr-1" /> Photo
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (newEquipName) {
+                        setEquipment([...equipment, { name: newEquipName, image: newEquipImage || "placeholder.jpg" }]);
+                        setNewEquipName("");
+                        setNewEquipImage("");
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === 5 && (
+              <div className="space-y-4">
                 <ReviewSection title="Personal Information">
                   <ReviewRow label="Full Name" value={fullName} />
                   <ReviewRow label="Email" value={email} />
@@ -396,6 +445,9 @@ function SignUpPage() {
                   <ReviewRow label="ID Proof" value={idProof || "Not uploaded"} />
                   <ReviewRow label="Business Doc" value={businessDoc || "Not uploaded"} />
                 </ReviewSection>
+                <ReviewSection title="Equipment">
+                  <ReviewRow label="Total Items" value={equipment.length.toString()} />
+                </ReviewSection>
               </div>
             )}
           </div>
@@ -407,7 +459,7 @@ function SignUpPage() {
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
             )}
-            {step < 4 ? (
+            {step < 5 ? (
               <Button onClick={() => setStep(step + 1)} className="flex-1" disabled={!canNext()}>
                 Continue <ArrowRight className="h-4 w-4" />
               </Button>

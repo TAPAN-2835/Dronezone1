@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { adminRequests } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,35 @@ const priorityClass = (p: string) =>
   p === "High" ? "text-destructive" : p === "Medium" ? "text-warning" : "text-muted-foreground";
 
 export const Route = createFileRoute("/admin/requests")({
-  head: () => ({ meta: [{ title: "Requests — DroneZone Admin" }] }),
-  component: () => (
+  head: () => ({ meta: [{ title: "Active Requests — DroneZone Admin" }] }),
+  component: AdminRequestsPage
+});
+
+function AdminRequestsPage() {
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const displayRequests = activeRequests.filter(
+    (r) => statusFilter === "all" || r.status === statusFilter
+  );
+
+  return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold sm:text-3xl">All Requests</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="font-display text-2xl font-bold sm:text-3xl">Active Requests</h1>
+        <div className="flex gap-2 flex-wrap">
+          {["all", "New Incoming", "Accepted", "Rejected"].map((f) => (
+            <Button
+              key={f}
+              size="sm"
+              variant={statusFilter === f ? "default" : "outline"}
+              onClick={() => setStatusFilter(f)}
+              className="capitalize"
+            >
+              {f}
+            </Button>
+          ))}
+        </div>
+      </div>
 
       <div className="hidden overflow-hidden rounded-xl border bg-card sm:block">
         <div className="overflow-x-auto">
@@ -31,7 +57,7 @@ export const Route = createFileRoute("/admin/requests")({
               </tr>
             </thead>
             <tbody>
-              {activeRequests.map((r) => (
+              {displayRequests.map((r) => (
                 <tr key={r.id} className="border-t hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-semibold">{r.id}</td>
                   <td className="px-4 py-3">
@@ -72,7 +98,7 @@ export const Route = createFileRoute("/admin/requests")({
       </div>
 
       <div className="space-y-3 sm:hidden">
-        {activeRequests.map((r) => (
+        {displayRequests.map((r) => (
           <Link
             key={r.id}
             to="/admin/requests/$id"
@@ -99,5 +125,5 @@ export const Route = createFileRoute("/admin/requests")({
         ))}
       </div>
     </div>
-  ),
-});
+  );
+}

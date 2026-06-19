@@ -35,6 +35,9 @@ function SignupPage() {
   const [businessName, setBusinessName] = useState("");
   const [serviceCategories, setServiceCategories] = useState("");
   const [experienceDetails, setExperienceDetails] = useState("");
+  const [equipment, setEquipment] = useState<{name: string, image: string}[]>([]);
+  const [newEquipName, setNewEquipName] = useState("");
+  const [newEquipImage, setNewEquipImage] = useState("");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -84,6 +87,7 @@ function SignupPage() {
             businessName,
             serviceCategories,
             experienceDetails,
+            equipment,
           });
 
           // Simulated Email Notification
@@ -330,6 +334,48 @@ function SignupPage() {
                       <UploadCloud className="w-4 h-4" />
                     </Button>
                   </div>
+                </div>
+              </div>
+
+              <h3 className="text-lg font-medium tracking-tight border-b pb-2 pt-4">
+                Equipment & Tools
+              </h3>
+              <div className="space-y-4">
+                {equipment.map((eq, i) => (
+                  <div key={i} className="flex justify-between items-center bg-muted/30 p-2 rounded border">
+                    <span className="font-medium text-sm">{eq.name}</span>
+                    <span className="text-xs text-success">{eq.image ? "Image attached" : ""}</span>
+                  </div>
+                ))}
+                <div className="flex gap-2 items-center">
+                  <Input 
+                    placeholder="Equipment Name (e.g. DJI Mavic 3)" 
+                    value={newEquipName} 
+                    onChange={e => setNewEquipName(e.target.value)} 
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="shrink-0"
+                    onClick={() => {
+                      setNewEquipImage("simulated-upload.jpg");
+                      toast.success("Simulated equipment image upload");
+                    }}
+                  >
+                    <UploadCloud className="h-4 w-4 mr-1" /> Photo
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (newEquipName) {
+                        setEquipment([...equipment, { name: newEquipName, image: newEquipImage || "placeholder.jpg" }]);
+                        setNewEquipName("");
+                        setNewEquipImage("");
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
                 </div>
               </div>
             </div>

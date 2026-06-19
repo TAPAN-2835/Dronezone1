@@ -55,16 +55,10 @@ function RequestReview() {
   const [showQuotation, setShowQuotation] = useState(false);
 
   /* quotation fields */
-  const [hardware, setHardware] = useState(2500);
-  const [labor, setLabor] = useState(1000);
-  const [shipping, setShipping] = useState(500);
-  const [discountPct, setDiscountPct] = useState(0);
+  const [fixedPrice, setFixedPrice] = useState(4000);
   const [gst, setGst] = useState(18);
   const [quoteNotes, setQuoteNotes] = useState("");
   const [quoteSent, setQuoteSent] = useState(false);
-  const [customerResponse, setCustomerResponse] = useState<"pending" | "accepted" | "changes">(
-    "pending",
-  );
 
   if (!job) {
     return (
@@ -84,11 +78,8 @@ function RequestReview() {
   const proposedDate = new Date(requestedDate.getTime() + additionalDays * 86400000);
 
   /* quotation calculations */
-  const subtotal = hardware + labor + shipping;
-  const discountAmount = Math.round((subtotal * discountPct) / 100);
-  const afterDiscount = subtotal - discountAmount;
-  const gstAmount = Math.round((afterDiscount * gst) / 100);
-  const total = afterDiscount + gstAmount;
+  const gstAmount = Math.round((fixedPrice * gst) / 100);
+  const total = fixedPrice + gstAmount;
 
   return (
     <>
@@ -428,26 +419,7 @@ function RequestReview() {
               {showQuotation && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
-                    <MoneyField label="Hardware Cost" value={hardware} onChange={setHardware} />
-                    <MoneyField label="Labor Charge" value={labor} onChange={setLabor} />
-                    <MoneyField label="Shipping Charge" value={shipping} onChange={setShipping} />
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Discount (%)</Label>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          value={discountPct}
-                          onChange={(e) =>
-                            setDiscountPct(Math.max(0, Math.min(100, +e.target.value || 0)))
-                          }
-                          className="h-10 pr-8"
-                        />
-                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                          %
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                    <MoneyField label="Fixed Price" value={fixedPrice} onChange={setFixedPrice} />
 
                   <div className="space-y-1.5">
                     <Label className="text-xs">GST (%)</Label>
@@ -462,27 +434,9 @@ function RequestReview() {
                   {/* Calculation display */}
                   <div className="rounded-lg border bg-muted/30 p-4 space-y-2 text-sm">
                     <div className="flex justify-between text-muted-foreground">
-                      <span>Hardware Cost</span>
-                      <span className="font-medium text-foreground">{inr(hardware)}</span>
+                      <span>Fixed Price</span>
+                      <span className="font-medium text-foreground">{inr(fixedPrice)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Labor Charge</span>
-                      <span className="font-medium text-foreground">{inr(labor)}</span>
-                    </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Shipping Charge</span>
-                      <span className="font-medium text-foreground">{inr(shipping)}</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between text-muted-foreground">
-                      <span>Subtotal</span>
-                      <span className="font-medium text-foreground">{inr(subtotal)}</span>
-                    </div>
-                    {discountPct > 0 && (
-                      <div className="flex justify-between text-success">
-                        <span>Discount ({discountPct}%)</span>
-                        <span className="font-medium">− {inr(discountAmount)}</span>
-                      </div>
-                    )}
                     <div className="flex justify-between text-muted-foreground">
                       <span>GST ({gst}%)</span>
                       <span className="font-medium text-foreground">{inr(gstAmount)}</span>
@@ -508,10 +462,10 @@ function RequestReview() {
                       className="w-full"
                       onClick={() => {
                         setQuoteSent(true);
-                        toast.success("Quotation sent to customer — awaiting review");
+                        toast.success("Fixed Price Quotation sent to customer.");
                       }}
                     >
-                      <Send className="h-4 w-4" /> Send Quotation to Customer
+                      <Send className="h-4 w-4" /> Send Fixed Price Quote
                     </Button>
                   ) : (
                     <div className="space-y-3">
@@ -520,73 +474,18 @@ function RequestReview() {
                           Quotation Sent
                         </div>
                         <div className="text-sm text-muted-foreground mt-1">
-                          Waiting for customer response…
+                          The fixed price has been shared with the customer.
                         </div>
                       </div>
-
-                      {/* Demo: simulate customer response */}
-                      <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
-                        <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
-                          Demo: Simulate Customer Response
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Button
-                            size="sm"
-                            variant={customerResponse === "accepted" ? "default" : "outline"}
-                            onClick={() => {
-                              setCustomerResponse("accepted");
-                              toast.success("Customer accepted the quotation!");
-                            }}
-                          >
-                            <Check className="h-3.5 w-3.5" /> Accept
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={customerResponse === "changes" ? "default" : "outline"}
-                            onClick={() => {
-                              setCustomerResponse("changes");
-                              toast.info("Customer requested changes to quotation");
-                            }}
-                          >
-                            <FileText className="h-3.5 w-3.5" /> Request Changes
-                          </Button>
-                        </div>
-                      </div>
-
-                      {customerResponse === "accepted" && (
-                        <Button
-                          className="w-full bg-success hover:bg-success/90"
-                          onClick={() => {
-                            toast.success("Converted to active job!");
-                            navigate({ to: "/app/active" });
-                          }}
-                        >
-                          <Check className="h-4 w-4" /> Convert to Active Job
-                        </Button>
-                      )}
-
-                      {customerResponse === "changes" && (
-                        <div className="rounded-lg border border-warning/30 bg-warning/5 p-3 text-center">
-                          <div className="text-xs text-[oklch(0.45_0.15_75)] font-medium">
-                            Customer has requested changes
-                          </div>
-                          <div className="text-[10px] text-muted-foreground mt-1">
-                            Revise the quotation above and re-send
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="mt-2"
-                            onClick={() => {
-                              setQuoteSent(false);
-                              setCustomerResponse("pending");
-                              toast.info("Quotation reopened for editing");
-                            }}
-                          >
-                            Revise Quotation
-                          </Button>
-                        </div>
-                      )}
+                      <Button
+                        className="w-full bg-success hover:bg-success/90"
+                        onClick={() => {
+                          toast.success("Converted to active job!");
+                          navigate({ to: "/app/active" });
+                        }}
+                      >
+                        <Check className="h-4 w-4" /> Convert to Active Job
+                      </Button>
                     </div>
                   )}
                 </CardContent>

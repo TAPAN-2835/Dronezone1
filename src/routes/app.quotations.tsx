@@ -55,10 +55,7 @@ function QuotationHistory() {
                 <th className="px-4 py-3 text-left font-medium">Quotation</th>
                 <th className="px-4 py-3 text-left font-medium">Job</th>
                 <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-right font-medium">Hardware</th>
-                <th className="px-4 py-3 text-right font-medium">Shipping</th>
-                <th className="px-4 py-3 text-right font-medium">Discount</th>
-                <th className="px-4 py-3 text-right font-medium">Total</th>
+                <th className="px-4 py-3 text-right font-medium">Fixed Price</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -89,13 +86,8 @@ function QuotationHistory() {
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${statusClass}`}
                       >
-                        {q.status.replace("_", " ")}
+                        {q.status === "customer_review" ? "Pending" : q.status.replace("_", " ")}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">{inr(q.hardwareCost)}</td>
-                    <td className="px-4 py-3 text-right">{inr(q.shippingCost)}</td>
-                    <td className="px-4 py-3 text-right">
-                      {q.discountPercent > 0 ? `${q.discountPercent}%` : "—"}
                     </td>
                     <td className="px-4 py-3 text-right font-semibold">{inr(total)}</td>
                   </tr>
