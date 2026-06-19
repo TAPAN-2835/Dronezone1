@@ -421,14 +421,15 @@ function RequestReview() {
                   <div className="grid grid-cols-2 gap-3">
                     <MoneyField label="Fixed Price" value={fixedPrice} onChange={setFixedPrice} />
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">GST (%)</Label>
-                    <Input
-                      type="number"
-                      value={gst}
-                      onChange={(e) => setGst(+e.target.value || 0)}
-                      className="h-10"
-                    />
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">GST (%)</Label>
+                      <Input
+                        type="number"
+                        value={gst}
+                        onChange={(e) => setGst(+e.target.value || 0)}
+                        className="h-10"
+                      />
+                    </div>
                   </div>
 
                   {/* Calculation display */}
