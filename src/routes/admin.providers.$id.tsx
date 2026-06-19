@@ -3,6 +3,8 @@ import { ArrowLeft } from "lucide-react";
 import { providerApplications, providerDocs, grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/lib/auth-store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/providers/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} — Provider` }] }),
@@ -11,7 +13,27 @@ export const Route = createFileRoute("/admin/providers/$id")({
 
 function ProviderDetail() {
   const { id } = Route.useParams();
-  const provider = providerApplications.find((p) => p.id === id);
+  const { providers, updateProviderStatus } = useAuth();
+
+  // Also check original mock if not found in auth store
+  const mockProvider = providerApplications.find((p) => p.id === id);
+  const storeProvider = providers.find((p) => p.id === id);
+
+  const provider = storeProvider
+    ? {
+        id: storeProvider.id,
+        provider: storeProvider.fullName,
+        business: storeProvider.businessName || "N/A",
+        status: storeProvider.status,
+        email: storeProvider.email,
+        phone: storeProvider.phone,
+        city: storeProvider.address,
+        submitted: new Date(storeProvider.createdAt).toLocaleDateString(),
+        experience: storeProvider.experienceDetails,
+        categories: storeProvider.serviceCategories,
+      }
+    : mockProvider;
+
   const providerGrievances = grievances.filter(
     (g) => g.raisedById === id || g.against === provider?.business,
   );
@@ -46,18 +68,58 @@ function ProviderDetail() {
           <p className="text-muted-foreground">{provider.business}</p>
           <div className="mt-2 flex gap-2">
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${provider.status === "Pending" ? "bg-warning/15 text-[oklch(0.45_0.15_75)]" : provider.status === "Rejected" ? "bg-destructive/15 text-destructive" : provider.status === "In Review" ? "bg-primary/10 text-primary" : "bg-success/15 text-success"}`}
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                provider.status === "Pending" || provider.status === "Pending Verification"
+                  ? "bg-warning/15 text-[oklch(0.45_0.15_75)]"
+                  : provider.status === "Rejected"
+                    ? "bg-destructive/15 text-destructive"
+                    : provider.status === "In Review" || provider.status === "Additional Documents Required"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-success/15 text-success"
+              }`}
             >
               {provider.status}
             </span>
             <span className="rounded-full bg-muted px-3 py-1 text-xs">{provider.id}</span>
           </div>
         </div>
-        <div className="flex gap-2 print:hidden">
-          <Button className="bg-success text-success-foreground hover:bg-success/90">
+        <div className="flex gap-2 flex-wrap print:hidden">
+          <Button
+            className="bg-success text-success-foreground hover:bg-success/90"
+            onClick={() => {
+              if (storeProvider) updateProviderStatus(provider.id, "Approved");
+              toast.success("Provider Approved", {
+                description:
+                  "Email sent: Your account has been verified successfully. You may now log in and access DroneZone services.",
+              });
+            }}
+          >
             Approve
           </Button>
-          <Button variant="destructive">Reject</Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (storeProvider) updateProviderStatus(provider.id, "Rejected");
+              toast.error("Provider Rejected", {
+                description:
+                  "Email sent: Your verification request was rejected. Please contact support or resubmit valid documents.",
+              });
+            }}
+          >
+            Reject
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (storeProvider) updateProviderStatus(provider.id, "Additional Documents Required");
+              toast.info("Request Docs", {
+                description:
+                  "Email sent: Additional documents are required before your account can be approved.",
+              });
+            }}
+          >
+            Request Docs
+          </Button>
         </div>
       </div>
 
@@ -80,18 +142,20 @@ function ProviderDetail() {
               {provider.phone}
             </div>
             <div className="sm:col-span-2">
-              <span className="text-muted-foreground">Address: </span>123 Drone Street,{" "}
-              {provider.city}, India 500001
+              <span className="text-muted-foreground">Address: </span>
+              {storeProvider ? provider.city : `123 Drone Street, ${provider.city}, India 500001`}
             </div>
             <div className="sm:col-span-2">
               <span className="text-muted-foreground">Service Areas: </span>
               {provider.city}, Suburbs
             </div>
             <div>
-              <span className="text-muted-foreground">Experience: </span>4 Years
+              <span className="text-muted-foreground">Experience: </span>
+              {(provider as any).experience || "4 Years"}
             </div>
             <div>
-              <span className="text-muted-foreground">Specializations: </span>Repair, Calibration
+              <span className="text-muted-foreground">Specializations: </span>
+              {(provider as any).categories || "Repair, Calibration"}
             </div>
           </CardContent>
         </Card>
