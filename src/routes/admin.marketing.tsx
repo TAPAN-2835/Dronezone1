@@ -1,9 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { campaigns } from "@/data/admin";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Users, Mail, MousePointerClick } from "lucide-react";
 
 export const Route = createFileRoute("/admin/marketing")({
   head: () => ({ meta: [{ title: "Marketing — DroneZone Admin" }] }),
-  component: () => (
+  component: MarketingPage,
+});
+
+function MarketingPage() {
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+
+  return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold sm:text-3xl">Campaign Management</h1>
@@ -52,8 +66,12 @@ export const Route = createFileRoute("/admin/marketing")({
                 </thead>
                 <tbody>
                   {campaigns.map((c) => (
-                    <tr key={c.name} className="border-t hover:bg-muted/20 transition-colors">
-                      <td className="px-4 py-3 font-semibold">{c.name}</td>
+                    <tr 
+                      key={c.name} 
+                      className="border-t hover:bg-muted/20 transition-colors cursor-pointer"
+                      onClick={() => setSelectedCampaign(c)}
+                    >
+                      <td className="px-4 py-3 font-semibold text-primary">{c.name}</td>
                       <td className="px-4 py-3">{c.type}</td>
                       <td className="px-4 py-3 text-muted-foreground">{c.audience}</td>
                       <td className="px-4 py-3 text-muted-foreground">{c.sent}</td>
@@ -72,10 +90,14 @@ export const Route = createFileRoute("/admin/marketing")({
           {/* Mobile card stack */}
           <div className="space-y-3 sm:hidden">
             {campaigns.map((c) => (
-              <div key={c.name} className="rounded-xl border bg-card p-4">
+              <div 
+                key={c.name} 
+                className="rounded-xl border bg-card p-4 cursor-pointer hover:bg-muted/20 transition-colors"
+                onClick={() => setSelectedCampaign(c)}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="font-semibold truncate">{c.name}</div>
+                    <div className="font-semibold truncate text-primary">{c.name}</div>
                     <div className="text-xs text-muted-foreground">
                       {c.type} · {c.audience}
                     </div>
@@ -157,6 +179,53 @@ export const Route = createFileRoute("/admin/marketing")({
           </div>
         </div>
       </div>
+
+      <Dialog open={!!selectedCampaign} onOpenChange={() => setSelectedCampaign(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Campaign Details</DialogTitle>
+          </DialogHeader>
+          {selectedCampaign && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg">{selectedCampaign.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedCampaign.type} · {selectedCampaign.audience} · Sent {selectedCampaign.sent}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-lg border bg-muted/20 p-3 text-center">
+                  <Users className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                  <div className="text-xs uppercase text-muted-foreground">Sent</div>
+                  <div className="font-semibold">{selectedCampaign.sentCount ?? 0}</div>
+                </div>
+                <div className="rounded-lg border bg-muted/20 p-3 text-center">
+                  <Mail className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                  <div className="text-xs uppercase text-muted-foreground">Open Rate</div>
+                  <div className="font-semibold text-success">{selectedCampaign.openRate ?? "0%"}</div>
+                </div>
+                <div className="rounded-lg border bg-muted/20 p-3 text-center">
+                  <MousePointerClick className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                  <div className="text-xs uppercase text-muted-foreground">Clicks</div>
+                  <div className="font-semibold">N/A</div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border p-4 space-y-3">
+                <div>
+                  <div className="text-xs font-semibold text-muted-foreground uppercase">Subject</div>
+                  <div className="text-sm font-medium mt-0.5">{selectedCampaign.subject ?? "No Subject"}</div>
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-muted-foreground uppercase">Email Body</div>
+                  <div className="text-sm mt-1 whitespace-pre-wrap">{selectedCampaign.body ?? "No body content."}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
-  ),
-});
+  );
+}

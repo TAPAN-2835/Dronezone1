@@ -62,9 +62,7 @@ function RequestReview() {
   const [gst, setGst] = useState(18);
   const [quoteNotes, setQuoteNotes] = useState("");
   const [quoteSent, setQuoteSent] = useState(false);
-  const [customerResponse, setCustomerResponse] = useState<"pending" | "accepted" | "changes">(
-    "pending",
-  );
+  const [customerResponse, setCustomerResponse] = useState<"pending" | "accepted">("pending");
 
   if (!job) {
     return (
@@ -524,68 +522,50 @@ function RequestReview() {
                         </div>
                       </div>
 
+                      <div className="mt-2 rounded-lg bg-muted/50 p-2 text-center text-xs text-muted-foreground border border-muted flex items-center justify-center gap-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        Fixed pricing — customers cannot negotiate quotation amounts
+                      </div>
+
                       {/* Demo: simulate customer response */}
-                      <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                      <div className="rounded-lg border bg-muted/30 p-3 space-y-2 mt-4">
                         <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
                           Demo: Simulate Customer Response
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="flex gap-2">
                           <Button
+                            className="flex-1 bg-success hover:bg-success/90"
                             size="sm"
-                            variant={customerResponse === "accepted" ? "default" : "outline"}
                             onClick={() => {
                               setCustomerResponse("accepted");
                               toast.success("Customer accepted the quotation!");
                             }}
                           >
-                            <Check className="h-3.5 w-3.5" /> Accept
+                            <Check className="h-3.5 w-3.5 mr-1" /> Accept
                           </Button>
                           <Button
+                            variant="outline"
+                            className="flex-1 text-destructive hover:bg-destructive/10"
                             size="sm"
-                            variant={customerResponse === "changes" ? "default" : "outline"}
                             onClick={() => {
-                              setCustomerResponse("changes");
-                              toast.info("Customer requested changes to quotation");
+                              toast.error("Customer rejected the quotation!");
                             }}
                           >
-                            <FileText className="h-3.5 w-3.5" /> Request Changes
+                            <X className="h-3.5 w-3.5 mr-1" /> Reject
                           </Button>
                         </div>
                       </div>
 
                       {customerResponse === "accepted" && (
                         <Button
-                          className="w-full bg-success hover:bg-success/90"
+                          className="w-full bg-primary mt-3"
                           onClick={() => {
                             toast.success("Converted to active job!");
                             navigate({ to: "/app/active" });
                           }}
                         >
-                          <Check className="h-4 w-4" /> Convert to Active Job
+                          <Check className="h-4 w-4 mr-2" /> Convert to Active Job
                         </Button>
-                      )}
-
-                      {customerResponse === "changes" && (
-                        <div className="rounded-lg border border-warning/30 bg-warning/5 p-3 text-center">
-                          <div className="text-xs text-[oklch(0.45_0.15_75)] font-medium">
-                            Customer has requested changes
-                          </div>
-                          <div className="text-[10px] text-muted-foreground mt-1">
-                            Revise the quotation above and re-send
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="mt-2"
-                            onClick={() => {
-                              setQuoteSent(false);
-                              setCustomerResponse("pending");
-                              toast.info("Quotation reopened for editing");
-                            }}
-                          >
-                            Revise Quotation
-                          </Button>
-                        </div>
                       )}
                     </div>
                   )}

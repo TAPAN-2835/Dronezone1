@@ -485,6 +485,12 @@ export const provider = {
   bank: { name: "HDFC Bank", account: "•••• 4521", ifsc: "HDFC0001234" },
   serviceAreas: ["Bengaluru", "Mysuru", "Hosur"],
   certifications: ["DGCA Certified Pilot", "DJI Authorized Repair Technician", "ISO 9001 Trained"],
+  equipmentClass: 1 as const,
+  equipment: [
+    { name: "DJI Mavic 3 Enterprise", image: "" },
+    { name: "Thermal Imaging Camera", image: "" },
+    { name: "Diagnostic Toolkit", image: "" }
+  ],
 };
 
 export const availability = {

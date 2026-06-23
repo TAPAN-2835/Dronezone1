@@ -53,11 +53,11 @@ function Tracking() {
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3.5 w-3.5" />
           Expected Completion:{" "}
-          {hasDateChangeRequest && dateChangeStatus === "accepted"
+          {hasDateChangeRequest
             ? "22 May 2026, 05:00 PM"
             : req.scheduledAt || "Pending"}
         </div>
-        {hasDateChangeRequest && dateChangeStatus === "accepted" && (
+        {hasDateChangeRequest && (
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
             Original Completion: {req.scheduledAt}
@@ -65,11 +65,11 @@ function Tracking() {
         )}
       </div>
 
-      {hasDateChangeRequest && dateChangeStatus === "pending" && (
-        <div className="rounded-2xl border-2 border-warning/50 bg-warning/10 p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-warning">
+      {hasDateChangeRequest && (
+        <div className="rounded-2xl border bg-card p-5 shadow-sm">
+          <div className="flex items-center gap-2 text-primary">
             <Clock className="h-5 w-5" />
-            <span className="font-semibold">Date Change Request</span>
+            <span className="font-semibold">Timeline Updated</span>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -77,11 +77,11 @@ function Tracking() {
               <div className="font-medium line-through opacity-70">{req.scheduledAt}</div>
             </div>
             <div>
-              <div className="text-xs text-muted-foreground">Proposed Timeline</div>
+              <div className="text-xs text-muted-foreground">New Timeline</div>
               <div className="font-medium">22 May 2026, 05:00 PM</div>
             </div>
           </div>
-          <div className="mt-3 rounded-lg bg-card/50 p-3 text-sm">
+          <div className="mt-3 rounded-lg bg-muted/40 p-3 text-sm">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Difference
             </div>
@@ -89,23 +89,9 @@ function Tracking() {
             <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Provider Notes
             </div>
-            <p className="italic">
+            <p className="italic text-muted-foreground">
               "Spare parts need to be ordered from the central warehouse, causing a slight delay."
             </p>
-          </div>
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={() => setDateChangeStatus("accepted")}
-              className="flex-1 rounded-xl bg-primary py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => setDateChangeStatus("rejected")}
-              className="flex-1 rounded-xl bg-destructive py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 transition"
-            >
-              Reject
-            </button>
           </div>
         </div>
       )}
@@ -174,7 +160,14 @@ function Tracking() {
                 .join("")}
             </div>
             <div className="flex-1">
-              <div className="font-semibold">{req.provider.name}</div>
+              <div className="flex items-center gap-2">
+                <div className="font-semibold">{req.provider.name}</div>
+                {(req.provider as any).serviceClass && (
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary" title={`Class ${(req.provider as any).serviceClass} — Premium equipment capabilities`}>
+                    Class {(req.provider as any).serviceClass}
+                  </span>
+                )}
+              </div>
               <div className="text-xs text-muted-foreground">
                 Field Engineer · ★ {req.provider.rating}
               </div>

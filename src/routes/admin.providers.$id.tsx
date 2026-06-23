@@ -185,6 +185,56 @@ function ProviderDetail() {
 
         <Card className="lg:col-span-2">
           <CardHeader>
+            <CardTitle className="text-sm">Equipment & Classification</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 sm:grid-cols-2 text-sm">
+              <div>
+                <div className="mb-2 font-semibold text-muted-foreground">Class Assignment</div>
+                <div className="flex items-center gap-4">
+                  <span className={`rounded-full px-3 py-1 font-semibold ${
+                    (provider as any).equipmentClass === 1 ? 'bg-primary/10 text-primary' :
+                    (provider as any).equipmentClass === 2 ? 'bg-success/10 text-success' :
+                    (provider as any).equipmentClass === 3 ? 'bg-warning/10 text-[oklch(0.45_0.15_75)]' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {(provider as any).equipmentClass ? `Class ${(provider as any).equipmentClass}` : 'Unassigned'}
+                  </span>
+                  <select className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    <option value="">Change Class...</option>
+                    <option value="1">Class 1 — Premium</option>
+                    <option value="2">Class 2 — Standard</option>
+                    <option value="3">Class 3 — Basic</option>
+                  </select>
+                </div>
+                <div className="mt-4 text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Site Verification: </span>
+                  {(provider as any).equipmentClass ? 'Verified by Sales Partner' : 'Pending Verification'}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 font-semibold text-muted-foreground">Submitted Equipment</div>
+                {((provider as any).equipment && (provider as any).equipment.length > 0) ? (
+                  <ul className="space-y-2">
+                    {((provider as any).equipment).map((eq: any, i: number) => (
+                      <li key={i} className="flex items-center gap-3 rounded-lg border p-2">
+                        <div className="h-10 w-10 flex-shrink-0 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                          Img
+                        </div>
+                        <span className="font-medium">{eq.name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground">No equipment listed.</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
             <CardTitle className="text-sm">Documents</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6 sm:grid-cols-2 text-sm">

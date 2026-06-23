@@ -90,7 +90,7 @@ export const customerRequests: CustomerRequest[] = [
     scheduledAt: "20 May 2026, 11:00 AM",
     location: "Koramangala, Bengaluru",
     urgent: true,
-    provider: { name: "Rahul Kumar", phone: "+91 98765 43210", rating: 4.8 },
+    provider: { name: "Rahul Kumar", phone: "+91 98765 43210", rating: 4.8, serviceClass: 1 },
     attachments: [
       { id: "ca1", name: "Propeller Damage Photo", type: "image" },
       { id: "ca2", name: "Flight Log Screenshot", type: "image" },

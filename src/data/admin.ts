@@ -209,6 +209,11 @@ export const providerApplications = [
     email: "ramesh@skyhigh.com",
     phone: "+91 98765 11111",
     city: "Bengaluru",
+    equipmentClass: 1,
+    equipment: [
+      { name: "DJI Inspire 3", image: "" },
+      { name: "Advanced Toolkit", image: "" }
+    ],
   },
   {
     id: "PRV-2002",
@@ -388,6 +393,10 @@ export const campaigns = [
     audience: "All Users",
     sent: "10 May 2026",
     status: "Sent",
+    subject: "Get 20% off on all repairs this May!",
+    body: "Hi there, we're offering a special 20% discount on all drone repairs booked this month. Don't miss out on getting your drone ready for summer flights.",
+    sentCount: 5000,
+    openRate: "45%",
   },
   {
     name: "Battery Discount",
@@ -395,6 +404,10 @@ export const campaigns = [
     audience: "Active Users",
     sent: "08 May 2026",
     status: "Sent",
+    subject: "10% off new batteries",
+    body: "Time to upgrade your power source! Enjoy 10% off on all battery replacements.",
+    sentCount: 3200,
+    openRate: "42%",
   },
   {
     name: "AMC Renewal Offer",
@@ -402,6 +415,10 @@ export const campaigns = [
     audience: "AMC Users",
     sent: "05 May 2026",
     status: "Sent",
+    subject: "Renew your AMC and get 1 month free",
+    body: "Your Annual Maintenance Contract is due for renewal soon. Renew now and get an extra month completely free.",
+    sentCount: 1500,
+    openRate: "55%",
   },
 ];
 
