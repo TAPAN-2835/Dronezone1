@@ -52,7 +52,7 @@ function RequestReview() {
   const [timelineNotes, setTimelineNotes] = useState(job?.timelineNotes ?? "");
   const [timelineAction, setTimelineAction] = useState<"none" | "accept" | "propose">("none");
   const [providerNotes, setProviderNotes] = useState("");
-  const [showQuotation, setShowQuotation] = useState(false);
+  const [showQuotation, setShowQuotation] = useState(true);
 
   /* quotation fields */
   const [hardware, setHardware] = useState(2500);

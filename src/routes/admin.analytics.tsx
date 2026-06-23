@@ -59,6 +59,32 @@ export const Route = createFileRoute("/admin/analytics")({
           </div>
         </div>
 
+        {/* Top Cities by Requests */}
+        <div className="rounded-xl border bg-card p-4 sm:p-5">
+          <div className="mb-3 font-display font-semibold">Top Cities by Requests</div>
+          <div className="h-52 sm:h-64">
+            <ResponsiveContainer>
+              <BarChart
+                data={[
+                  { name: "Bengaluru", value: 210 },
+                  { name: "Mumbai", value: 185 },
+                  { name: "Hyderabad", value: 140 },
+                  { name: "Pune", value: 95 },
+                  { name: "Delhi", value: 80 },
+                ]}
+                layout="vertical"
+                margin={{ left: 40 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="oklch(0.92 0.012 255)" />
+                <XAxis type="number" tick={{ fontSize: 10 }} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Bar dataKey="value" fill="oklch(0.65 0.18 160)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
         {/* Provider Analytics */}
         <div className="rounded-xl border bg-card p-4 sm:p-5">
           <div className="mb-3 font-display font-semibold">Provider Status Distribution</div>

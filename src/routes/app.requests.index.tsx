@@ -11,7 +11,7 @@ import { jobs, type JobStatus } from "@/data/demo";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
-export const Route = createFileRoute("/app/requests")({
+export const Route = createFileRoute("/app/requests/")({
   head: () => ({ meta: [{ title: "Job Requests — DroneZone" }] }),
   component: Requests,
 });

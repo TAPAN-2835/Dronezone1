@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, Clock, AlertCircle, Circle } from "lucide-react";
 import { adminRequests } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,77 @@ export const Route = createFileRoute("/admin/requests/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} — Request` }] }),
   component: AdminRequestDetail,
 });
+
+type WorkflowStage = {
+  label: string;
+  description: string;
+  done: boolean;
+  active: boolean;
+};
+
+function getWorkflowStages(status: string): WorkflowStage[] {
+  const isNew = status === "New";
+  const isInProgress = status === "In Progress";
+  const isActive = status === "Active";
+  const isCompleted = status === "Completed";
+
+  return [
+    {
+      label: "Request Submitted",
+      description: "Customer submitted the service request",
+      done: true,
+      active: false,
+    },
+    {
+      label: "Provider Review",
+      description: "Service provider reviews the request and creates a quotation",
+      done: !isNew,
+      active: isNew,
+    },
+    {
+      label: "Quotation",
+      description: "Provider sends quotation to customer",
+      done: isInProgress || isActive || isCompleted,
+      active: false,
+    },
+    {
+      label: "Customer Approval",
+      description: "Customer approves the quotation",
+      done: isActive || isCompleted,
+      active: isInProgress,
+    },
+    {
+      label: "Active Job",
+      description: "Job is in progress at customer site",
+      done: isActive || isCompleted,
+      active: isActive && !isCompleted,
+    },
+    {
+      label: "Completed",
+      description: "Service completed and feedback submitted",
+      done: isCompleted,
+      active: false,
+    },
+  ];
+}
+
+function getBottleneckMessage(status: string): { msg: string; variant: "warning" | "info" | "success" } {
+  if (status === "New")
+    return { msg: "Waiting for Provider to Review & Create Quotation", variant: "warning" };
+  if (status === "In Progress")
+    return { msg: "Waiting for Customer to Approve Quotation", variant: "info" };
+  if (status === "Active")
+    return { msg: "Job is Active — In Progress", variant: "success" };
+  if (status === "Completed")
+    return { msg: "Completed", variant: "success" };
+  return { msg: "Unknown Stage", variant: "warning" };
+}
+
+const bottleneckStyles = {
+  warning: "border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300",
+  info: "border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+  success: "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
+};
 
 function AdminRequestDetail() {
   const { id } = Route.useParams();
@@ -24,6 +95,9 @@ function AdminRequestDetail() {
       </div>
     );
   }
+
+  const stages = getWorkflowStages(req.status);
+  const bottleneck = getBottleneckMessage(req.status);
 
   return (
     <div className="space-y-6">
@@ -53,6 +127,7 @@ function AdminRequestDetail() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        {/* Request Details card */}
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">Request Details</CardTitle>
@@ -86,75 +161,80 @@ function AdminRequestDetail() {
           </CardContent>
         </Card>
 
+        {/* Workflow Status card — enhanced vertical stepper */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Workflow Status</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Clock className="h-4 w-4 text-primary" />
+              Workflow Status
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Current Stage
-                </div>
-                <div className="mt-1 font-semibold">{req.status}</div>
-              </div>
-              <div>
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Waiting For
-                </div>
-                <div className="mt-1 font-semibold text-warning">
-                  {req.status === "New"
-                    ? "Provider Action"
-                    : req.status === "In Progress"
-                      ? "Customer Approval"
-                      : "None"}
-                </div>
-              </div>
-            </div>
+          <CardContent className="space-y-4">
+            {/* Vertical stepper */}
+            <ol className="relative space-y-3 border-l-2 border-border pl-5 text-sm">
+              {stages.map((stage, i) => (
+                <li key={i} className="relative">
+                  {/* Step dot */}
+                  <span
+                    className={`absolute -left-[27px] flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                      stage.done
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : stage.active
+                          ? "border-yellow-400 bg-yellow-400 text-yellow-900"
+                          : "border-border bg-card"
+                    }`}
+                  >
+                    {stage.done ? (
+                      <Check className="h-3 w-3" strokeWidth={3} />
+                    ) : stage.active ? (
+                      <Clock className="h-3 w-3" strokeWidth={2.5} />
+                    ) : (
+                      <Circle className="h-2.5 w-2.5 text-muted-foreground/30" />
+                    )}
+                  </span>
 
-            <div className="pt-2">
-              <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
-                Workflow Progress
-              </div>
-              <div className="flex items-center gap-1 text-xs">
-                <span className="font-semibold text-primary">Submitted</span>
-                <span className="text-muted-foreground">→</span>
-                <span
-                  className={
-                    req.status === "New" ? "font-semibold text-primary" : "text-muted-foreground"
-                  }
-                >
-                  Review
-                </span>
-                <span className="text-muted-foreground">→</span>
-                <span
-                  className={
-                    req.status === "In Progress"
-                      ? "font-semibold text-primary"
-                      : "text-muted-foreground"
-                  }
-                >
-                  Quotation
-                </span>
-                <span className="text-muted-foreground">→</span>
-                <span className="text-muted-foreground">Approval</span>
-                <span className="text-muted-foreground">→</span>
-                <span className="text-muted-foreground">Active Job</span>
-                <span className="text-muted-foreground">→</span>
-                <span
-                  className={
-                    req.status === "Completed"
-                      ? "font-semibold text-primary"
-                      : "text-muted-foreground"
-                  }
-                >
-                  Resolved
-                </span>
+                  {/* Label row */}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={
+                        stage.done
+                          ? "font-medium text-emerald-600 dark:text-emerald-400"
+                          : stage.active
+                            ? "font-semibold text-yellow-600 dark:text-yellow-400"
+                            : "text-muted-foreground"
+                      }
+                    >
+                      {stage.label}
+                    </span>
+                    {stage.active && (
+                      <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-semibold text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300">
+                        Current
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Description shown only for active stage */}
+                  {stage.active && (
+                    <div className="mt-0.5 text-xs text-muted-foreground">{stage.description}</div>
+                  )}
+                </li>
+              ))}
+            </ol>
+
+            {/* Current Bottleneck highlight */}
+            <div
+              className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-xs font-medium ${bottleneckStyles[bottleneck.variant]}`}
+            >
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <div>
+                <span className="mr-1 font-bold uppercase tracking-wide opacity-60">Bottleneck:</span>
+                {bottleneck.msg}
               </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Actions card */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-sm">Actions</CardTitle>

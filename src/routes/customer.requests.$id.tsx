@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Phone, MessageSquare, MapPin, Check, Paperclip, Clock, ExternalLink } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customerRequests, trackingStages } from "@/data/customer";
-import { getMapEmbedUrl, getMapSearchUrl } from "@/lib/map-utils";
 
 export const Route = createFileRoute("/customer/requests/$id")({
   head: () => ({ meta: [{ title: "Request Details — DroneZone" }] }),
@@ -180,7 +179,11 @@ function Tracking() {
             </a>
             <Link
               to="/customer/chat"
-              className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary"
+              className={`grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary ${
+                ["in_progress", "en_route", "on_site", "testing", "accepted"].includes(req.status)
+                  ? ""
+                  : "pointer-events-none opacity-30 cursor-not-allowed"
+              }`}
             >
               <MessageSquare className="h-4 w-4" />
             </Link>

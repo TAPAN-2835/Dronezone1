@@ -30,7 +30,7 @@ import { Route as AppVerificationRouteImport } from './routes/app.verification'
 import { Route as AppSignupRouteImport } from './routes/app.signup'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppScheduleRouteImport } from './routes/app.schedule'
-import { Route as AppRequestsRouteImport } from './routes/app.requests'
+import { Route as AppQuotationsRouteImport } from './routes/app.quotations'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppHistoryRouteImport } from './routes/app.history'
@@ -48,6 +48,7 @@ import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AppRequestsIndexRouteImport } from './routes/app.requests.index'
 import { Route as CustomerRequestsIdRouteImport } from './routes/customer.requests.$id'
 import { Route as CustomerProfileSectionRouteImport } from './routes/customer.profile.$section'
 import { Route as CustomerGrievancesNewRouteImport } from './routes/customer.grievances.new'
@@ -166,9 +167,9 @@ const AppScheduleRoute = AppScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRequestsRoute = AppRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
+const AppQuotationsRoute = AppQuotationsRouteImport.update({
+  id: '/quotations',
+  path: '/quotations',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -256,6 +257,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AppRequestsIndexRoute = AppRequestsIndexRouteImport.update({
+  id: '/requests/',
+  path: '/requests/',
+  getParentRoute: () => AppRoute,
+} as any)
 const CustomerRequestsIdRoute = CustomerRequestsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -272,9 +278,9 @@ const CustomerGrievancesNewRoute = CustomerGrievancesNewRouteImport.update({
   getParentRoute: () => CustomerRoute,
 } as any)
 const AppRequestsIdRoute = AppRequestsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AppRequestsRoute,
+  id: '/requests/$id',
+  path: '/requests/$id',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppJobsIdRoute = AppJobsIdRouteImport.update({
   id: '/jobs/$id',
@@ -341,7 +347,7 @@ export interface FileRoutesByFullPath {
   '/app/history': typeof AppHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
-  '/app/requests': typeof AppRequestsRouteWithChildren
+  '/app/quotations': typeof AppQuotationsRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/signup': typeof AppSignupRoute
@@ -369,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/customer/grievances/new': typeof CustomerGrievancesNewRoute
   '/customer/profile/$section': typeof CustomerProfileSectionRoute
   '/customer/requests/$id': typeof CustomerRequestsIdRoute
+  '/app/requests/': typeof AppRequestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -394,7 +401,7 @@ export interface FileRoutesByTo {
   '/app/history': typeof AppHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
-  '/app/requests': typeof AppRequestsRouteWithChildren
+  '/app/quotations': typeof AppQuotationsRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/signup': typeof AppSignupRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/customer/grievances/new': typeof CustomerGrievancesNewRoute
   '/customer/profile/$section': typeof CustomerProfileSectionRoute
   '/customer/requests/$id': typeof CustomerRequestsIdRoute
+  '/app/requests': typeof AppRequestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -448,7 +456,7 @@ export interface FileRoutesById {
   '/app/history': typeof AppHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
-  '/app/requests': typeof AppRequestsRouteWithChildren
+  '/app/quotations': typeof AppQuotationsRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/signup': typeof AppSignupRoute
@@ -476,6 +484,7 @@ export interface FileRoutesById {
   '/customer/grievances/new': typeof CustomerGrievancesNewRoute
   '/customer/profile/$section': typeof CustomerProfileSectionRoute
   '/customer/requests/$id': typeof CustomerRequestsIdRoute
+  '/app/requests/': typeof AppRequestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -503,7 +512,7 @@ export interface FileRouteTypes {
     | '/app/history'
     | '/app/notifications'
     | '/app/profile'
-    | '/app/requests'
+    | '/app/quotations'
     | '/app/schedule'
     | '/app/settings'
     | '/app/signup'
@@ -531,6 +540,7 @@ export interface FileRouteTypes {
     | '/customer/grievances/new'
     | '/customer/profile/$section'
     | '/customer/requests/$id'
+    | '/app/requests/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -556,7 +566,7 @@ export interface FileRouteTypes {
     | '/app/history'
     | '/app/notifications'
     | '/app/profile'
-    | '/app/requests'
+    | '/app/quotations'
     | '/app/schedule'
     | '/app/settings'
     | '/app/signup'
@@ -584,6 +594,7 @@ export interface FileRouteTypes {
     | '/customer/grievances/new'
     | '/customer/profile/$section'
     | '/customer/requests/$id'
+    | '/app/requests'
   id:
     | '__root__'
     | '/'
@@ -609,7 +620,7 @@ export interface FileRouteTypes {
     | '/app/history'
     | '/app/notifications'
     | '/app/profile'
-    | '/app/requests'
+    | '/app/quotations'
     | '/app/schedule'
     | '/app/settings'
     | '/app/signup'
@@ -637,6 +648,7 @@ export interface FileRouteTypes {
     | '/customer/grievances/new'
     | '/customer/profile/$section'
     | '/customer/requests/$id'
+    | '/app/requests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -797,11 +809,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppScheduleRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/requests': {
-      id: '/app/requests'
-      path: '/requests'
-      fullPath: '/app/requests'
-      preLoaderRoute: typeof AppRequestsRouteImport
+    '/app/quotations': {
+      id: '/app/quotations'
+      path: '/quotations'
+      fullPath: '/app/quotations'
+      preLoaderRoute: typeof AppQuotationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/profile': {
@@ -923,6 +935,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/app/requests/': {
+      id: '/app/requests/'
+      path: '/requests'
+      fullPath: '/app/requests/'
+      preLoaderRoute: typeof AppRequestsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/customer/requests/$id': {
       id: '/customer/requests/$id'
       path: '/$id'
@@ -946,10 +965,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/requests/$id': {
       id: '/app/requests/$id'
-      path: '/$id'
+      path: '/requests/$id'
       fullPath: '/app/requests/$id'
       preLoaderRoute: typeof AppRequestsIdRouteImport
-      parentRoute: typeof AppRequestsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/jobs/$id': {
       id: '/app/jobs/$id'
@@ -1102,18 +1121,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface AppRequestsRouteChildren {
-  AppRequestsIdRoute: typeof AppRequestsIdRoute
-}
-
-const AppRequestsRouteChildren: AppRequestsRouteChildren = {
-  AppRequestsIdRoute: AppRequestsIdRoute,
-}
-
-const AppRequestsRouteWithChildren = AppRequestsRoute._addFileChildren(
-  AppRequestsRouteChildren,
-)
-
 interface AppRouteChildren {
   AppActiveRoute: typeof AppActiveRoute
   AppChatRoute: typeof AppChatRoute
@@ -1121,13 +1128,15 @@ interface AppRouteChildren {
   AppHistoryRoute: typeof AppHistoryRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
-  AppRequestsRoute: typeof AppRequestsRouteWithChildren
+  AppQuotationsRoute: typeof AppQuotationsRoute
   AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSignupRoute: typeof AppSignupRoute
   AppVerificationRoute: typeof AppVerificationRoute
   AppGrievancesNewRoute: typeof AppGrievancesNewRoute
   AppJobsIdRoute: typeof AppJobsIdRoute
+  AppRequestsIdRoute: typeof AppRequestsIdRoute
+  AppRequestsIndexRoute: typeof AppRequestsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1137,13 +1146,15 @@ const AppRouteChildren: AppRouteChildren = {
   AppHistoryRoute: AppHistoryRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
-  AppRequestsRoute: AppRequestsRouteWithChildren,
+  AppQuotationsRoute: AppQuotationsRoute,
   AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSignupRoute: AppSignupRoute,
   AppVerificationRoute: AppVerificationRoute,
   AppGrievancesNewRoute: AppGrievancesNewRoute,
   AppJobsIdRoute: AppJobsIdRoute,
+  AppRequestsIdRoute: AppRequestsIdRoute,
+  AppRequestsIndexRoute: AppRequestsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
