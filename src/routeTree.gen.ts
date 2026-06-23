@@ -31,7 +31,6 @@ import { Route as AppSignupRouteImport } from './routes/app.signup'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppScheduleRouteImport } from './routes/app.schedule'
 import { Route as AppRequestsRouteImport } from './routes/app.requests'
-import { Route as AppQuotationsRouteImport } from './routes/app.quotations'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppHistoryRouteImport } from './routes/app.history'
@@ -170,11 +169,6 @@ const AppScheduleRoute = AppScheduleRouteImport.update({
 const AppRequestsRoute = AppRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppQuotationsRoute = AppQuotationsRouteImport.update({
-  id: '/quotations',
-  path: '/quotations',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -347,7 +341,6 @@ export interface FileRoutesByFullPath {
   '/app/history': typeof AppHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
-  '/app/quotations': typeof AppQuotationsRoute
   '/app/requests': typeof AppRequestsRouteWithChildren
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
@@ -401,7 +394,6 @@ export interface FileRoutesByTo {
   '/app/history': typeof AppHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
-  '/app/quotations': typeof AppQuotationsRoute
   '/app/requests': typeof AppRequestsRouteWithChildren
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
@@ -456,7 +448,6 @@ export interface FileRoutesById {
   '/app/history': typeof AppHistoryRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
-  '/app/quotations': typeof AppQuotationsRoute
   '/app/requests': typeof AppRequestsRouteWithChildren
   '/app/schedule': typeof AppScheduleRoute
   '/app/settings': typeof AppSettingsRoute
@@ -512,7 +503,6 @@ export interface FileRouteTypes {
     | '/app/history'
     | '/app/notifications'
     | '/app/profile'
-    | '/app/quotations'
     | '/app/requests'
     | '/app/schedule'
     | '/app/settings'
@@ -566,7 +556,6 @@ export interface FileRouteTypes {
     | '/app/history'
     | '/app/notifications'
     | '/app/profile'
-    | '/app/quotations'
     | '/app/requests'
     | '/app/schedule'
     | '/app/settings'
@@ -620,7 +609,6 @@ export interface FileRouteTypes {
     | '/app/history'
     | '/app/notifications'
     | '/app/profile'
-    | '/app/quotations'
     | '/app/requests'
     | '/app/schedule'
     | '/app/settings'
@@ -814,13 +802,6 @@ declare module '@tanstack/react-router' {
       path: '/requests'
       fullPath: '/app/requests'
       preLoaderRoute: typeof AppRequestsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/quotations': {
-      id: '/app/quotations'
-      path: '/quotations'
-      fullPath: '/app/quotations'
-      preLoaderRoute: typeof AppQuotationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/profile': {
@@ -1140,7 +1121,6 @@ interface AppRouteChildren {
   AppHistoryRoute: typeof AppHistoryRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
-  AppQuotationsRoute: typeof AppQuotationsRoute
   AppRequestsRoute: typeof AppRequestsRouteWithChildren
   AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -1157,7 +1137,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppHistoryRoute: AppHistoryRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
-  AppQuotationsRoute: AppQuotationsRoute,
   AppRequestsRoute: AppRequestsRouteWithChildren,
   AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,

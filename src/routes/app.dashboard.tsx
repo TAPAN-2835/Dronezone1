@@ -144,7 +144,7 @@ function Dashboard() {
         })}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-2">
         <Link to="/app/notifications">
           <Card className="transition-shadow hover:shadow-md cursor-pointer">
             <CardContent className="flex items-center gap-3 p-4">
@@ -159,20 +159,7 @@ function Dashboard() {
             </CardContent>
           </Card>
         </Link>
-        <Link to="/app/quotations">
-          <Card className="transition-shadow hover:shadow-md cursor-pointer">
-            <CardContent className="flex items-center gap-3 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/15 text-[oklch(0.45_0.15_75)]">
-                <IndianRupee className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold">Quotations</div>
-                <div className="text-xs text-muted-foreground">Manage quotes</div>
-              </div>
-              <ArrowUpRight className="ml-auto h-4 w-4 text-muted-foreground" />
-            </CardContent>
-          </Card>
-        </Link>
+
         <Link to="/app/grievances/new" className="col-span-2 sm:col-span-1">
           <Card className="transition-shadow hover:shadow-md cursor-pointer">
             <CardContent className="flex items-center gap-3 p-4">

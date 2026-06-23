@@ -21,18 +21,20 @@ export const Route = createFileRoute("/app/history")({
   component: History,
 });
 
-function getDelay(job: (typeof jobs)[number]): { days: number; label: string; color: string } {
+function getDelay(job: (typeof jobs)[number]): { days: number; label: string; color: string; bg: string } {
   if (!job.completedAt || !job.requestedCompletionDate)
-    return { days: 0, label: "On Time", color: "text-success" };
+    return { days: 0, label: "On Time", color: "text-success", bg: "bg-success/15" };
   const completed = new Date(job.completedAt);
   const requested = new Date(job.requestedCompletionDate);
   const diffMs = completed.getTime() - requested.getTime();
   const diffDays = Math.max(0, Math.ceil(diffMs / 86400000));
-  if (diffDays === 0) return { days: 0, label: "On Time", color: "text-success" };
+  if (diffDays === 0) return { days: 0, label: "On Time", color: "text-success", bg: "bg-success/15" };
+  if (diffDays === 1) return { days: 1, label: "1 Day Delay", color: "text-destructive", bg: "bg-destructive/10" };
   return {
     days: diffDays,
-    label: `${diffDays} Day${diffDays > 1 ? "s" : ""} Delay`,
+    label: `${diffDays} Days Delay`,
     color: "text-destructive",
+    bg: "bg-destructive/30",
   };
 }
 
@@ -177,11 +179,7 @@ function History() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          delay.days === 0
-                            ? "bg-success/15 text-success"
-                            : "bg-destructive/10 text-destructive"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${delay.bg} ${delay.color}`}
                       >
                         {delay.days === 0 ? (
                           <CheckCircle2 className="h-3 w-3" />

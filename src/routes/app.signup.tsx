@@ -77,7 +77,7 @@ function SignUpPage() {
   const canNext = () => {
     if (step === 1) return fullName && email && phone && password.length >= 6;
     if (step === 2) return address && city && state && pincode;
-    if (step === 3) return certs.length > 0;
+    if (step === 3) return certs.length > 0 && dgca && idProof;
     return true;
   };
 

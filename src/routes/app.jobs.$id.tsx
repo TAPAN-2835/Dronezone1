@@ -80,11 +80,7 @@ function JobDetails() {
         }
         actions={
           <>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/app/quotations">
-                <FileText className="h-4 w-4" /> Quotation
-              </Link>
-            </Button>
+
             <Button variant="outline" size="sm" asChild>
               <Link to="/app/chat">
                 <MessageSquare className="h-4 w-4" /> Chat
