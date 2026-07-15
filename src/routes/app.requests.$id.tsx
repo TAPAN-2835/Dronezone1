@@ -30,7 +30,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { inr } from "@/data/demo";
+const inr = (value: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
 import { toast } from "sonner";
 import {
   acceptAssignment,
@@ -38,6 +43,7 @@ import {
   rejectAssignment,
   updateJobTimeline,
 } from "@/lib/api/provider";
+import { RequestAttachments } from "@/components/shared/RequestAttachments";
 
 export const Page = definePage("/app/requests/$id")({
   head: ({ params }) => ({ meta: [{ title: `Review ${params.id} â€” DroneZone` }] }),
@@ -268,30 +274,16 @@ function RequestReview() {
             </CardContent>
           </Card>
 
-          {/* â”€â”€ Attachments â”€â”€ */}
-          {job.attachments && job.attachments.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Paperclip className="h-4 w-4 text-primary" /> Attachments
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {job.attachments.map((a: any) => (
-                    <div
-                      key={a.id}
-                      className="flex aspect-video flex-col items-center justify-center rounded-lg border bg-gradient-to-br from-muted to-card p-3 text-center"
-                    >
-                      <Paperclip className="h-5 w-5 text-muted-foreground" />
-                      <span className="mt-2 text-xs font-medium">{a.name}</span>
-                      <span className="text-[10px] uppercase text-muted-foreground">{a.type}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Paperclip className="h-4 w-4 text-primary" /> Attachments
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RequestAttachments requestId={job.service_request_id} />
+            </CardContent>
+          </Card>
 
           {/* â”€â”€ ITEM 3 & 4: More Days Required + Timeline Negotiation â”€â”€ */}
           {!isNew && (

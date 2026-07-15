@@ -1,11 +1,11 @@
 ﻿import { definePage, Link, useLoaderData } from "@/lib/router";
 import { ArrowLeft, User, Wrench, IndianRupee, Shield, Clock } from "lucide-react";
-import { grievances } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { inr } from "@/data/demo";
 import { getAdminJobDetails } from "@/lib/api/admin";
+const inr = (value: number) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(value);
 
 export const Page = definePage("/admin/jobs/$id")({
   head: ({ params }) => ({ meta: [{ title: `Job ${params.id} â€” Admin` }] }),
@@ -14,8 +14,7 @@ export const Page = definePage("/admin/jobs/$id")({
 });
 
 function AdminJobDetail() {
-  const { job } = useLoaderData({ from: "/admin/jobs/$id" }) as any;
-  const relatedGrievances = grievances.filter((g) => g.jobId === job?.id);
+  const { job, grievances: relatedGrievances } = useLoaderData({ from: "/admin/jobs/$id" }) as any;
 
   if (!job) {
     return (
@@ -87,7 +86,7 @@ function AdminJobDetail() {
                 <CardTitle className="text-sm">Related Grievances</CardTitle>
               </CardHeader>
               <CardContent className="divide-y">
-                {relatedGrievances.map((g) => (
+                {relatedGrievances.map((g: any) => (
                   <Link
                     key={g.id}
                     to="/admin/grievances/$id"
@@ -95,8 +94,8 @@ function AdminJobDetail() {
                     className="flex items-center justify-between py-3 first:pt-0 last:pb-0 hover:text-primary"
                   >
                     <div>
-                      <div className="font-semibold">{g.id}</div>
-                      <div className="text-xs text-muted-foreground">{g.issue}</div>
+                      <div className="font-semibold">{g.grievance_number}</div>
+                      <div className="text-xs text-muted-foreground">{g.subject}</div>
                     </div>
                     <span className="text-xs font-medium">{g.status}</span>
                   </Link>

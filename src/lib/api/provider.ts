@@ -10,7 +10,7 @@ const assignmentSelect =
 
 export async function getProviderDashboard() {
   const user = await providerUser();
-  const [profile, pending, active, completed] = await Promise.all([
+  const [profile, pending, active, completed, notifications] = await Promise.all([
     supabase
       .from("provider_profiles")
       .select("*, users(id,email,phone,first_name,last_name,is_active,created_at,updated_at)")
@@ -30,10 +30,48 @@ export async function getProviderDashboard() {
       .order("updated_at", { ascending: false }),
     supabase
       .from("job_assignments")
-      .select("id", { count: "exact", head: true })
+      .select("id,completed_at,service_requests(fixed_price,tax_percent)")
       .eq("provider_id", user.id)
       .eq("status", "completed"),
+    supabase
+      .from("notifications")
+      .select("id,title,body,deep_link,read_at,created_at")
+      .is("deleted_at", null)
+      .is("archived_at", null)
+      .order("created_at", { ascending: false })
+      .limit(4),
   ]);
+  const completedRows = unwrap(completed) ?? [];
+  const monthKey = new Date().toISOString().slice(0, 7);
+  const revenueMonth = completedRows
+    .filter((row: any) => row.completed_at?.startsWith(monthKey))
+    .reduce(
+      (sum: number, row: any) =>
+        sum +
+        Number(row.service_requests?.fixed_price ?? 0) *
+          (1 + Number(row.service_requests?.tax_percent ?? 0) / 100),
+      0,
+    );
+  const weeklyJobs = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - offset));
+    const key = date.toISOString().slice(0, 10);
+    return {
+      day: date.toLocaleDateString("en-IN", { weekday: "short" }),
+      jobs: completedRows.filter((row: any) => row.completed_at?.startsWith(key)).length,
+    };
+  });
+  const revenueTrend = Array.from({ length: 6 }, (_, offset) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - (5 - offset));
+    const key = date.toISOString().slice(0, 7);
+    return {
+      month: date.toLocaleDateString("en-IN", { month: "short" }),
+      revenue: completedRows
+        .filter((row: any) => row.completed_at?.startsWith(key))
+        .reduce((sum: number, row: any) => sum + Number(row.service_requests?.fixed_price ?? 0), 0),
+    };
+  });
   return {
     profile: unwrap(profile),
     newRequests: unwrap(pending) ?? [],
@@ -41,9 +79,12 @@ export async function getProviderDashboard() {
     stats: {
       newCount: pending.data?.length ?? 0,
       activeCount: active.data?.length ?? 0,
-      completedCount: completed.count ?? 0,
-      revenueMonth: 0,
+      completedCount: completedRows.length,
+      revenueMonth,
     },
+    weeklyJobs,
+    revenueTrend,
+    notifications: unwrap(notifications) ?? [],
   };
 }
 

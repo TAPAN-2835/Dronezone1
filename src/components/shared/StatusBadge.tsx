@@ -1,5 +1,18 @@
 import { cn } from "@/lib/utils";
-import { type JobStatus, statusLabel, statusTone } from "@/data/demo";
+type JobStatus = string;
+type Tone = "blue" | "green" | "amber" | "red" | "slate";
+const statusLabel = (status: string) =>
+  status.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const statusTone = (status: string): Tone =>
+  ["completed", "approved"].includes(status)
+    ? "green"
+    : ["rejected", "cancelled"].includes(status)
+      ? "red"
+      : ["pending", "on_hold", "review", "in_approval"].includes(status)
+        ? "amber"
+        : ["accepted", "in_progress"].includes(status)
+          ? "blue"
+          : "slate";
 
 const tones: Record<ReturnType<typeof statusTone>, string> = {
   blue: "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20",

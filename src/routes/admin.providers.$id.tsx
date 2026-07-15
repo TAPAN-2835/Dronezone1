@@ -1,6 +1,5 @@
 ﻿import { definePage, Link, useRouter } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
-import { providerDocs, grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -9,10 +8,27 @@ import {
   getAdminProviderDetails,
   updateProviderVerification,
 } from "@/lib/api/admin";
+import {
+  getProviderDocumentSignedUrl,
+  getProviderEquipmentSignedUrl,
+  listProviderDocuments,
+  listProviderEquipment,
+  reviewProviderDocument,
+  reviewProviderEquipment,
+} from "@/lib/api/storage";
 
 export const Page = definePage("/admin/providers/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Provider` }] }),
-  loader: ({ params }) => getAdminProviderDetails({ data: { providerId: params.id } }),
+  loader: async ({ params }) => {
+    const { provider, grievances } = await getAdminProviderDetails({
+      data: { providerId: params.id },
+    });
+    const [documents, equipment] = await Promise.all([
+      listProviderDocuments(provider.user_id),
+      listProviderEquipment(provider.user_id),
+    ]);
+    return { provider, documents, equipment, grievances };
+  },
   component: ProviderDetail,
 });
 
@@ -20,6 +36,8 @@ function ProviderDetail() {
   const { id } = Page.useParams();
   const loaderData = Page.useLoaderData() as any;
   const dbProvider = loaderData?.provider;
+  const documents = loaderData?.documents ?? [];
+  const equipment = loaderData?.equipment ?? [];
   const router = useRouter();
 
   const provider = {
@@ -37,11 +55,10 @@ function ProviderDetail() {
       ? `${dbProvider.years_of_experience} years`
       : "Not provided",
     categories: dbProvider.specializations || "Not provided",
+    equipmentClass: dbProvider.equipment_class,
   };
 
-  const providerGrievances = grievances.filter(
-    (g) => g.raisedById === provider.id || g.against === provider.business,
-  );
+  const providerGrievances = loaderData?.grievances ?? [];
 
   if (!provider) {
     return (
@@ -188,11 +205,14 @@ function ProviderDetail() {
               {provider.submitted}
             </div>
             <div>
-              <span className="text-muted-foreground">Review Date: </span>14 May 2026
+              <span className="text-muted-foreground">Review Date: </span>
+              {dbProvider.verified_at
+                ? new Date(dbProvider.verified_at).toLocaleDateString()
+                : "Pending"}
             </div>
             <div className="sm:col-span-2">
-              <span className="text-muted-foreground">Reviewer Notes: </span>All documents verified.
-              Waiting on final background check clearance.
+              <span className="text-muted-foreground">Reviewer Notes: </span>
+              {dbProvider.rejection_reason || "See individual document and equipment review notes."}
             </div>
           </CardContent>
         </Card>
@@ -237,14 +257,61 @@ function ProviderDetail() {
               </div>
               <div>
                 <div className="mb-2 font-semibold text-muted-foreground">Submitted Equipment</div>
-                {(provider as any).equipment && (provider as any).equipment.length > 0 ? (
+                {equipment.length > 0 ? (
                   <ul className="space-y-2">
-                    {(provider as any).equipment.map((eq: any, i: number) => (
-                      <li key={i} className="flex items-center gap-3 rounded-lg border p-2">
-                        <div className="h-10 w-10 flex-shrink-0 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                          Img
+                    {equipment.map((eq: any) => (
+                      <li key={eq.id} className="flex items-center gap-3 rounded-lg border p-2">
+                        <button
+                          className="h-10 w-10 flex-shrink-0 rounded bg-muted text-xs text-primary"
+                          onClick={async () => {
+                            try {
+                              window.open(
+                                await getProviderEquipmentSignedUrl(eq),
+                                "_blank",
+                                "noopener,noreferrer",
+                              );
+                            } catch (error) {
+                              toast.error(
+                                error instanceof Error ? error.message : "Preview failed",
+                              );
+                            }
+                          }}
+                        >
+                          View
+                        </button>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium">{eq.equipment_name}</div>
+                          <div className="text-xs capitalize text-muted-foreground">
+                            {eq.verification_status}
+                          </div>
+                          {eq.admin_notes && (
+                            <p className="text-xs text-destructive">{eq.admin_notes}</p>
+                          )}
                         </div>
-                        <span className="font-medium">{eq.name}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            await reviewProviderEquipment(eq.id, "approved");
+                            toast.success("Equipment approved");
+                            await router.invalidate();
+                          }}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={async () => {
+                            const notes = window.prompt("Rejection notes:")?.trim();
+                            if (!notes) return;
+                            await reviewProviderEquipment(eq.id, "rejected", notes);
+                            toast.success("Equipment rejected");
+                            await router.invalidate();
+                          }}
+                        >
+                          Reject
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -260,36 +327,68 @@ function ProviderDetail() {
           <CardHeader>
             <CardTitle className="text-sm">Documents</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-6 sm:grid-cols-2 text-sm">
-            <div>
-              <div className="mb-2 font-semibold text-muted-foreground">Uploaded Documents</div>
+          <CardContent className="text-sm">
+            {documents.length === 0 ? (
+              <p className="text-muted-foreground">No documents uploaded.</p>
+            ) : (
               <ul className="space-y-2">
-                {providerDocs
-                  .filter((d) => d.status === "Verified")
-                  .map((d) => (
-                    <li key={d.name} className="flex justify-between rounded-lg border p-2">
-                      <span>{d.name}</span>
-                      <span className="text-xs font-semibold text-success">{d.status}</span>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-            <div>
-              <div className="mb-2 font-semibold text-muted-foreground">Pending Documents</div>
-              <ul className="space-y-2">
-                {providerDocs
-                  .filter((d) => d.status !== "Verified")
-                  .map((d) => (
-                    <li
-                      key={d.name}
-                      className="flex justify-between rounded-lg border border-warning/30 bg-warning/5 p-2"
+                {documents.map((document: any) => (
+                  <li
+                    key={document.id}
+                    className="flex flex-wrap items-center gap-2 rounded-lg border p-3"
+                  >
+                    <button
+                      className="font-medium text-primary hover:underline"
+                      onClick={async () => {
+                        try {
+                          window.open(
+                            await getProviderDocumentSignedUrl(document),
+                            "_blank",
+                            "noopener,noreferrer",
+                          );
+                        } catch (error) {
+                          toast.error(error instanceof Error ? error.message : "Preview failed");
+                        }
+                      }}
                     >
-                      <span>{d.name}</span>
-                      <span className="text-xs font-semibold text-warning">{d.status}</span>
-                    </li>
-                  ))}
+                      {document.document_name}
+                    </button>
+                    <span className="mr-auto text-xs capitalize text-muted-foreground">
+                      {document.document_type.replaceAll("_", " ")} · {document.verification_status}
+                    </span>
+                    {document.admin_notes && (
+                      <span className="w-full text-xs text-destructive">
+                        Admin notes: {document.admin_notes}
+                      </span>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        await reviewProviderDocument(document.id, "approved");
+                        toast.success("Document approved");
+                        await router.invalidate();
+                      }}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={async () => {
+                        const notes = window.prompt("Rejection notes:")?.trim();
+                        if (!notes) return;
+                        await reviewProviderDocument(document.id, "rejected", notes);
+                        toast.success("Document rejected");
+                        await router.invalidate();
+                      }}
+                    >
+                      Reject
+                    </Button>
+                  </li>
+                ))}
               </ul>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -304,7 +403,7 @@ function ProviderDetail() {
               </p>
             ) : (
               <div className="divide-y">
-                {providerGrievances.map((g) => (
+                {providerGrievances.map((g: any) => (
                   <Link
                     key={g.id}
                     to="/admin/grievances/$id"
@@ -312,7 +411,7 @@ function ProviderDetail() {
                     className="flex justify-between py-3 text-sm hover:text-primary"
                   >
                     <div>
-                      <span className="font-semibold">{g.id}</span> Â· {g.issue}
+                      <span className="font-semibold">{g.grievance_number}</span> · {g.subject}
                     </div>
                     <span className="text-xs">{g.status}</span>
                   </Link>

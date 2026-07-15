@@ -25,9 +25,15 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { revenueTrend, weeklyJobs, inr, notifications } from "@/data/demo";
 import { motion } from "framer-motion";
 import { getProviderDashboard } from "@/lib/api/provider";
+
+const inr = (value: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
 
 export const Page = definePage("/app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard â€” DroneZone" }] }),
@@ -42,10 +48,11 @@ const toneStyles: Record<string, string> = {
 };
 
 function Dashboard() {
-  const { profile, newRequests, activeJobs, stats } = Page.useLoaderData();
+  const { profile, newRequests, activeJobs, stats, revenueTrend, weeklyJobs, notifications } =
+    Page.useLoaderData();
 
   const recentNotifs = notifications.slice(0, 4);
-  const unreadNotifs = notifications.filter((n) => !n.read).length;
+  const unreadNotifs = notifications.filter((n: any) => !n.read_at).length;
 
   const statCards = [
     {
@@ -379,10 +386,10 @@ function Dashboard() {
           </Button>
         </CardHeader>
         <CardContent className="divide-y">
-          {recentNotifs.map((n) => (
+          {recentNotifs.map((n: any) => (
             <Link
               key={n.id}
-              to={n.href ?? "/app/notifications"}
+              to={n.deep_link ?? "/app/notifications"}
               className="flex items-start gap-3 py-3 first:pt-0 last:pb-0 hover:bg-muted/30 -mx-2 px-2 rounded-lg transition"
             >
               <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
@@ -390,7 +397,9 @@ function Dashboard() {
                 <div className="text-sm font-medium">{n.title}</div>
                 <div className="text-xs text-muted-foreground">{n.body}</div>
               </div>
-              <div className="text-xs text-muted-foreground">{n.time}</div>
+              <div className="text-xs text-muted-foreground">
+                {new Date(n.created_at).toLocaleString("en-IN")}
+              </div>
             </Link>
           ))}
         </CardContent>

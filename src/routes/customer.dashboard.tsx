@@ -1,10 +1,7 @@
 ﻿import { definePage, Link } from "@/lib/router";
 import { ChevronRight, Plus, Shield, Sparkles } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
-import { amc, customer, customerRequests, inr } from "@/data/customer";
-
 import { getCustomerDashboard } from "@/lib/api/customer";
-import { format } from "date-fns";
 
 export const Page = definePage("/customer/dashboard")({
   head: () => ({ meta: [{ title: "Home â€” DroneZone" }] }),
@@ -52,14 +49,20 @@ function Home() {
               My AMC
             </span>
           </div>
-          <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">
-            Active
+          <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success capitalize">
+            {data.amc?.status?.replaceAll("_", " ") ?? "No plan"}
           </span>
         </div>
         <div className="mt-3 flex items-end justify-between">
           <div>
-            <div className="font-display text-lg font-semibold">{amc.plan}</div>
-            <div className="text-xs text-muted-foreground">Valid till {amc.validTill}</div>
+            <div className="font-display text-lg font-semibold">
+              {data.amc?.amc_plans?.name ?? "Choose an AMC plan"}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {data.amc?.expires_on
+                ? `Valid till ${new Date(data.amc.expires_on).toLocaleDateString("en-IN")}`
+                : "View available plans"}
+            </div>
           </div>
           <Link to="/customer/amc" className="text-xs font-semibold text-primary">
             View Details
@@ -118,5 +121,3 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export { StatusPill };
-// silence unused inr
-void inr;

@@ -21,6 +21,7 @@ import {
   rejectServiceRequest,
   reviewServiceRequest,
 } from "@/lib/api/admin";
+import { RequestAttachments } from "@/components/shared/RequestAttachments";
 
 export const Page = definePage("/admin/requests/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} — Request` }] }),
@@ -136,6 +137,15 @@ function AdminRequestDetail() {
                 </li>
               ))}
             </ol>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-sm">Request Attachments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RequestAttachments requestId={req.id} />
           </CardContent>
         </Card>
 

@@ -1,70 +1,58 @@
-﻿import { definePage } from "@/lib/router";
-import { Download } from "lucide-react";
+import { definePage, Link } from "@/lib/router";
 import { CustomerShell } from "@/components/layout/CustomerShell";
-import { invoice, inr } from "@/data/customer";
+import { getCustomerInvoices } from "@/lib/api/customer";
 
 export const Page = definePage("/customer/invoices")({
-  head: () => ({ meta: [{ title: "Invoice â€” DroneZone" }] }),
+  head: () => ({ meta: [{ title: "Invoices — DroneZone" }] }),
+  loader: () => getCustomerInvoices(),
   component: () => (
-    <CustomerShell title="Invoice Details" showBack>
-      <Invoice />
+    <CustomerShell title="Invoices" showBack>
+      <Invoices />
     </CustomerShell>
   ),
 });
-
-function Invoice() {
+function Invoices() {
+  const rows = Page.useLoaderData<Awaited<ReturnType<typeof getCustomerInvoices>>>();
   return (
-    <div className="space-y-4 px-5 py-5">
-      <div className="rounded-2xl border bg-card p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Invoice</div>
-            <div className="mt-0.5 font-display text-xl font-bold">#{invoice.id}</div>
-          </div>
-          <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
-            {invoice.status}
-          </span>
-        </div>
-        <div className="mt-4 flex justify-between text-sm">
-          <span className="text-muted-foreground">Date</span>
-          <span className="font-medium">{invoice.date}</span>
-        </div>
-        <div className="mt-4 space-y-2 border-t pt-4">
-          {invoice.items.map((it) => (
-            <div key={it.label} className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{it.label}</span>
-              <span>{inr(it.amount)}</span>
+    <div className="space-y-3 p-5">
+      {rows.map((row: any) => {
+        const subtotal = Number(row.fixed_price);
+        const tax = (subtotal * Number(row.tax_percent || 0)) / 100;
+        const currency = row.currency || "INR";
+        const money = (v: number) =>
+          new Intl.NumberFormat("en-IN", { style: "currency", currency }).format(v);
+        return (
+          <Link
+            key={row.id}
+            to="/customer/requests/$id"
+            params={{ id: row.id }}
+            className="block rounded-xl border bg-card p-4 hover:bg-muted/30"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-semibold">{row.request_number}</div>
+                <div className="text-xs text-muted-foreground">{row.title}</div>
+              </div>
+              <div className="font-bold">{money(subtotal + tax)}</div>
             </div>
-          ))}
+            <div className="mt-3 flex justify-between border-t pt-3 text-xs text-muted-foreground">
+              <span>
+                Base {money(subtotal)} · Tax {row.tax_percent || 0}%
+              </span>
+              <span>
+                {row.completed_at
+                  ? new Date(row.completed_at).toLocaleDateString("en-IN")
+                  : "Completed"}
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+      {!rows.length && (
+        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+          No completed fixed-price jobs are available for invoicing.
         </div>
-        <div className="mt-4 space-y-1.5 border-t pt-4 text-sm">
-          <Row label="Subtotal" value={inr(invoice.subtotal)} />
-          <Row label="GST (18%)" value={inr(invoice.gst)} />
-        </div>
-        <div className="mt-4 flex items-center justify-between border-t pt-4">
-          <span className="font-display text-base font-semibold">Total</span>
-          <span className="font-display text-2xl font-bold">{inr(invoice.total)}</span>
-        </div>
-        <div className="mt-4 flex justify-between border-t pt-4 text-sm">
-          <span className="text-muted-foreground">Payment Method</span>
-          <span className="font-medium">{invoice.method}</span>
-        </div>
-      </div>
-      <button className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-primary text-sm font-semibold text-primary hover:bg-primary/5">
-        <Download className="h-4 w-4" /> Download Invoice
-      </button>
-      <button className="h-12 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90">
-        Make Another Payment
-      </button>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span>{value}</span>
+      )}
     </div>
   );
 }

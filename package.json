@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development --configLoader runner",
     "preview": "vite preview",
     "lint": "eslint .",
+    "test:smoke": "node tests/frontend/phase2_smoke.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

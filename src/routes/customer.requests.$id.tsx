@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { Phone, MessageSquare, MapPin, Check, Paperclip, Clock, ExternalLink } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
-import { trackingStages } from "@/data/customer";
 import { getRequestDetails } from "@/lib/api/customer";
 import { format } from "date-fns";
+import { RequestAttachments } from "@/components/shared/RequestAttachments";
 
 export const Page = definePage("/customer/requests/$id")({
   head: () => ({ meta: [{ title: "Request Details â€” DroneZone" }] }),
@@ -75,6 +75,13 @@ function Tracking() {
             ? format(new Date(request.requested_completion_date), "PPP")
             : "Pending"}
         </div>
+      </div>
+
+      <div className="rounded-2xl border bg-card p-4">
+        <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Request Attachments
+        </div>
+        <RequestAttachments requestId={request.id} canUpload canDelete />
       </div>
 
       <div className="rounded-2xl border bg-card p-5">

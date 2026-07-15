@@ -21,7 +21,6 @@ import { Page as ProviderNotificationsPage } from "@/routes/app.notifications";
 import { Page as ProviderProfilePage } from "@/routes/app.profile";
 import { Page as ProviderSettingsPage } from "@/routes/app.settings";
 import { Page as ProviderGrievancePage } from "@/routes/app.grievances.new";
-import { Page as ProviderSignupPage } from "@/routes/app.signup";
 import { Page as ProviderVerificationPage } from "@/routes/app.verification";
 import { Page as AdminDashboardPage } from "@/routes/admin.dashboard";
 import { Page as AdminRequestsPage } from "@/routes/admin.requests";
@@ -188,7 +187,7 @@ export default function App() {
           <Route path="profile" element={<PageView page={ProviderProfilePage} />} />
           <Route path="settings" element={<PageView page={ProviderSettingsPage} />} />
           <Route path="grievances/new" element={<PageView page={ProviderGrievancePage} />} />
-          <Route path="signup" element={<PageView page={ProviderSignupPage} />} />
+          <Route path="signup" element={<Navigate to="../verification" replace />} />
           <Route path="verification" element={<PageView page={ProviderVerificationPage} />} />
         </Route>
 

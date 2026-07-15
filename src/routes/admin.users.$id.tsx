@@ -1,6 +1,5 @@
 ﻿import { definePage, Link, useLoaderData } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
-import { grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAdminUserDetails } from "@/lib/api/admin";
@@ -15,10 +14,7 @@ function UserDetail() {
   const loaderData = useLoaderData({ from: "/admin/users/$id" }) as any;
   const dbUser = loaderData?.user;
   const requests = loaderData?.requests;
-  const userGrievances = grievances.filter(
-    (g) =>
-      g.raisedById === dbUser?.id || g.raisedBy === `${dbUser?.first_name} ${dbUser?.last_name}`,
-  );
+  const userGrievances = loaderData?.grievances ?? [];
 
   if (!dbUser) {
     return (
@@ -90,7 +86,7 @@ function UserDetail() {
               <p className="text-sm text-muted-foreground">No grievances raised.</p>
             ) : (
               <div className="divide-y">
-                {userGrievances.map((g) => (
+                {userGrievances.map((g: any) => (
                   <Link
                     key={g.id}
                     to="/admin/grievances/$id"
@@ -98,7 +94,7 @@ function UserDetail() {
                     className="flex justify-between py-2 text-sm hover:text-primary"
                   >
                     <span>
-                      {g.id} Â· {g.issue}
+                      {g.grievance_number} · {g.subject}
                     </span>
                     <span className="text-xs">{g.status}</span>
                   </Link>

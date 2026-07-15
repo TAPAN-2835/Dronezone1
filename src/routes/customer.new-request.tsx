@@ -1,10 +1,11 @@
 import { definePage, useNavigate } from "@/lib/router";
 import { useState } from "react";
-import { MapPin, AlertTriangle } from "lucide-react";
+import { MapPin, AlertTriangle, Paperclip } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { toast } from "sonner";
 import { createServiceRequest } from "@/lib/api/requests";
 import { getCustomerAssets } from "@/lib/api/customer";
+import { uploadRequestAttachment } from "@/lib/api/storage";
 
 export const Page = definePage("/customer/new-request")({
   head: () => ({ meta: [{ title: "New Request â€” DroneZone" }] }),
@@ -28,6 +29,7 @@ function NewRequest() {
   const [addressId, setAddressId] = useState(assets.addresses[0]?.id || "");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ function NewRequest() {
       if (!droneId || !categoryId || !addressId || !title || !description) {
         throw new Error("Please fill all required fields.");
       }
-      await createServiceRequest({
+      const request = (await createServiceRequest({
         data: {
           categoryId,
           droneId,
@@ -45,8 +47,18 @@ function NewRequest() {
           serviceAddressId: addressId,
           urgent,
         },
-      });
-      toast.success("Request submitted!");
+      })) as any;
+      const failed: string[] = [];
+      for (const file of files) {
+        try {
+          await uploadRequestAttachment(request.id, file);
+        } catch {
+          failed.push(file.name);
+        }
+      }
+      if (failed.length)
+        toast.warning(`Request submitted, but ${failed.length} attachment(s) failed.`);
+      else toast.success("Request submitted!");
       nav({ to: "/customer/requests" });
     } catch (error: any) {
       toast.error(error.message);
@@ -73,6 +85,25 @@ function NewRequest() {
             </option>
           ))}
         </select>
+      </Field>
+      <Field label="Issue Attachments" icon={<Paperclip className="h-4 w-4" />}>
+        <label className="flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-card px-3 text-sm text-muted-foreground hover:border-primary/40">
+          {files.length ? `${files.length} file(s) selected` : "Select images or PDF (optional)"}
+          <input
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            className="sr-only"
+            onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
+          />
+        </label>
+        {files.length > 0 && (
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            {files.map((file) => (
+              <li key={`${file.name}-${file.size}`}>{file.name}</li>
+            ))}
+          </ul>
+        )}
       </Field>
       <Field label="Drone">
         <select

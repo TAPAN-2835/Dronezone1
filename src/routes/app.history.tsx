@@ -14,7 +14,19 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { inr, ratingLabels } from "@/data/demo";
+const inr = (value: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+const ratingLabels: Record<number, string> = {
+  1: "Poor",
+  2: "Fair",
+  3: "Good",
+  4: "Very good",
+  5: "Excellent",
+};
 import { getProviderHistory } from "@/lib/api/provider";
 
 export const Page = definePage("/app/history")({

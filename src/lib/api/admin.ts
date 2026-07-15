@@ -65,14 +65,21 @@ export async function updateProviderVerification({
 
 export async function getAdminProviderDetails({ data }: { data: { providerId: string } }) {
   await admin();
-  const provider = unwrap(
-    await supabase
-      .from("provider_profiles")
-      .select("*, users(id,email,phone,first_name,last_name,is_active,created_at,updated_at)")
-      .eq("id", data.providerId)
-      .single(),
-  );
-  return { provider };
+  const providerResult = await supabase
+    .from("provider_profiles")
+    .select("*, users(id,email,phone,first_name,last_name,is_active,created_at,updated_at)")
+    .eq("id", data.providerId)
+    .single();
+  const provider = unwrap(providerResult);
+  const grievances =
+    unwrap(
+      await supabase
+        .from("grievances")
+        .select("*")
+        .or(`raised_by.eq.${provider.user_id},against_user_id.eq.${provider.user_id}`)
+        .order("created_at", { ascending: false }),
+    ) ?? [];
+  return { provider, grievances };
 }
 
 export async function getAdminUsers() {
@@ -100,7 +107,7 @@ export async function getAdminUsers() {
 
 export async function getAdminUserDetails({ data }: { data: { userId: string } }) {
   await admin();
-  const [user, requests] = await Promise.all([
+  const [user, requests, grievances] = await Promise.all([
     supabase
       .from("users")
       .select(
@@ -113,8 +120,17 @@ export async function getAdminUserDetails({ data }: { data: { userId: string } }
       .select("*, drones(*), service_categories(*)")
       .eq("customer_id", data.userId)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("grievances")
+      .select("*")
+      .or(`raised_by.eq.${data.userId},against_user_id.eq.${data.userId}`)
+      .order("created_at", { ascending: false }),
   ]);
-  return { user: unwrap(user), requests: unwrap(requests) ?? [] };
+  return {
+    user: unwrap(user),
+    requests: unwrap(requests) ?? [],
+    grievances: unwrap(grievances) ?? [],
+  };
 }
 
 export async function getAdminRequests() {
@@ -202,12 +218,19 @@ export async function getAdminJobs() {
 
 export async function getAdminJobDetails({ data }: { data: { jobId: string } }) {
   await admin();
-  const job = unwrap(
-    await supabase
-      .from("job_assignments")
-      .select("*, service_requests(*, drones(*), addresses(*), service_categories(*))")
-      .eq("id", data.jobId)
-      .single(),
-  );
-  return { job };
+  const jobResult = await supabase
+    .from("job_assignments")
+    .select("*, service_requests(*, drones(*), addresses(*), service_categories(*))")
+    .eq("id", data.jobId)
+    .single();
+  const job = unwrap(jobResult);
+  const grievances =
+    unwrap(
+      await supabase
+        .from("grievances")
+        .select("*")
+        .eq("service_request_id", job.service_request_id)
+        .order("created_at", { ascending: false }),
+    ) ?? [];
+  return { job, grievances };
 }

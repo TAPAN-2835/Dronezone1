@@ -16,7 +16,8 @@ import {
   AlertOctagon,
 } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
-import { customer } from "@/data/customer";
+import { getCustomerProfile } from "@/lib/api/customer";
+import { useAuth } from "@/lib/auth-store";
 
 const iconMap = {
   User,
@@ -53,16 +54,24 @@ const items = [
 
 export const Page = definePage("/customer/profile")({
   head: () => ({ meta: [{ title: "Profile â€” DroneZone" }] }),
-  component: () => (
+  loader: () => getCustomerProfile(),
+  component: Profile,
+});
+
+function Profile() {
+  const { account } = Page.useLoaderData<Awaited<ReturnType<typeof getCustomerProfile>>>();
+  const { signOut } = useAuth();
+  const name = `${account.first_name} ${account.last_name}`.trim();
+  return (
     <CustomerShell title="Profile">
       <div className="px-5 py-5">
         <div className="flex items-center gap-3 rounded-2xl border bg-card p-4">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
-            JD
+            {`${account.first_name?.[0] ?? ""}${account.last_name?.[0] ?? ""}`.toUpperCase()}
           </div>
           <div className="flex-1">
-            <div className="font-display text-base font-semibold">{customer.name}</div>
-            <div className="text-xs text-muted-foreground">{customer.email}</div>
+            <div className="font-display text-base font-semibold">{name}</div>
+            <div className="text-xs text-muted-foreground">{account.email}</div>
           </div>
         </div>
         <div className="mt-4 divide-y rounded-2xl border bg-card">
@@ -93,13 +102,13 @@ export const Page = definePage("/customer/profile")({
             );
           })}
         </div>
-        <Link
-          to="/"
+        <button
+          onClick={() => void signOut()}
           className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border bg-card text-sm font-semibold text-destructive"
         >
           <LogOut className="h-4 w-4" /> Logout
-        </Link>
+        </button>
       </div>
     </CustomerShell>
-  ),
-});
+  );
+}

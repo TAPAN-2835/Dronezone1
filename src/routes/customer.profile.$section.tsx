@@ -1,198 +1,126 @@
-﻿import { definePage, Link } from "@/lib/router";
-import {
-  ArrowLeft,
-  User,
-  Building2,
-  Award,
-  MapPin,
-  FileText,
-  CreditCard,
-  Shield,
-  Bell,
-  HelpCircle,
-} from "lucide-react";
+import { definePage, Link } from "@/lib/router";
+import { ArrowLeft } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
-import { customer, type ProfileSectionId } from "@/data/customer";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { getCustomerProfile } from "@/lib/api/customer";
+import { UnavailableModule } from "@/components/shared/UnavailableModule";
 
-const sectionMeta: Record<ProfileSectionId | "support", { title: string; icon: typeof User }> = {
-  personal: { title: "Personal Details", icon: User },
-  business: { title: "Business Details", icon: Building2 },
-  certifications: { title: "Certifications", icon: Award },
-  areas: { title: "Service Areas", icon: MapPin },
-  documents: { title: "Documents", icon: FileText },
-  bank: { title: "Bank Details", icon: CreditCard },
-  "amc-prefs": { title: "AMC Preferences", icon: Shield },
-  notifications: { title: "Notification Preferences", icon: Bell },
-  support: { title: "Help & Support", icon: HelpCircle },
+const titles: Record<string, string> = {
+  personal: "Personal Details",
+  business: "Business Details",
+  certifications: "Certifications",
+  areas: "Service Areas",
+  documents: "Documents",
+  bank: "Bank Details",
+  "amc-prefs": "AMC Preferences",
+  notifications: "Notification Preferences",
+  support: "Help & Support",
 };
-
 export const Page = definePage("/customer/profile/$section")({
-  head: ({ params }) => ({ meta: [{ title: `${params.section} â€” Profile` }] }),
-  component: ProfileSection,
+  head: ({ params }) => ({ meta: [{ title: `${params.section} — Profile` }] }),
+  loader: () => getCustomerProfile(),
+  component: Section,
 });
-
-function ProfileSection() {
-  const { section } = Page.useParams();
-  const meta = sectionMeta[section as ProfileSectionId | "support"];
-
-  if (!meta) {
-    return (
-      <CustomerShell title="Profile" showBack>
-        <div className="p-5 text-sm text-muted-foreground">Section not found.</div>
-      </CustomerShell>
+function Section() {
+  const section = Page.useParams().section ?? "";
+  const data = Page.useLoaderData<Awaited<ReturnType<typeof getCustomerProfile>>>();
+  const title = titles[section] || "Profile";
+  let content: React.ReactNode;
+  if (section === "personal")
+    content = (
+      <>
+        <Panel>
+          <Row label="Full name" value={`${data.account.first_name} ${data.account.last_name}`} />
+          <Row label="Email" value={data.account.email} />
+          <Row label="Phone" value={data.account.phone} />
+          <Row
+            label="Member since"
+            value={new Date(data.account.created_at).toLocaleDateString("en-IN")}
+          />
+        </Panel>
+        <Panel title="My drones">
+          {data.drones.map((d: any) => (
+            <div key={d.id} className="border-t py-3 first:border-0">
+              <div className="font-semibold">
+                {d.manufacturer} {d.model}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {d.serial_number} · Warranty: {d.warranty_status}
+              </div>
+            </div>
+          ))}
+        </Panel>
+      </>
     );
-  }
-
+  else if (section === "areas")
+    content = (
+      <Panel title="Saved addresses">
+        {data.addresses.map((a: any) => (
+          <div key={a.id} className="border-t py-3 first:border-0">
+            <div className="font-semibold">{a.label || "Address"}</div>
+            <div className="text-sm text-muted-foreground">
+              {[a.address_line_1, a.address_line_2, a.city, a.state, a.postal_code]
+                .filter(Boolean)
+                .join(", ")}
+            </div>
+          </div>
+        ))}
+      </Panel>
+    );
+  else if (section === "amc-prefs")
+    content = (
+      <Panel>
+        <Row label="Current plan" value={data.subscription?.amc_plans?.name || "No plan"} />
+        <Row
+          label="Status"
+          value={data.subscription?.status?.replaceAll("_", " ") || "Not subscribed"}
+        />
+        <Row label="Auto renewal" value={data.subscription?.auto_renew ? "Enabled" : "Disabled"} />
+      </Panel>
+    );
+  else if (section === "support")
+    content = (
+      <Panel>
+        <p className="text-sm text-muted-foreground">
+          Contact details must be configured by the deployment owner. No demo contact information is
+          shown.
+        </p>
+      </Panel>
+    );
+  else
+    content = (
+      <UnavailableModule
+        title={`${title} is not configured`}
+        reason="The current approved database schema has no secure fields for this section. Demo values were removed."
+      />
+    );
   return (
-    <CustomerShell title={meta.title} showBack>
-      <div className="px-5 py-5">
+    <CustomerShell title={title} showBack>
+      <div className="space-y-4 px-5 py-5">
         <Link
           to="/customer/profile"
-          className="mb-4 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Profile
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Profile
         </Link>
-
-        {section === "personal" && (
-          <div className="space-y-4 rounded-2xl border bg-card p-4 text-sm">
-            <Row label="Full Name" value={customer.name} />
-            <Row label="Email" value={customer.email} />
-            <Row label="Phone" value={customer.phone} />
-            <Row label="Member Since" value={customer.joined} />
-          </div>
-        )}
-
-        {section === "business" && (
-          <div className="space-y-4 rounded-2xl border bg-card p-4 text-sm">
-            <Row label="Business Name" value={customer.business.name} />
-            <Row label="GSTIN" value={customer.business.gst} />
-            <Row label="Business Type" value={customer.business.type} />
-          </div>
-        )}
-
-        {section === "certifications" && (
-          <div className="rounded-2xl border bg-card p-4">
-            <ul className="space-y-3">
-              {customer.certifications.map((c) => (
-                <li key={c} className="flex items-center gap-2 text-sm">
-                  <Award className="h-4 w-4 text-success" /> {c}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {section === "areas" && (
-          <div className="rounded-2xl border bg-card p-4">
-            <div className="mb-3 text-xs font-semibold uppercase text-muted-foreground">
-              Saved Locations
-            </div>
-            {customer.addresses.map((a) => (
-              <div key={a.label} className="mb-3 text-sm">
-                <div className="font-semibold">{a.label}</div>
-                <div className="text-muted-foreground">{a.address}</div>
-              </div>
-            ))}
-            <div className="mt-4 text-xs font-semibold uppercase text-muted-foreground">
-              Service Areas
-            </div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {customer.serviceAreas.map((a) => (
-                <span
-                  key={a}
-                  className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
-                >
-                  {a}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {section === "documents" && (
-          <div className="divide-y rounded-2xl border bg-card">
-            {customer.documents.map((d) => (
-              <div key={d.name} className="flex items-center justify-between p-4 text-sm">
-                <span>{d.name}</span>
-                <span
-                  className={`text-xs font-semibold ${d.status === "Verified" ? "text-success" : "text-warning"}`}
-                >
-                  {d.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {section === "bank" && (
-          <div className="space-y-4 rounded-2xl border bg-card p-4 text-sm">
-            <Row label="Bank" value={customer.bank.name} />
-            <Row label="Account" value={customer.bank.account} />
-            <Row label="IFSC" value={customer.bank.ifsc} />
-          </div>
-        )}
-
-        {section === "amc-prefs" && (
-          <div className="space-y-4 rounded-2xl border bg-card p-4 text-sm">
-            <Row label="Preferred Plan" value={customer.amcPreferences.preferredPlan} />
-            <div className="flex items-center justify-between">
-              <Label>Auto Renewal</Label>
-              <Switch checked={customer.amcPreferences.autoRenewal} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label>Expiry Notifications</Label>
-              <Switch checked={customer.amcPreferences.notifyBeforeExpiry} />
-            </div>
-          </div>
-        )}
-
-        {section === "notifications" && (
-          <div className="space-y-3 rounded-2xl border bg-card p-4">
-            {Object.entries(customer.notificationPrefs).map(([key, val]) => (
-              <div key={key} className="flex items-center justify-between text-sm capitalize">
-                <Label>{key.replace(/([A-Z])/g, " $1").trim()}</Label>
-                <Switch checked={val} />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {section === "support" && (
-          <div className="rounded-2xl border bg-card p-4 text-sm space-y-3">
-            <p className="text-muted-foreground">Need help? Reach our support team.</p>
-            <Row label="Email" value="support@dronezone.com" />
-            <Row label="Phone" value="+91 1800-123-4567" />
-            <Row label="Hours" value="Monâ€“Sat, 9 AM â€“ 7 PM IST" />
-          </div>
-        )}
-
-        {section === "personal" && (
-          <div className="mt-4 rounded-2xl border bg-card p-4">
-            <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
-              My Drones
-            </div>
-            {customer.drones.map((d) => (
-              <div key={d.serial} className="border-t py-3 first:border-0 first:pt-0 text-sm">
-                <div className="font-semibold">{d.model}</div>
-                <div className="text-xs text-muted-foreground">
-                  {d.serial} Â· {d.purchaseDate} Â· Warranty: {d.warranty}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {content}
       </div>
     </CustomerShell>
   );
 }
-
+function Panel({ title, children }: { title?: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-4 rounded-2xl border bg-card p-4 text-sm">
+      {title && <div className="font-semibold">{title}</div>}
+      {children}
+    </div>
+  );
+}
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <div className="text-xs uppercase text-muted-foreground">{label}</div>
-      <div className="mt-0.5 font-medium">{value}</div>
+      <div className="mt-0.5 font-medium capitalize">{value}</div>
     </div>
   );
 }

@@ -20,7 +20,6 @@ import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { provider, notifications } from "@/data/demo";
 import { useAuth } from "@/lib/auth-store";
 
 const navItems = [
@@ -46,8 +45,7 @@ const mobileNav = [
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const unread = notifications.filter((n) => !n.read).length;
+  const { signOut, user } = useAuth();
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center border-b px-5">
@@ -81,11 +79,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   )}
                   <Icon className="h-4 w-4 shrink-0" />
                   <span className="flex-1 truncate">{item.label}</span>
-                  {item.to === "/app/notifications" && unread > 0 && (
-                    <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                      {unread}
-                    </span>
-                  )}
                 </Link>
               </li>
             );
@@ -100,8 +93,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">{provider.name}</div>
-            <div className="truncate text-xs text-muted-foreground">{provider.business.name}</div>
+            <div className="truncate text-sm font-semibold">Provider account</div>
+            <div className="truncate text-xs text-muted-foreground">{user?.email}</div>
           </div>
           <button
             type="button"
@@ -123,7 +116,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 function TopBar({ onMenu }: { onMenu: () => void }) {
   const navigate = useNavigate();
-  const unread = notifications.filter((n) => !n.read).length;
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md sm:px-6 lg:px-8">
       <button
@@ -151,9 +143,6 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5" />
-        {unread > 0 && (
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
-        )}
       </Button>
       <Avatar className="h-9 w-9 ring-2 ring-primary/10">
         <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">

@@ -1,7 +1,12 @@
 ﻿import { definePage, Link } from "@/lib/router";
 import { Button } from "@/components/ui/button";
 import { getAdminProviders } from "@/lib/api/admin";
-import { providerDocs } from "@/data/admin";
+const requiredDocuments = [
+  "Government ID",
+  "Business registration",
+  "DGCA certification",
+  "Professional certificate",
+];
 
 export const Page = definePage("/admin/providers")({
   head: () => ({ meta: [{ title: "Providers â€” DroneZone Admin" }] }),
@@ -169,14 +174,10 @@ function AdminProvidersPage() {
           <div className="rounded-xl border bg-card p-5">
             <div className="font-display font-semibold">Documents Checklist</div>
             <ul className="mt-3 space-y-2">
-              {providerDocs.map((d) => (
-                <li key={d.name} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="truncate">{d.name}</span>
-                  <span
-                    className={`shrink-0 text-xs font-semibold ${d.status === "Verified" ? "text-success" : "text-warning"}`}
-                  >
-                    {d.status}
-                  </span>
+              {requiredDocuments.map((name) => (
+                <li key={name} className="flex items-center justify-between gap-2 text-sm">
+                  <span className="truncate">{name}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">Required</span>
                 </li>
               ))}
             </ul>

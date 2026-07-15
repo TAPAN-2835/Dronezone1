@@ -3,7 +3,7 @@ import { requireRole, unwrap } from "./shared";
 
 export async function getCustomerDashboard() {
   const user = await requireRole("customer");
-  const [profileResult, requestResult] = await Promise.all([
+  const [profileResult, requestResult, amcResult] = await Promise.all([
     supabase.from("customer_profiles").select("display_name").eq("user_id", user.id).maybeSingle(),
     supabase
       .from("service_requests")
@@ -11,11 +11,20 @@ export async function getCustomerDashboard() {
       .eq("customer_id", user.id)
       .order("created_at", { ascending: false })
       .limit(3),
+    supabase
+      .from("amc_subscriptions")
+      .select("status,expires_on,amc_plans(name)")
+      .eq("customer_id", user.id)
+      .in("status", ["active", "pending_payment"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
   if (profileResult.error) throw new Error(profileResult.error.message);
   return {
     profile: profileResult.data ?? { display_name: user.user_metadata?.first_name || "Customer" },
     requests: unwrap(requestResult) ?? [],
+    amc: unwrap(amcResult),
   };
 }
 
@@ -30,6 +39,63 @@ export async function getCustomerRequests() {
         .order("created_at", { ascending: false }),
     ) ?? []
   );
+}
+
+export async function getCustomerInvoices() {
+  const user = await requireRole("customer");
+  return (
+    unwrap(
+      await supabase
+        .from("service_requests")
+        .select(
+          "id,request_number,title,fixed_price,tax_percent,currency,completed_at,job_assignments(id,provider_id)",
+        )
+        .eq("customer_id", user.id)
+        .eq("status", "completed")
+        .not("fixed_price", "is", null)
+        .order("completed_at", { ascending: false }),
+    ) ?? []
+  );
+}
+
+export async function getCustomerProfile() {
+  const user = await requireRole("customer");
+  const [account, profile, addresses, drones, subscription] = await Promise.all([
+    supabase
+      .from("users")
+      .select("id,email,phone,first_name,last_name,created_at")
+      .eq("id", user.id)
+      .single(),
+    supabase.from("customer_profiles").select("*").eq("user_id", user.id).maybeSingle(),
+    supabase
+      .from("addresses")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("is_default", { ascending: false }),
+    supabase
+      .from("drones")
+      .select("*")
+      .eq("owner_id", user.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("amc_subscriptions")
+      .select("*,amc_plans(name)")
+      .eq("customer_id", user.id)
+      .in("status", ["active", "pending_payment"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const accountRow = unwrap(account);
+  if (!accountRow) throw new Error("Customer account record not found");
+  return {
+    account: accountRow,
+    profile: unwrap(profile),
+    addresses: unwrap(addresses) ?? [],
+    drones: unwrap(drones) ?? [],
+    subscription: unwrap(subscription),
+  };
 }
 
 export async function getRequestDetails(input: { data: { id: string } }) {

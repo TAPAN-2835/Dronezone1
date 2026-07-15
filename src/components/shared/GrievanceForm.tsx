@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { grievanceCategories } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { createGrievance } from "@/lib/api/platform";
+import { uploadGrievanceAttachment } from "@/lib/api/storage";
 import { toast } from "sonner";
 
 interface GrievanceFormProps {
@@ -12,18 +13,47 @@ interface GrievanceFormProps {
   defaultJobId?: string;
 }
 
-export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: GrievanceFormProps) {
-  const [jobId, setJobId] = useState(defaultJobId);
-  const [category, setCategory] = useState(grievanceCategories[0]);
-  const [priority, setPriority] = useState("Medium");
-  const [against, setAgainst] = useState("");
-  const [description, setDescription] = useState("");
+const categories = [
+  "Service quality",
+  "Provider conduct",
+  "Customer conduct",
+  "Delay",
+  "Billing",
+  "Other",
+];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Grievance submitted successfully. Reference: GRV-NEW");
-    onSuccess?.();
-  };
+export function GrievanceForm({ onSuccess, defaultJobId = "" }: GrievanceFormProps) {
+  const [requestId, setRequestId] = useState(defaultJobId);
+  const [category, setCategory] = useState(categories[0]);
+  const [priority, setPriority] = useState("medium");
+  const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      const grievance = await createGrievance({
+        category,
+        subject,
+        description,
+        priority,
+        serviceRequestId: requestId || undefined,
+      });
+      if (file) await uploadGrievanceAttachment(grievance.id, file);
+      toast.success(`Grievance submitted: ${grievance.grievance_number}`);
+      onSuccess?.();
+      setSubject("");
+      setDescription("");
+      setFile(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to submit grievance");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -35,14 +65,22 @@ export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: Gr
           onChange={(e) => setCategory(e.target.value)}
           className="mt-1.5 flex h-10 w-full rounded-lg border bg-card px-3 text-sm"
         >
-          {grievanceCategories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
+          {categories.map((value) => (
+            <option key={value}>{value}</option>
           ))}
         </select>
       </div>
-
+      <div>
+        <Label htmlFor="grievance-file">Evidence (optional)</Label>
+        <Input
+          id="grievance-file"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,application/pdf"
+          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+          className="mt-1.5"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">JPEG, PNG, WebP, or PDF up to 10 MB.</p>
+      </div>
       <div>
         <Label htmlFor="priority">Priority</Label>
         <select
@@ -51,37 +89,35 @@ export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: Gr
           onChange={(e) => setPriority(e.target.value)}
           className="mt-1.5 flex h-10 w-full rounded-lg border bg-card px-3 text-sm"
         >
-          {["Low", "Medium", "High", "Critical"].map((p) => (
-            <option key={p} value={p}>
-              {p}
+          {["low", "medium", "high", "critical"].map((value) => (
+            <option key={value} value={value}>
+              {value[0].toUpperCase() + value.slice(1)}
             </option>
           ))}
         </select>
       </div>
-
       <div>
-        <Label htmlFor="against">Against (party name)</Label>
+        <Label htmlFor="subject">Subject</Label>
         <Input
-          id="against"
-          value={against}
-          onChange={(e) => setAgainst(e.target.value)}
-          placeholder="Name of customer or provider"
+          id="subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          placeholder="Short summary of the issue"
           className="mt-1.5"
           required
+          maxLength={200}
         />
       </div>
-
       <div>
-        <Label htmlFor="jobId">Related Job ID (optional)</Label>
+        <Label htmlFor="requestId">Related request UUID (optional)</Label>
         <Input
-          id="jobId"
-          value={jobId}
-          onChange={(e) => setJobId(e.target.value)}
-          placeholder="e.g. REQ-1024"
+          id="requestId"
+          value={requestId}
+          onChange={(e) => setRequestId(e.target.value)}
+          placeholder="Paste the request ID from request details"
           className="mt-1.5"
         />
       </div>
-
       <div>
         <Label htmlFor="description">Description</Label>
         <Textarea
@@ -91,19 +127,11 @@ export function GrievanceForm({ raisedByType, onSuccess, defaultJobId = "" }: Gr
           placeholder="Describe the issue in detail…"
           className="mt-1.5 min-h-[120px]"
           required
+          maxLength={10000}
         />
       </div>
-
-      <div>
-        <Label>Attachment (optional)</Label>
-        <Input type="file" className="mt-1.5" accept="image/*,.pdf" />
-        <p className="mt-1 text-xs text-muted-foreground">Upload photos or documents as evidence</p>
-      </div>
-
-      <input type="hidden" value={raisedByType} />
-
-      <Button type="submit" className="w-full">
-        Submit Grievance
+      <Button type="submit" className="w-full" disabled={busy}>
+        {busy ? "Submitting…" : "Submit Grievance"}
       </Button>
     </form>
   );
