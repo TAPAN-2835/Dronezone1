@@ -2,6 +2,15 @@
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { getAdminRequests } from "@/lib/api/admin";
+import { useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const priorityClass = (p: string) =>
   p === "High" ? "text-destructive" : p === "Medium" ? "text-warning" : "text-muted-foreground";
@@ -14,14 +23,53 @@ export const Page = definePage("/admin/requests")({
 
 function AdminRequestsPage() {
   const { requests } = useLoaderData({ from: "/admin/requests" });
-
-  const activeRequests = requests.filter(
-    (r: any) => !["completed", "resolved", "archived", "closed"].includes(r.status),
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("all");
+  const filteredRequests = useMemo(
+    () =>
+      requests.filter((request: any) => {
+        const matchesStatus = status === "all" || request.status === status;
+        const haystack =
+          `${request.request_number} ${request.title} ${request.users?.first_name} ${request.users?.last_name}`.toLowerCase();
+        return matchesStatus && haystack.includes(query.toLowerCase());
+      }),
+    [query, requests, status],
   );
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">All Requests</h1>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search request number, title or customer"
+          className="sm:max-w-md"
+        />
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="sm:w-52">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[
+              "all",
+              "draft",
+              "in_approval",
+              "review",
+              "approved",
+              "rejected",
+              "in_progress",
+              "completed",
+              "cancelled",
+            ].map((value) => (
+              <SelectItem key={value} value={value}>
+                {value.replaceAll("_", " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="hidden overflow-hidden rounded-xl border bg-card sm:block">
         <div className="overflow-x-auto">
@@ -38,7 +86,7 @@ function AdminRequestsPage() {
               </tr>
             </thead>
             <tbody>
-              {activeRequests.map((r: any) => (
+              {filteredRequests.map((r: any) => (
                 <tr key={r.id} className="border-t hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-semibold">
                     <span className="truncate w-24 block">{r.id.split("-")[0]}</span>
@@ -81,7 +129,7 @@ function AdminRequestsPage() {
       </div>
 
       <div className="space-y-3 sm:hidden">
-        {activeRequests.map((r: any) => (
+        {filteredRequests.map((r: any) => (
           <Link
             key={r.id}
             to="/admin/requests/$id"

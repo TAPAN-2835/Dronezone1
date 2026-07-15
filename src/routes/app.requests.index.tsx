@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { getProviderRequests, updateAssignmentStatus } from "@/lib/api/provider";
+import { acceptAssignment, getProviderRequests, rejectAssignment } from "@/lib/api/provider";
 
 export const Page = definePage("/app/requests/")({
   head: () => ({ meta: [{ title: "New Requests â€” DroneZone" }] }),
@@ -36,7 +36,16 @@ function Requests() {
   );
 
   const handleAction = (assignmentId: string, newStatus: "accepted" | "rejected") => {
-    toast.promise(updateAssignmentStatus({ data: { assignmentId, newStatus } }), {
+    const reason =
+      newStatus === "rejected"
+        ? window.prompt("Reason for rejecting this assignment:")?.trim()
+        : undefined;
+    if (newStatus === "rejected" && !reason) return;
+    const operation =
+      newStatus === "accepted"
+        ? acceptAssignment(assignmentId)
+        : rejectAssignment(assignmentId, reason!);
+    toast.promise(operation, {
       loading: "Updating status...",
       success: `Request ${newStatus}`,
       error: "Failed to update status",

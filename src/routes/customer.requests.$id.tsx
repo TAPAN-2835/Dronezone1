@@ -26,7 +26,7 @@ const dbTrackingStages = [
 ];
 
 function Tracking() {
-  const { request, assignment } = Page.useLoaderData();
+  const { request, assignment, provider, history } = Page.useLoaderData();
 
   // Find the max index that we've passed based on status
   let currentIdx = dbTrackingStages.findIndex((s) => s.key === request.status);
@@ -119,20 +119,21 @@ function Tracking() {
         <div className="rounded-2xl border bg-card p-4">
           <div className="flex items-center gap-3">
             <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 font-semibold text-primary">
-              {assignment.users?.first_name?.[0] || "P"}
+              {provider?.first_name?.[0] || "P"}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <div className="font-semibold">
-                  {assignment.provider_profiles?.business_name || "Assigned Provider"}
+                  {provider?.business_name || "Assigned Provider"}
                 </div>
               </div>
               <div className="text-xs text-muted-foreground">
-                Field Engineer Â· â˜… {assignment.provider_profiles?.average_rating || "New"}
+                Class {provider?.equipment_class ?? "unassigned"} provider · ★{" "}
+                {provider?.average_rating || "New"}
               </div>
             </div>
             <a
-              href={`tel:${assignment.users?.phone?.replace(/\s/g, "")}`}
+              href={`tel:${provider?.phone?.replace(/\s/g, "")}`}
               className="grid h-10 w-10 place-items-center rounded-full bg-success/15 text-success"
             >
               <Phone className="h-4 w-4" />
@@ -144,6 +145,27 @@ function Tracking() {
               <MessageSquare className="h-4 w-4" />
             </Link>
           </div>
+        </div>
+      )}
+
+      {history.length > 0 && (
+        <div className="rounded-2xl border bg-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Job History
+          </div>
+          <ol className="mt-3 space-y-3">
+            {history.map((entry: any) => (
+              <li key={entry.id} className="border-l-2 border-primary/30 pl-3 text-sm">
+                <div className="font-medium capitalize">
+                  {entry.from_status.replaceAll("_", " ")} → {entry.to_status.replaceAll("_", " ")}
+                </div>
+                {entry.notes && <p className="text-xs text-muted-foreground">{entry.notes}</p>}
+                <time className="text-xs text-muted-foreground">
+                  {format(new Date(entry.created_at), "PPP")}
+                </time>
+              </li>
+            ))}
+          </ol>
         </div>
       )}
 

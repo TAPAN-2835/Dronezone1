@@ -1,16 +1,21 @@
 import { supabase } from "@/lib/supabase";
-import { requireRole, unwrap } from "./shared";
+import { callRpc, requireRole, unwrap } from "./shared";
 
 async function providerUser() {
   return requireRole("provider");
 }
 
-const assignmentSelect = "*, service_requests(*, drones(*), addresses(*), service_categories(*))";
+const assignmentSelect =
+  "*, service_requests(*, users!service_requests_customer_id_fkey(first_name,last_name,phone), drones(*), addresses(*), service_categories(*))";
 
 export async function getProviderDashboard() {
   const user = await providerUser();
   const [profile, pending, active, completed] = await Promise.all([
-    supabase.from("provider_profiles").select("*, users(*)").eq("user_id", user.id).maybeSingle(),
+    supabase
+      .from("provider_profiles")
+      .select("*, users(id,email,phone,first_name,last_name,is_active,created_at,updated_at)")
+      .eq("user_id", user.id)
+      .maybeSingle(),
     supabase
       .from("job_assignments")
       .select(assignmentSelect)
@@ -57,63 +62,57 @@ export async function getProviderRequests() {
 
 export async function getProviderJobDetails({ data }: { data: { assignmentId: string } }) {
   const user = await providerUser();
-  const assignment = unwrap(
-    await supabase
+  const [assignmentResult, historyResult] = await Promise.all([
+    supabase
       .from("job_assignments")
       .select(assignmentSelect)
       .eq("id", data.assignmentId)
       .eq("provider_id", user.id)
       .single(),
-  );
-  return { assignment };
+    supabase
+      .from("job_status_history")
+      .select("*")
+      .eq("job_assignment_id", data.assignmentId)
+      .order("created_at", { ascending: true }),
+  ]);
+  return { assignment: unwrap(assignmentResult), history: unwrap(historyResult) ?? [] };
 }
 
-export async function updateAssignmentStatus({
-  data,
-}: {
-  data: {
-    assignmentId: string;
-    newStatus: "accepted" | "rejected" | "in_progress" | "completed" | "cancelled" | "on_hold";
-  };
-}) {
-  const user = await providerUser();
-  const assignment = unwrap(
-    await supabase
-      .from("job_assignments")
-      .select("service_request_id")
-      .eq("id", data.assignmentId)
-      .eq("provider_id", user.id)
-      .single(),
-  );
-  if (!assignment) throw new Error("Assignment not found");
-  unwrap(
-    await supabase
-      .from("job_assignments")
-      .update({ status: data.newStatus })
-      .eq("id", data.assignmentId)
-      .eq("provider_id", user.id),
-  );
-  const requestStatus =
-    data.newStatus === "accepted"
-      ? "approved"
-      : data.newStatus === "rejected"
-        ? "review"
-        : ["in_progress", "on_hold"].includes(data.newStatus)
-          ? "in_progress"
-          : data.newStatus === "completed"
-            ? "completed"
-            : data.newStatus === "cancelled"
-              ? "cancelled"
-              : null;
-  if (requestStatus)
-    unwrap(
-      await supabase
-        .from("service_requests")
-        .update({ status: requestStatus })
-        .eq("id", assignment.service_request_id),
-    );
-  return { success: true };
-}
+export const acceptAssignment = (assignmentId: string, providerNotes?: string) =>
+  callRpc("provider_accept_assignment", {
+    p_assignment_id: assignmentId,
+    p_provider_notes: providerNotes ?? null,
+  });
+
+export const rejectAssignment = (assignmentId: string, reason: string) =>
+  callRpc("provider_reject_assignment", {
+    p_assignment_id: assignmentId,
+    p_rejection_reason: reason,
+  });
+
+export const startJob = (assignmentId: string) =>
+  callRpc("start_job", { p_assignment_id: assignmentId });
+
+export const updateJobTimeline = (data: {
+  assignmentId: string;
+  proposedCompletionDate: string;
+  additionalDaysRequested?: number;
+  additionalDaysReason?: string;
+  providerNotes?: string;
+}) =>
+  callRpc("update_job_timeline", {
+    p_assignment_id: data.assignmentId,
+    p_proposed_completion_date: data.proposedCompletionDate,
+    p_additional_days_requested: data.additionalDaysRequested ?? 0,
+    p_additional_days_reason: data.additionalDaysReason ?? null,
+    p_provider_notes: data.providerNotes ?? null,
+  });
+
+export const completeJob = (assignmentId: string, completionSummary: string) =>
+  callRpc("complete_job", {
+    p_assignment_id: assignmentId,
+    p_completion_summary: completionSummary,
+  });
 
 async function jobsByStatuses(statuses: string[]) {
   const user = await providerUser();

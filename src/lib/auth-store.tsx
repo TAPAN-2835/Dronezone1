@@ -9,56 +9,73 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { getDatabaseAuthContext, type AppRole } from "@/lib/api/auth";
 
-export type AppRole = "customer" | "provider" | "admin";
+export type { AppRole } from "@/lib/api/auth";
 
 type AuthContextValue = {
   user: User | null;
   session: Session | null;
   loading: boolean;
   role: AppRole | null;
+  authError: string | null;
+  provisioningFailed: boolean;
   refreshRole: () => Promise<AppRole | null>;
   signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-function normalizeRole(value: unknown): AppRole | null {
-  const role = typeof value === "string" ? value.toLowerCase() : "";
-  return role === "customer" || role === "provider" || role === "admin" ? role : null;
-}
-
 export async function resolveUserRole(user: User): Promise<AppRole | null> {
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("roles!inner(name)")
-    .eq("user_id", user.id)
-    .is("revoked_at", null)
-    .limit(1)
-    .maybeSingle();
-
-  if (error) console.warn("Unable to load the user's database role:", error.message);
-  const relation = (data as { roles?: { name?: string } | { name?: string }[] } | null)?.roles;
-  const databaseRole = Array.isArray(relation) ? relation[0]?.name : relation?.name;
-  return normalizeRole(databaseRole) ?? normalizeRole(user.user_metadata?.role);
+  const context = await getDatabaseAuthContext(user);
+  return context.profileProvisioned ? context.role : null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [provisioningFailed, setProvisioningFailed] = useState(false);
 
   const applySession = useCallback(async (nextSession: Session | null) => {
+    setLoading(true);
     setSession(nextSession);
-    setRole(nextSession?.user ? await resolveUserRole(nextSession.user) : null);
-    setLoading(false);
+    setAuthError(null);
+    setProvisioningFailed(false);
+
+    if (!nextSession?.user) {
+      setRole(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const context = await getDatabaseAuthContext(nextSession.user);
+      setRole(context.profileProvisioned ? context.role : null);
+      if (!context.role || !context.profileProvisioned) {
+        setProvisioningFailed(true);
+        setAuthError("Your account exists in Auth but its application role/profile is incomplete.");
+      }
+    } catch (error) {
+      setRole(null);
+      setAuthError(error instanceof Error ? error.message : "Unable to load account authorization");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     let active = true;
     void supabase.auth.getSession().then(({ data, error }) => {
       if (!active) return;
-      if (error) console.warn("Unable to restore the Supabase session:", error.message);
+      if (error) {
+        setSession(null);
+        setRole(null);
+        setAuthError(error.message);
+        setLoading(false);
+        return;
+      }
       void applySession(data.session);
     });
 
@@ -79,9 +96,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRole(null);
       return null;
     }
-    const nextRole = await resolveUserRole(session.user);
-    setRole(nextRole);
-    return nextRole;
+    try {
+      setAuthError(null);
+      const context = await getDatabaseAuthContext(session.user);
+      const nextRole = context.profileProvisioned ? context.role : null;
+      setRole(nextRole);
+      setProvisioningFailed(!context.role || !context.profileProvisioned);
+      return nextRole;
+    } catch (error) {
+      setRole(null);
+      setAuthError(error instanceof Error ? error.message : "Unable to refresh authorization");
+      return null;
+    }
   }, [session]);
 
   const signOut = useCallback(async () => {
@@ -90,8 +116,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user: session?.user ?? null, session, loading, role, refreshRole, signOut }),
-    [loading, refreshRole, role, session, signOut],
+    () => ({
+      user: session?.user ?? null,
+      session,
+      loading,
+      role,
+      authError,
+      provisioningFailed,
+      refreshRole,
+      signOut,
+    }),
+    [authError, loading, provisioningFailed, refreshRole, role, session, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

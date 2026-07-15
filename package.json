@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --configLoader runner",
     "build": "vite build --configLoader runner",
     "build:dev": "vite build --mode development --configLoader runner",
     "preview": "vite preview",

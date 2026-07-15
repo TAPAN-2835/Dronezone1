@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { RoleSwitcher } from "@/components/layout/RoleSwitcher";
 import { AppShell } from "@/components/layout/AppShell";
@@ -69,16 +69,59 @@ function PageView({ page }: { page: PageModule }) {
 }
 
 function ProtectedArea({ roles, children }: { roles: AppRole[]; children: React.ReactNode }) {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, authError, provisioningFailed } = useAuth();
+  const location = useLocation();
   if (loading) {
     return (
       <div className="grid min-h-screen place-items-center text-muted-foreground">Loading…</div>
     );
   }
-  if (!user) return <Navigate to="/login" replace />;
-  if (!role || !roles.includes(role))
-    return <Navigate to={role === "customer" ? "/customer/dashboard" : "/"} replace />;
+  if (!user)
+    return (
+      <Navigate
+        to={`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`}
+        replace
+      />
+    );
+  if (provisioningFailed || (!role && authError))
+    return <Navigate to="/forbidden?reason=provisioning" replace />;
+  if (!role || !roles.includes(role)) return <Navigate to="/forbidden" replace />;
   return children;
+}
+
+function Forbidden() {
+  const { user, role, provisioningFailed, signOut } = useAuth();
+  return (
+    <main className="grid min-h-screen place-items-center bg-background px-4 text-center">
+      <div className="max-w-md rounded-xl border bg-card p-8 shadow-sm">
+        <h1 className="font-display text-2xl font-bold">Access unavailable</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {provisioningFailed
+            ? "Your sign-in succeeded, but the required database role or profile was not provisioned. Contact an administrator."
+            : "Your database role does not permit access to this page."}
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          {user && role && (
+            <a
+              className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"
+              href={
+                role === "customer"
+                  ? "/customer/dashboard"
+                  : role === "provider"
+                    ? "/app/dashboard"
+                    : "/admin/dashboard"
+              }
+            >
+              Open dashboard
+            </a>
+          )}
+          <button className="rounded-md border px-4 py-2 text-sm" onClick={() => void signOut()}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    </main>
+  );
 }
 
 function ProviderArea() {
@@ -129,6 +172,7 @@ export default function App() {
         <Route path="/" element={<PageView page={HomePage} />} />
         <Route path="/login" element={<PageView page={LoginPage} />} />
         <Route path="/signup" element={<PageView page={SignupPage} />} />
+        <Route path="/forbidden" element={<Forbidden />} />
 
         <Route path="/app" element={<ProviderArea />}>
           <Route index element={<Navigate to="dashboard" replace />} />

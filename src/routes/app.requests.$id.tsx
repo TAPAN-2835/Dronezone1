@@ -32,7 +32,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { inr } from "@/data/demo";
 import { toast } from "sonner";
-import { getProviderJobDetails, updateAssignmentStatus } from "@/lib/api/provider";
+import {
+  acceptAssignment,
+  getProviderJobDetails,
+  rejectAssignment,
+  updateJobTimeline,
+} from "@/lib/api/provider";
 
 export const Page = definePage("/app/requests/$id")({
   head: ({ params }) => ({ meta: [{ title: `Review ${params.id} â€” DroneZone` }] }),
@@ -42,6 +47,10 @@ export const Page = definePage("/app/requests/$id")({
     <div className="p-8 text-sm text-muted-foreground">Request not found.</div>
   ),
 });
+
+// The current database contract has no quotation model. Keep the mentor-approved
+// layout code dormant until a forward migration adds an authorized persistence path.
+const schemaSupportsQuotations = false;
 
 function RequestReview() {
   const { assignment } = Page.useLoaderData();
@@ -93,7 +102,16 @@ function RequestReview() {
   const total = afterDiscount + gstAmount;
 
   const handleStatusUpdate = (newStatus: "accepted" | "rejected") => {
-    toast.promise(updateAssignmentStatus({ data: { assignmentId: job.id, newStatus } }), {
+    const reason =
+      newStatus === "rejected"
+        ? window.prompt("Reason for rejecting this assignment:")?.trim()
+        : undefined;
+    if (newStatus === "rejected" && !reason) return;
+    const operation =
+      newStatus === "accepted"
+        ? acceptAssignment(job.id, providerNotes)
+        : rejectAssignment(job.id, reason!);
+    toast.promise(operation, {
       loading: "Updating...",
       success: () => {
         if (newStatus === "accepted") router.navigate({ to: "/app/active" });
@@ -276,7 +294,7 @@ function RequestReview() {
           )}
 
           {/* â”€â”€ ITEM 3 & 4: More Days Required + Timeline Negotiation â”€â”€ */}
-          {isNew && (
+          {!isNew && (
             <Card className="border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-sm">
@@ -346,10 +364,10 @@ function RequestReview() {
                   )}
                 </div>
 
-                {/* Timeline Negotiation Actions */}
+                {/* Provider timeline update (no customer approval state exists in the schema). */}
                 <div className="space-y-3">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Timeline Decision
+                    Timeline Update
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
                     <Button
@@ -376,9 +394,7 @@ function RequestReview() {
                       <Calendar className="h-4 w-4" />
                       <div className="text-left">
                         <div className="font-semibold">Propose New Timeline</div>
-                        <div className="text-[10px] opacity-70">
-                          Submit revised date for approval
-                        </div>
+                        <div className="text-[10px] opacity-70">Save a revised completion date</div>
                       </div>
                     </Button>
                   </div>
@@ -386,11 +402,25 @@ function RequestReview() {
                   {timelineAction === "propose" && additionalDays > 0 && (
                     <Button
                       className="w-full"
-                      onClick={() => {
-                        toast.success("Timeline revision submitted â€” Awaiting Customer Approval");
-                      }}
+                      onClick={() =>
+                        toast.promise(
+                          updateJobTimeline({
+                            assignmentId: job.id,
+                            proposedCompletionDate: proposedDate.toISOString().slice(0, 10),
+                            additionalDaysRequested: additionalDays,
+                            additionalDaysReason: timelineNotes,
+                            providerNotes,
+                          }),
+                          {
+                            loading: "Saving timeline...",
+                            success: "Timeline updated",
+                            error: (error) => error.message,
+                            finally: () => router.invalidate(),
+                          },
+                        )
+                      }
                     >
-                      <Send className="h-4 w-4" /> Submit Timeline Revision
+                      <Send className="h-4 w-4" /> Save Timeline Update
                     </Button>
                   )}
                   {timelineAction === "propose" && additionalDays === 0 && (
@@ -421,7 +451,7 @@ function RequestReview() {
           )}
 
           {/* â”€â”€ ITEM 5 & 6: Inline Quotation Builder â”€â”€ */}
-          {isNew && (
+          {schemaSupportsQuotations && isNew ? (
             <Card className="border-primary/20">
               <CardHeader
                 className="cursor-pointer"
@@ -610,7 +640,7 @@ function RequestReview() {
                 </CardContent>
               )}
             </Card>
-          )}
+          ) : null}
         </div>
 
         {/* â”€â”€ Right sidebar â”€â”€ */}

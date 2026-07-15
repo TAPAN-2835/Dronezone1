@@ -4,7 +4,11 @@ import { providerDocs, grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { getAdminProviderDetails, updateProviderVerification } from "@/lib/api/admin";
+import {
+  assignProviderClass,
+  getAdminProviderDetails,
+  updateProviderVerification,
+} from "@/lib/api/admin";
 
 export const Page = definePage("/admin/providers/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Provider` }] }),
@@ -103,8 +107,10 @@ function ProviderDetail() {
           <Button
             variant="destructive"
             onClick={async () => {
+              const reason = window.prompt("Provider rejection reason:")?.trim();
+              if (!reason) return;
               await updateProviderVerification({
-                data: { providerId: provider.id, status: "Rejected" },
+                data: { providerId: provider.id, status: "Rejected", rejectionReason: reason },
               });
               router.invalidate();
               toast.success("Provider Rejected", {
@@ -115,21 +121,19 @@ function ProviderDetail() {
           >
             Reject
           </Button>
-          <Button
-            variant="outline"
-            onClick={async () => {
-              await updateProviderVerification({
-                data: { providerId: provider.id, status: "In Review" },
-              });
-              router.invalidate();
-              toast.success("Info Requested", {
-                description:
-                  "Email sent: We need a bit more information to complete your verification.",
-              });
-            }}
-          >
-            Request Docs
-          </Button>
+          {[1, 2, 3].map((equipmentClass) => (
+            <Button
+              key={equipmentClass}
+              variant="outline"
+              onClick={async () => {
+                await assignProviderClass(provider.id, equipmentClass);
+                await router.invalidate();
+                toast.success(`Provider assigned to class ${equipmentClass}`);
+              }}
+            >
+              Class {equipmentClass}
+            </Button>
+          ))}
         </div>
       </div>
 

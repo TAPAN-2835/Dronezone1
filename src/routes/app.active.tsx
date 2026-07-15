@@ -6,8 +6,15 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { getProviderActiveJobs, updateAssignmentStatus } from "@/lib/api/provider";
+import {
+  completeJob,
+  getProviderActiveJobs,
+  startJob,
+  updateJobTimeline,
+} from "@/lib/api/provider";
 import { toast } from "sonner";
 
 export const Page = definePage("/app/active")({
@@ -19,7 +26,6 @@ export const Page = definePage("/app/active")({
 const activeStages = [
   { key: "accepted", label: "Job Accepted" },
   { key: "in_progress", label: "Service in Progress" },
-  { key: "on_hold", label: "On Hold (Awaiting Parts)" },
   { key: "completed", label: "Completed" },
 ];
 
@@ -27,6 +33,8 @@ function Active() {
   const { jobs: active } = Page.useLoaderData();
   const router = useRouter();
   const [selectedId, setSelectedId] = useState(active[0]?.id);
+  const [proposedDate, setProposedDate] = useState("");
+  const [timelineReason, setTimelineReason] = useState("");
   const selected = active.find((j: any) => j.id === selectedId) ?? active[0];
 
   if (!selected) {
@@ -122,6 +130,58 @@ function Active() {
 
           <Card>
             <CardHeader>
+              <CardTitle className="text-sm">Completion timeline</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Input
+                type="date"
+                min={new Date().toISOString().slice(0, 10)}
+                value={proposedDate}
+                onChange={(event) => setProposedDate(event.target.value)}
+              />
+              <Textarea
+                value={timelineReason}
+                onChange={(event) => setTimelineReason(event.target.value)}
+                placeholder="Provider notes or reason for additional days"
+              />
+              <Button
+                variant="outline"
+                disabled={!proposedDate}
+                onClick={() => {
+                  const requested = selected.service_requests?.requested_completion_date;
+                  const additionalDays = requested
+                    ? Math.max(
+                        0,
+                        Math.ceil(
+                          (new Date(proposedDate).getTime() - new Date(requested).getTime()) /
+                            86400000,
+                        ),
+                      )
+                    : 0;
+                  toast.promise(
+                    updateJobTimeline({
+                      assignmentId: selected.id,
+                      proposedCompletionDate: proposedDate,
+                      additionalDaysRequested: additionalDays,
+                      additionalDaysReason: additionalDays > 0 ? timelineReason : undefined,
+                      providerNotes: timelineReason,
+                    }),
+                    {
+                      loading: "Saving timeline...",
+                      success: "Timeline updated",
+                      error: (error) => error.message,
+                      finally: () => router.invalidate(),
+                    },
+                  );
+                }}
+              >
+                Save timeline
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle className="text-sm">Workflow timeline</CardTitle>
             </CardHeader>
             <CardContent>
@@ -173,17 +233,12 @@ function Active() {
                 {selected.status === "accepted" && (
                   <Button
                     onClick={() => {
-                      toast.promise(
-                        updateAssignmentStatus({
-                          data: { assignmentId: selected.id, newStatus: "in_progress" },
-                        }),
-                        {
-                          loading: "Updating...",
-                          success: "Started service!",
-                          error: "Failed to update",
-                          finally: () => router.invalidate(),
-                        },
-                      );
+                      toast.promise(startJob(selected.id), {
+                        loading: "Updating...",
+                        success: "Started service!",
+                        error: "Failed to update",
+                        finally: () => router.invalidate(),
+                      });
                     }}
                   >
                     Start Service (In Progress)
@@ -194,9 +249,10 @@ function Active() {
                     <Button
                       onClick={() => {
                         toast.promise(
-                          updateAssignmentStatus({
-                            data: { assignmentId: selected.id, newStatus: "completed" },
-                          }),
+                          completeJob(
+                            selected.id,
+                            window.prompt("Completion summary:")?.trim() || "Service completed",
+                          ),
                           {
                             loading: "Marking completed...",
                             success: "Job marked as completed!",
@@ -208,44 +264,7 @@ function Active() {
                     >
                       <Check className="h-4 w-4 mr-2" /> Mark as Completed
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        toast.promise(
-                          updateAssignmentStatus({
-                            data: { assignmentId: selected.id, newStatus: "on_hold" },
-                          }),
-                          {
-                            loading: "Updating...",
-                            success: "Put job on hold",
-                            error: "Failed to update",
-                            finally: () => router.invalidate(),
-                          },
-                        );
-                      }}
-                    >
-                      Put On Hold
-                    </Button>
                   </>
-                )}
-                {selected.status === "on_hold" && (
-                  <Button
-                    onClick={() => {
-                      toast.promise(
-                        updateAssignmentStatus({
-                          data: { assignmentId: selected.id, newStatus: "in_progress" },
-                        }),
-                        {
-                          loading: "Resuming...",
-                          success: "Job resumed!",
-                          error: "Failed to update",
-                          finally: () => router.invalidate(),
-                        },
-                      );
-                    }}
-                  >
-                    Resume Service
-                  </Button>
                 )}
               </div>
             </CardContent>

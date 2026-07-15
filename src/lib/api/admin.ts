@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { requireRole, unwrap } from "./shared";
+import { callRpc, requireRole, unwrap } from "./shared";
 
 const admin = () => requireRole("admin");
 
@@ -36,7 +36,7 @@ export async function getAdminProviders() {
   const providers = unwrap(
     await supabase
       .from("provider_profiles")
-      .select("*, users(*)")
+      .select("*, users(id,email,phone,first_name,last_name,is_active,created_at,updated_at)")
       .order("created_at", { ascending: false }),
   );
   return { providers: providers ?? [] };
@@ -45,23 +45,22 @@ export async function getAdminProviders() {
 export async function updateProviderVerification({
   data,
 }: {
-  data: { providerId: string; status: string };
+  data: { providerId: string; status: string; rejectionReason?: string };
 }) {
-  const currentAdmin = await admin();
+  await admin();
   const normalized = data.status.toLowerCase().replaceAll(" ", "_");
   if (!["pending", "in_review", "approved", "rejected", "suspended"].includes(normalized))
     throw new Error("Invalid provider status");
-  unwrap(
-    await supabase
-      .from("provider_profiles")
-      .update({
-        status: normalized,
-        verified_by: currentAdmin.id,
-        verified_at: normalized === "approved" ? new Date().toISOString() : null,
-      })
-      .eq("id", data.providerId),
-  );
-  return { success: true };
+  if (normalized === "approved")
+    return callRpc("approve_provider", { p_provider_profile_id: data.providerId });
+  if (normalized === "rejected") {
+    if (!data.rejectionReason?.trim()) throw new Error("A rejection reason is required");
+    return callRpc("reject_provider", {
+      p_provider_profile_id: data.providerId,
+      p_rejection_reason: data.rejectionReason.trim(),
+    });
+  }
+  throw new Error("This provider transition is not available in the hardened workflow");
 }
 
 export async function getAdminProviderDetails({ data }: { data: { providerId: string } }) {
@@ -69,7 +68,7 @@ export async function getAdminProviderDetails({ data }: { data: { providerId: st
   const provider = unwrap(
     await supabase
       .from("provider_profiles")
-      .select("*, users(*)")
+      .select("*, users(id,email,phone,first_name,last_name,is_active,created_at,updated_at)")
       .eq("id", data.providerId)
       .single(),
   );
@@ -90,7 +89,9 @@ export async function getAdminUsers() {
   const users = unwrap(
     await supabase
       .from("users")
-      .select("*")
+      .select(
+        "id,email,phone,first_name,last_name,is_active,email_verified,phone_verified,created_at,updated_at",
+      )
       .in("id", ids)
       .order("created_at", { ascending: false }),
   );
@@ -100,7 +101,13 @@ export async function getAdminUsers() {
 export async function getAdminUserDetails({ data }: { data: { userId: string } }) {
   await admin();
   const [user, requests] = await Promise.all([
-    supabase.from("users").select("*").eq("id", data.userId).single(),
+    supabase
+      .from("users")
+      .select(
+        "id,email,phone,first_name,last_name,is_active,email_verified,phone_verified,created_at,updated_at",
+      )
+      .eq("id", data.userId)
+      .single(),
     supabase
       .from("service_requests")
       .select("*, drones(*), service_categories(*)")
@@ -115,7 +122,9 @@ export async function getAdminRequests() {
   const requests = unwrap(
     await supabase
       .from("service_requests")
-      .select("*, users!service_requests_customer_id_fkey(*), drones(*), service_categories(*)")
+      .select(
+        "*, users!service_requests_customer_id_fkey(id,email,phone,first_name,last_name,is_active,created_at,updated_at), drones(*), service_categories(*)",
+      )
       .order("created_at", { ascending: false }),
   );
   return { requests: requests ?? [] };
@@ -123,16 +132,21 @@ export async function getAdminRequests() {
 
 export async function getAdminRequestDetails({ data }: { data: { requestId: string } }) {
   await admin();
-  const request = unwrap(
-    await supabase
+  const [requestResult, providersResult] = await Promise.all([
+    supabase
       .from("service_requests")
       .select(
-        "*, users!service_requests_customer_id_fkey(*), drones(*), addresses(*), service_categories(*), job_assignments(*)",
+        "*, users!service_requests_customer_id_fkey(id,email,phone,first_name,last_name,is_active,created_at,updated_at), drones(*), addresses(*), service_categories(*), job_assignments(*)",
       )
       .eq("id", data.requestId)
       .single(),
-  );
-  return { request };
+    supabase
+      .from("provider_profiles")
+      .select("id, user_id, business_name, equipment_class")
+      .eq("status", "approved")
+      .order("business_name"),
+  ]);
+  return { request: unwrap(requestResult), providers: unwrap(providersResult) ?? [] };
 }
 
 export async function assignRequestToProvider({
@@ -140,30 +154,39 @@ export async function assignRequestToProvider({
 }: {
   data: { requestId: string; providerId: string };
 }) {
-  const currentAdmin = await admin();
-  const provider = unwrap(
-    await supabase
-      .from("provider_profiles")
-      .select("user_id, status")
-      .eq("user_id", data.providerId)
-      .maybeSingle(),
+  await admin();
+  return callRpc("assign_provider", {
+    p_request_id: data.requestId,
+    p_provider_id: data.providerId,
+  });
+}
+
+export const reviewServiceRequest = (requestId: string) =>
+  callRpc("review_service_request", { p_request_id: requestId });
+
+export const approveServiceRequest = (requestId: string) =>
+  callRpc("approve_service_request", { p_request_id: requestId });
+
+export const rejectServiceRequest = (requestId: string, reason: string) =>
+  callRpc("reject_service_request", { p_request_id: requestId, p_rejection_reason: reason });
+
+export const assignProviderClass = (providerProfileId: string, equipmentClass: number) =>
+  callRpc("assign_provider_class", {
+    p_provider_profile_id: providerProfileId,
+    p_equipment_class: equipmentClass,
+  });
+
+export async function getApprovedProviders() {
+  await admin();
+  return (
+    unwrap(
+      await supabase
+        .from("provider_profiles")
+        .select("id, user_id, business_name, equipment_class")
+        .eq("status", "approved")
+        .order("business_name"),
+    ) ?? []
   );
-  if (!provider || provider.status !== "approved") throw new Error("Provider is not approved");
-  unwrap(
-    await supabase.from("job_assignments").insert({
-      service_request_id: data.requestId,
-      provider_id: provider.user_id,
-      assigned_by: currentAdmin.id,
-      status: "pending",
-    }),
-  );
-  unwrap(
-    await supabase
-      .from("service_requests")
-      .update({ status: "review", assigned_at: new Date().toISOString() })
-      .eq("id", data.requestId),
-  );
-  return { success: true };
 }
 
 export async function getAdminJobs() {

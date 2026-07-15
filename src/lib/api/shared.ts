@@ -27,3 +27,9 @@ export function unwrap<T>(result: { data: T; error: { message: string } | null }
   if (result.error) throw new Error(result.error.message);
   return result.data;
 }
+
+export async function callRpc<T>(name: string, params: Record<string, unknown> = {}) {
+  const result = await supabase.rpc(name, params);
+  if (result.error) throw new Error(result.error.message);
+  return result.data as T;
+}

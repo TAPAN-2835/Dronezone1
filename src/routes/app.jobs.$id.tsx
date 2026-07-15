@@ -44,7 +44,7 @@ const amcLabels = {
 };
 
 function JobDetails() {
-  const { assignment } = Page.useLoaderData();
+  const { assignment, history } = Page.useLoaderData();
   const job = assignment;
 
   if (!job) {
@@ -145,6 +145,32 @@ function JobDetails() {
               </div>
             </CardContent>
           </Card>
+
+          {history.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Status History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ol className="space-y-3">
+                  {history.map((entry: any) => (
+                    <li key={entry.id} className="border-l-2 border-primary/30 pl-3 text-sm">
+                      <div className="font-medium capitalize">
+                        {entry.from_status.replaceAll("_", " ")} →{" "}
+                        {entry.to_status.replaceAll("_", " ")}
+                      </div>
+                      {entry.notes && (
+                        <p className="text-xs text-muted-foreground">{entry.notes}</p>
+                      )}
+                      <time className="text-xs text-muted-foreground">
+                        {new Date(entry.created_at).toLocaleDateString("en-IN")}
+                      </time>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>

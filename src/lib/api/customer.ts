@@ -45,18 +45,35 @@ export async function getRequestDetails(input: { data: { id: string } }) {
   const assignment = request.job_assignments?.find(
     (item: any) => !["rejected", "cancelled"].includes(item.status),
   );
-  return { request, assignment: assignment ?? null };
+  const [providerResult, historyResult] = assignment
+    ? await Promise.all([
+        supabase.rpc("get_assigned_provider_for_request", { p_request_id: request.id }),
+        supabase
+          .from("job_status_history")
+          .select("*")
+          .eq("job_assignment_id", assignment.id)
+          .order("created_at", { ascending: true }),
+      ])
+    : [
+        { data: null, error: null },
+        { data: [], error: null },
+      ];
+  if (providerResult.error) throw new Error(providerResult.error.message);
+  if (historyResult.error) throw new Error(historyResult.error.message);
+  const providerRows = providerResult.data as any;
+  return {
+    request,
+    assignment: assignment ?? null,
+    provider: Array.isArray(providerRows) ? (providerRows[0] ?? null) : providerRows,
+    history: historyResult.data ?? [],
+  };
 }
 
 export async function getCustomerAssets() {
   const user = await requireRole("customer");
   const [drones, addresses, categories] = await Promise.all([
     supabase.from("drones").select("id, model").eq("owner_id", user.id).is("deleted_at", null),
-    supabase
-      .from("addresses")
-      .select("id, address_line_1, city")
-      .eq("user_id", user.id)
-      .is("deleted_at", null),
+    supabase.from("addresses").select("id, address_line_1, city").eq("user_id", user.id),
     supabase.from("service_categories").select("id, name").eq("is_active", true),
   ]);
   return {

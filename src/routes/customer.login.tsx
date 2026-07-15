@@ -5,6 +5,8 @@ import { Logo } from "@/components/layout/Logo";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { resolveUserRole } from "@/lib/auth-store";
+import { defaultRouteForRole } from "@/lib/api/auth";
+import { useLocation } from "react-router-dom";
 
 export const Page = definePage("/customer/login")({
   head: () => ({ meta: [{ title: "Login â€” DroneZone" }] }),
@@ -13,6 +15,7 @@ export const Page = definePage("/customer/login")({
 
 function CustomerLogin() {
   const nav = useNavigate();
+  const location = useLocation();
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,13 +38,18 @@ function CustomerLogin() {
               toast.error(error.message);
             } else {
               toast.success("Welcome back");
-              const role = data.user ? await resolveUserRole(data.user) : null;
-              if (role === "customer") {
-                nav({ to: "/customer/dashboard" });
-              } else if (role === "admin") {
-                nav({ to: "/admin/dashboard" });
-              } else {
-                nav({ to: "/app/dashboard" });
+              try {
+                const role = data.user ? await resolveUserRole(data.user) : null;
+                if (!role) throw new Error("Account role/profile provisioning is incomplete");
+                const requested = new URLSearchParams(location.search).get("returnTo");
+                const safeReturn =
+                  requested?.startsWith("/") && !requested.startsWith("//") ? requested : null;
+                nav({ to: safeReturn || defaultRouteForRole(role), replace: true });
+              } catch (roleError) {
+                toast.error(
+                  roleError instanceof Error ? roleError.message : "Unable to load account role",
+                );
+                nav({ to: "/forbidden?reason=provisioning", replace: true });
               }
             }
           }}

@@ -10,6 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { resolveUserRole } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
+import { defaultRouteForRole } from "@/lib/api/auth";
+import { useLocation } from "react-router-dom";
 
 export const Page = definePage("/login")({
   head: () => ({
@@ -23,6 +25,7 @@ export const Page = definePage("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mode, setMode] = useState<"email" | "mobile">("email");
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
@@ -48,15 +51,17 @@ function LoginPage() {
       return;
     }
     toast.success("Welcome back");
-    const role = await resolveUserRole(data.user);
-    navigate({
-      to:
-        role === "customer"
-          ? "/customer/dashboard"
-          : role === "admin"
-            ? "/admin/dashboard"
-            : "/app/dashboard",
-    });
+    try {
+      const role = await resolveUserRole(data.user);
+      if (!role) throw new Error("Account role/profile provisioning is incomplete");
+      const requested = new URLSearchParams(location.search).get("returnTo");
+      const safeReturn =
+        requested?.startsWith("/") && !requested.startsWith("//") ? requested : null;
+      navigate({ to: safeReturn || defaultRouteForRole(role), replace: true });
+    } catch (roleError) {
+      toast.error(roleError instanceof Error ? roleError.message : "Unable to load account role");
+      navigate({ to: "/forbidden?reason=provisioning", replace: true });
+    }
   }
 
   return (
