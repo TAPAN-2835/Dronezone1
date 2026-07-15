@@ -1,11 +1,11 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+﻿import { definePage, Link, useParams } from "@/lib/router";
 import { useState } from "react";
 import { Phone, MessageSquare, MapPin, Check, Paperclip, Clock, ExternalLink } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customerRequests, trackingStages } from "@/data/customer";
 
-export const Route = createFileRoute("/customer/requests/$id")({
-  head: () => ({ meta: [{ title: "Request Details — DroneZone" }] }),
+export const Page = definePage("/customer/requests/$id")({
+  head: () => ({ meta: [{ title: "Request Details â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Request Details" showBack>
       <Tracking />
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/customer/requests/$id")({
 });
 
 function Tracking() {
-  const { id } = useParams({ from: "/customer/requests/$id" });
+  const { id } = useParams();
   const req = customerRequests.find((r) => r.id === id) ?? customerRequests[0];
   const currentIdx = trackingStages.findIndex((s) => s.key === req.status);
 
@@ -52,9 +52,7 @@ function Tracking() {
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3.5 w-3.5" />
           Expected Completion:{" "}
-          {hasDateChangeRequest
-            ? "22 May 2026, 05:00 PM"
-            : req.scheduledAt || "Pending"}
+          {hasDateChangeRequest ? "22 May 2026, 05:00 PM" : req.scheduledAt || "Pending"}
         </div>
         {hasDateChangeRequest && (
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
@@ -162,13 +160,16 @@ function Tracking() {
               <div className="flex items-center gap-2">
                 <div className="font-semibold">{req.provider.name}</div>
                 {(req.provider as any).serviceClass && (
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary" title={`Class ${(req.provider as any).serviceClass} — Premium equipment capabilities`}>
+                  <span
+                    className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+                    title={`Class ${(req.provider as any).serviceClass} â€” Premium equipment capabilities`}
+                  >
                     Class {(req.provider as any).serviceClass}
                   </span>
                 )}
               </div>
               <div className="text-xs text-muted-foreground">
-                Field Engineer · ★ {req.provider.rating}
+                Field Engineer Â· â˜… {req.provider.rating}
               </div>
             </div>
             <a

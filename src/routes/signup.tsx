@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, Link, useNavigate } from "@/lib/router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { ArrowRight, Shield, CheckCircle2, UploadCloud } from "lucide-react";
@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-store";
 
-export const Route = createFileRoute("/signup")({
+export const Page = definePage("/signup")({
   head: () => ({
     meta: [
-      { title: "Register — DroneZone Provider" },
+      { title: "Register â€” DroneZone Provider" },
       { name: "description", content: "Register as a DroneZone service provider." },
     ],
   }),
@@ -139,7 +139,7 @@ function SignupPage() {
         </div>
         <div className="relative flex items-center gap-2 text-xs text-white/60">
           <Shield className="h-4 w-4" />
-          DGCA-aligned · ISO 27001 ready
+          DGCA-aligned Â· ISO 27001 ready
         </div>
       </div>
 
@@ -341,7 +341,7 @@ function SignupPage() {
               disabled={loading}
             >
               {loading ? (
-                "Registering…"
+                "Registeringâ€¦"
               ) : (
                 <>
                   Create Account <ArrowRight className="ml-1 h-4 w-4" />

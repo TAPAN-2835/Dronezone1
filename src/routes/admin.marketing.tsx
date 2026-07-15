@@ -1,16 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { campaigns } from "@/data/admin";
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Users, Mail, MousePointerClick } from "lucide-react";
 
-export const Route = createFileRoute("/admin/marketing")({
-  head: () => ({ meta: [{ title: "Marketing — DroneZone Admin" }] }),
+export const Page = definePage("/admin/marketing")({
+  head: () => ({ meta: [{ title: "Marketing â€” DroneZone Admin" }] }),
   component: MarketingPage,
 });
 
@@ -66,8 +61,8 @@ function MarketingPage() {
                 </thead>
                 <tbody>
                   {campaigns.map((c) => (
-                    <tr 
-                      key={c.name} 
+                    <tr
+                      key={c.name}
                       className="border-t hover:bg-muted/20 transition-colors cursor-pointer"
                       onClick={() => setSelectedCampaign(c)}
                     >
@@ -90,8 +85,8 @@ function MarketingPage() {
           {/* Mobile card stack */}
           <div className="space-y-3 sm:hidden">
             {campaigns.map((c) => (
-              <div 
-                key={c.name} 
+              <div
+                key={c.name}
                 className="rounded-xl border bg-card p-4 cursor-pointer hover:bg-muted/20 transition-colors"
                 onClick={() => setSelectedCampaign(c)}
               >
@@ -99,7 +94,7 @@ function MarketingPage() {
                   <div className="min-w-0">
                     <div className="font-semibold truncate text-primary">{c.name}</div>
                     <div className="text-xs text-muted-foreground">
-                      {c.type} · {c.audience}
+                      {c.type} Â· {c.audience}
                     </div>
                   </div>
                   <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
@@ -190,7 +185,8 @@ function MarketingPage() {
               <div>
                 <h3 className="font-semibold text-lg">{selectedCampaign.name}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {selectedCampaign.type} · {selectedCampaign.audience} · Sent {selectedCampaign.sent}
+                  {selectedCampaign.type} Â· {selectedCampaign.audience} Â· Sent{" "}
+                  {selectedCampaign.sent}
                 </p>
               </div>
 
@@ -203,7 +199,9 @@ function MarketingPage() {
                 <div className="rounded-lg border bg-muted/20 p-3 text-center">
                   <Mail className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
                   <div className="text-xs uppercase text-muted-foreground">Open Rate</div>
-                  <div className="font-semibold text-success">{selectedCampaign.openRate ?? "0%"}</div>
+                  <div className="font-semibold text-success">
+                    {selectedCampaign.openRate ?? "0%"}
+                  </div>
                 </div>
                 <div className="rounded-lg border bg-muted/20 p-3 text-center">
                   <MousePointerClick className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
@@ -214,12 +212,20 @@ function MarketingPage() {
 
               <div className="rounded-lg border p-4 space-y-3">
                 <div>
-                  <div className="text-xs font-semibold text-muted-foreground uppercase">Subject</div>
-                  <div className="text-sm font-medium mt-0.5">{selectedCampaign.subject ?? "No Subject"}</div>
+                  <div className="text-xs font-semibold text-muted-foreground uppercase">
+                    Subject
+                  </div>
+                  <div className="text-sm font-medium mt-0.5">
+                    {selectedCampaign.subject ?? "No Subject"}
+                  </div>
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-muted-foreground uppercase">Email Body</div>
-                  <div className="text-sm mt-1 whitespace-pre-wrap">{selectedCampaign.body ?? "No body content."}</div>
+                  <div className="text-xs font-semibold text-muted-foreground uppercase">
+                    Email Body
+                  </div>
+                  <div className="text-sm mt-1 whitespace-pre-wrap">
+                    {selectedCampaign.body ?? "No body content."}
+                  </div>
                 </div>
               </div>
             </div>

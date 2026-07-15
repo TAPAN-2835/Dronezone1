@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import {
   ArrowLeft,
   Phone,
@@ -22,8 +22,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { jobs, quotations, inr } from "@/data/demo";
 
-export const Route = createFileRoute("/app/jobs/$id")({
-  head: ({ params }) => ({ meta: [{ title: `Job ${params.id} — DroneZone` }] }),
+export const Page = definePage("/app/jobs/$id")({
+  head: ({ params }) => ({ meta: [{ title: `Job ${params.id} â€” DroneZone` }] }),
   component: JobDetails,
   notFoundComponent: () => <div className="p-8 text-sm text-muted-foreground">Job not found.</div>,
 });
@@ -43,7 +43,7 @@ const amcLabels = {
 };
 
 function JobDetails() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const job = jobs.find((j) => j.id === id);
   const quote = quotations.find((q) => q.jobId === id);
 
@@ -141,7 +141,7 @@ function JobDetails() {
                 />
                 <Field label="Current status" value={job.status.replace("_", " ")} />
                 <Field label="Assigned engineer" value={job.assignedEngineer ?? "Not assigned"} />
-                <Field label="Service category" value={job.serviceCategory ?? "—"} />
+                <Field label="Service category" value={job.serviceCategory ?? "â€”"} />
               </div>
             </CardContent>
           </Card>
@@ -155,8 +155,8 @@ function JobDetails() {
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Model" value={job.drone.model} />
               <Field label="Serial" value={job.drone.serial} />
-              <Field label="Purchase date" value={job.drone.purchaseDate ?? "—"} />
-              <Field label="Warranty" value={job.drone.warranty ?? "—"} />
+              <Field label="Purchase date" value={job.drone.purchaseDate ?? "â€”"} />
+              <Field label="Warranty" value={job.drone.warranty ?? "â€”"} />
             </CardContent>
           </Card>
 
@@ -259,7 +259,7 @@ function JobDetails() {
                   <div className="flex justify-between text-success">
                     <span>Discount ({quote.discountPercent}%)</span>
                     <span>
-                      −{" "}
+                      âˆ’{" "}
                       {inr(
                         Math.round(
                           ((quote.hardwareCost + quote.laborCost + quote.shippingCost) *
@@ -294,7 +294,7 @@ function JobDetails() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2 text-sm">
-                <span className="mt-0.5 text-muted-foreground font-medium">•</span>
+                <span className="mt-0.5 text-muted-foreground font-medium">â€¢</span>
                 {job.location}
               </div>
             </CardContent>

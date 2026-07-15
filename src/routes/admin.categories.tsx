@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { categories, droneModels } from "@/data/admin";
 
-export const Route = createFileRoute("/admin/categories")({
-  head: () => ({ meta: [{ title: "Services & Models — DroneZone Admin" }] }),
+export const Page = definePage("/admin/categories")({
+  head: () => ({ meta: [{ title: "Services & Models â€” DroneZone Admin" }] }),
   component: () => (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">Services &amp; Models</h1>

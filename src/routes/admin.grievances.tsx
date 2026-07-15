@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { useMemo, useState } from "react";
 import { Search, Filter, Plus, ArrowUpDown } from "lucide-react";
 import { grievances, type GrievanceStatus } from "@/data/admin";
@@ -19,8 +19,8 @@ const priorityClass = (p: string) =>
       ? "text-warning"
       : "text-muted-foreground";
 
-export const Route = createFileRoute("/admin/grievances")({
-  head: () => ({ meta: [{ title: "Grievances — DroneZone Admin" }] }),
+export const Page = definePage("/admin/grievances")({
+  head: () => ({ meta: [{ title: "Grievances â€” DroneZone Admin" }] }),
   component: GrievancesList,
 });
 
@@ -59,7 +59,7 @@ function GrievancesList() {
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search grievances…"
+            placeholder="Search grievancesâ€¦"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="h-10 pl-9"

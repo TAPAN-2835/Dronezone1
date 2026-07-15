@@ -1,11 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, Link, useNavigate } from "@/lib/router";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/customer/login")({
-  head: () => ({ meta: [{ title: "Login — DroneZone" }] }),
+export const Page = definePage("/customer/login")({
+  head: () => ({ meta: [{ title: "Login â€” DroneZone" }] }),
   component: CustomerLogin,
 });
 

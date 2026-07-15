@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, useNavigate } from "@/lib/router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
@@ -24,10 +24,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/app/signup")({
+export const Page = definePage("/app/signup")({
   head: () => ({
     meta: [
-      { title: "Sign Up — DroneZone Provider" },
+      { title: "Sign Up â€” DroneZone Provider" },
       { name: "description", content: "Create your DroneZone service provider account." },
     ],
   }),
@@ -414,7 +414,7 @@ function SignUpPage() {
             ) : (
               <Button
                 onClick={() => {
-                  toast.success("Application submitted! Redirecting to verification…");
+                  toast.success("Application submitted! Redirecting to verificationâ€¦");
                   setTimeout(() => navigate({ to: "/app/verification" }), 800);
                 }}
                 className="flex-1 bg-success hover:bg-success/90"

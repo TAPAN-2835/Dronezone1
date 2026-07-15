@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import {
   ArrowLeft,
   User,
@@ -28,13 +28,13 @@ const sectionMeta: Record<ProfileSectionId | "support", { title: string; icon: t
   support: { title: "Help & Support", icon: HelpCircle },
 };
 
-export const Route = createFileRoute("/customer/profile/$section")({
-  head: ({ params }) => ({ meta: [{ title: `${params.section} — Profile` }] }),
+export const Page = definePage("/customer/profile/$section")({
+  head: ({ params }) => ({ meta: [{ title: `${params.section} â€” Profile` }] }),
   component: ProfileSection,
 });
 
 function ProfileSection() {
-  const { section } = Route.useParams();
+  const { section } = Page.useParams();
   const meta = sectionMeta[section as ProfileSectionId | "support"];
 
   if (!meta) {
@@ -164,7 +164,7 @@ function ProfileSection() {
             <p className="text-muted-foreground">Need help? Reach our support team.</p>
             <Row label="Email" value="support@dronezone.com" />
             <Row label="Phone" value="+91 1800-123-4567" />
-            <Row label="Hours" value="Mon–Sat, 9 AM – 7 PM IST" />
+            <Row label="Hours" value="Monâ€“Sat, 9 AM â€“ 7 PM IST" />
           </div>
         )}
 
@@ -177,7 +177,7 @@ function ProfileSection() {
               <div key={d.serial} className="border-t py-3 first:border-0 first:pt-0 text-sm">
                 <div className="font-semibold">{d.model}</div>
                 <div className="text-xs text-muted-foreground">
-                  {d.serial} · {d.purchaseDate} · Warranty: {d.warranty}
+                  {d.serial} Â· {d.purchaseDate} Â· Warranty: {d.warranty}
                 </div>
               </div>
             ))}

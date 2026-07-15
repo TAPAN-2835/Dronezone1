@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ChevronRight, Plus, Shield, Sparkles } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { amc, customer, customerRequests, inr } from "@/data/customer";
 
-export const Route = createFileRoute("/customer/dashboard")({
-  head: () => ({ meta: [{ title: "Home — DroneZone" }] }),
+export const Page = definePage("/customer/dashboard")({
+  head: () => ({ meta: [{ title: "Home â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="">
       <Home />
@@ -19,7 +19,7 @@ function Home() {
       <div>
         <div className="text-sm text-muted-foreground">Good morning,</div>
         <h1 className="font-display text-2xl font-bold tracking-tight">
-          Hello, {customer.name.split(" ")[0]} 👋
+          Hello, {customer.name.split(" ")[0]} ðŸ‘‹
         </h1>
       </div>
 

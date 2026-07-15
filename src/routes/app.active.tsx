@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { Check, Circle, MapPin, MessageSquare, Phone, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { jobs, stages } from "@/data/demo";
 import { useState } from "react";
 
-export const Route = createFileRoute("/app/active")({
-  head: () => ({ meta: [{ title: "Active Jobs — DroneZone" }] }),
+export const Page = definePage("/app/active")({
+  head: () => ({ meta: [{ title: "Active Jobs â€” DroneZone" }] }),
   component: Active,
 });
 
@@ -48,7 +48,7 @@ function Active() {
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         <Card className="lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto">
           <CardHeader>
-            <CardTitle className="text-sm">In progress · {active.length}</CardTitle>
+            <CardTitle className="text-sm">In progress Â· {active.length}</CardTitle>
           </CardHeader>
           <CardContent className="divide-y p-0">
             {active.map((j) => (

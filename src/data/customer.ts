@@ -21,7 +21,7 @@ export interface CustomerRequest {
   scheduledAt: string;
   location: string;
   urgent: boolean;
-  provider?: { name: string; phone: string; rating: number };
+  provider?: { name: string; phone: string; rating: number; serviceClass?: number };
   amount?: number;
   attachments?: { id: string; name: string; type: "image" | "document" }[];
   originalDescription?: string;

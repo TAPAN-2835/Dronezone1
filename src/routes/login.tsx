@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, Link, useNavigate } from "@/lib/router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Phone, Lock, ArrowRight, Shield, CheckCircle2 } from "lucide-react";
@@ -10,10 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-store";
 
-export const Route = createFileRoute("/login")({
+export const Page = definePage("/login")({
   head: () => ({
     meta: [
-      { title: "Login — DroneZone Provider" },
+      { title: "Login â€” DroneZone Provider" },
       { name: "description", content: "Login to your DroneZone service provider workspace." },
     ],
   }),
@@ -85,7 +85,7 @@ function LoginPage() {
         </div>
         <div className="relative space-y-6">
           <h2 className="font-display text-4xl font-semibold leading-tight">
-            Run your drone service business — end to end.
+            Run your drone service business â€” end to end.
           </h2>
           <p className="text-white/70">
             Manage requests, send quotations, track active jobs, and chat with customers in one
@@ -107,7 +107,7 @@ function LoginPage() {
         </div>
         <div className="relative flex items-center gap-2 text-xs text-white/60">
           <Shield className="h-4 w-4" />
-          DGCA-aligned · ISO 27001 ready
+          DGCA-aligned Â· ISO 27001 ready
         </div>
       </div>
 
@@ -223,7 +223,7 @@ function LoginPage() {
               disabled={loading}
             >
               {loading ? (
-                "Signing in…"
+                "Signing inâ€¦"
               ) : (
                 <>
                   Login <ArrowRight className="ml-1 h-4 w-4" />
@@ -234,7 +234,7 @@ function LoginPage() {
 
           <div className="mt-6 rounded-lg border bg-muted/50 p-3 text-xs text-muted-foreground">
             <div className="font-semibold text-foreground">Demo credentials</div>
-            provider@dronezone.com · Drone@123
+            provider@dronezone.com Â· Drone@123
           </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">

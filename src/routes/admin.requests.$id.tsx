@@ -1,12 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft, Check, Clock, AlertCircle, Circle } from "lucide-react";
 import { adminRequests } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const Route = createFileRoute("/admin/requests/$id")({
-  head: ({ params }) => ({ meta: [{ title: `${params.id} — Request` }] }),
+export const Page = definePage("/admin/requests/$id")({
+  head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Request` }] }),
   component: AdminRequestDetail,
 });
 
@@ -63,26 +63,29 @@ function getWorkflowStages(status: string): WorkflowStage[] {
   ];
 }
 
-function getBottleneckMessage(status: string): { msg: string; variant: "warning" | "info" | "success" } {
+function getBottleneckMessage(status: string): {
+  msg: string;
+  variant: "warning" | "info" | "success";
+} {
   if (status === "New")
     return { msg: "Waiting for Provider to Review & Create Quotation", variant: "warning" };
   if (status === "In Progress")
     return { msg: "Waiting for Customer to Approve Quotation", variant: "info" };
-  if (status === "Active")
-    return { msg: "Job is Active — In Progress", variant: "success" };
-  if (status === "Completed")
-    return { msg: "Completed", variant: "success" };
+  if (status === "Active") return { msg: "Job is Active â€” In Progress", variant: "success" };
+  if (status === "Completed") return { msg: "Completed", variant: "success" };
   return { msg: "Unknown Stage", variant: "warning" };
 }
 
 const bottleneckStyles = {
-  warning: "border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300",
+  warning:
+    "border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300",
   info: "border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-  success: "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
+  success:
+    "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
 };
 
 function AdminRequestDetail() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const req = adminRequests.find((r) => r.id === id);
 
   if (!req) {
@@ -161,7 +164,7 @@ function AdminRequestDetail() {
           </CardContent>
         </Card>
 
-        {/* Workflow Status card — enhanced vertical stepper */}
+        {/* Workflow Status card â€” enhanced vertical stepper */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -227,7 +230,9 @@ function AdminRequestDetail() {
             >
               <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               <div>
-                <span className="mr-1 font-bold uppercase tracking-wide opacity-60">Bottleneck:</span>
+                <span className="mr-1 font-bold uppercase tracking-wide opacity-60">
+                  Bottleneck:
+                </span>
                 {bottleneck.msg}
               </div>
             </div>

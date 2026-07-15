@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 
-export const Route = createFileRoute("/customer/onboarding")({
-  head: () => ({ meta: [{ title: "Welcome — DroneZone" }] }),
+export const Page = definePage("/customer/onboarding")({
+  head: () => ({ meta: [{ title: "Welcome â€” DroneZone" }] }),
   component: Onboarding,
 });
 
@@ -51,7 +51,7 @@ function Onboarding() {
             to="/customer/dashboard"
             className="block pt-2 text-center text-xs text-muted-foreground hover:text-foreground"
           >
-            Skip — enter demo
+            Skip â€” enter demo
           </Link>
         </div>
       </div>

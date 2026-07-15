@@ -1,11 +1,11 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+﻿import { definePage, Link, Outlet, useRouterState } from "@/lib/router";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customerRequests } from "@/data/customer";
 import { StatusPill } from "./customer.dashboard";
 import { useState } from "react";
 
-export const Route = createFileRoute("/customer/requests")({
-  head: () => ({ meta: [{ title: "My Requests — DroneZone" }] }),
+export const Page = definePage("/customer/requests")({
+  head: () => ({ meta: [{ title: "My Requests â€” DroneZone" }] }),
   component: RequestsRoute,
 });
 
@@ -50,7 +50,7 @@ function RequestsList() {
                 <div className="text-sm font-semibold">{r.id}</div>
                 <div className="mt-0.5 text-sm">{r.issue}</div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {r.drone} · {r.createdAt}
+                  {r.drone} Â· {r.createdAt}
                 </div>
               </div>
               <StatusPill status={r.status} />

@@ -1,14 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 
-export const Route = createFileRoute("/admin/profile")({
-  head: () => ({ meta: [{ title: "Settings — DroneZone Admin" }] }),
+export const Page = definePage("/admin/profile")({
+  head: () => ({ meta: [{ title: "Settings â€” DroneZone Admin" }] }),
   component: () => (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">My Profile</h1>
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main profile card */}
         <div className="rounded-xl border bg-card p-5 sm:p-6 lg:col-span-2">
-          {/* Avatar + name row — wraps gracefully */}
+          {/* Avatar + name row â€” wraps gracefully */}
           <div className="flex flex-wrap items-center gap-4">
             <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-primary/10 text-lg font-bold text-primary sm:h-16 sm:w-16">
               AD
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin/profile")({
             </div>
           </div>
 
-          {/* Fields grid — 1 col on mobile, 2 on sm+ */}
+          {/* Fields grid â€” 1 col on mobile, 2 on sm+ */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Field label="Full Name" value="Admin User" />
             <Field label="Email" value="admin@dronezone.com" />

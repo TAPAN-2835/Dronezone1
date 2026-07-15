@@ -1,12 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
 import { GrievanceForm } from "@/components/shared/GrievanceForm";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/app/grievances/new")({
-  head: () => ({ meta: [{ title: "Raise Grievance — DroneZone" }] }),
+export const Page = definePage("/app/grievances/new")({
+  head: () => ({ meta: [{ title: "Raise Grievance â€” DroneZone" }] }),
   component: () => (
     <>
       <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2">

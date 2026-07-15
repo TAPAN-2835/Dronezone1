@@ -1,12 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, useNavigate } from "@/lib/router";
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { ratingCriteria } from "@/data/customer";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/customer/rate")({
-  head: () => ({ meta: [{ title: "Rate — DroneZone" }] }),
+export const Page = definePage("/customer/rate")({
+  head: () => ({ meta: [{ title: "Rate â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Rate Your Experience" showBack>
       <Rate />
@@ -54,7 +54,7 @@ function Rate() {
         <div className="mb-2 text-sm font-semibold">Your Feedback</div>
         <textarea
           rows={4}
-          placeholder="Share your experience…"
+          placeholder="Share your experienceâ€¦"
           defaultValue="Great service! The issue was resolved quickly."
           className="w-full rounded-xl border bg-card p-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
         />

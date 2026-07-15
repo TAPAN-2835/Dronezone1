@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+﻿import { useState } from "react";
+import { Link, Outlet, useRouterState } from "@/lib/router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -156,7 +156,7 @@ export function AdminShell() {
           <div className="relative max-w-md flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
-              placeholder="Search anything…"
+              placeholder="Search anythingâ€¦"
               className="h-10 w-full rounded-lg border bg-card pl-9 pr-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
             />
           </div>

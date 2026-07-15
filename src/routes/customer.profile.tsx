@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import {
   ChevronRight,
   User,
@@ -51,8 +51,8 @@ const items = [
   { icon: "HelpCircle" as const, label: "Help & Support", section: "support" as const },
 ];
 
-export const Route = createFileRoute("/customer/profile")({
-  head: () => ({ meta: [{ title: "Profile — DroneZone" }] }),
+export const Page = definePage("/customer/profile")({
+  head: () => ({ meta: [{ title: "Profile â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Profile">
       <div className="px-5 py-5">

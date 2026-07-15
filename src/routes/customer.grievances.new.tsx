@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { GrievanceForm } from "@/components/shared/GrievanceForm";
 
-export const Route = createFileRoute("/customer/grievances/new")({
-  head: () => ({ meta: [{ title: "Raise Grievance — DroneZone" }] }),
+export const Page = definePage("/customer/grievances/new")({
+  head: () => ({ meta: [{ title: "Raise Grievance â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Raise Grievance" showBack>
       <div className="px-5 py-5">

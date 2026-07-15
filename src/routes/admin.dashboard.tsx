@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { Users, Wrench, Inbox, IndianRupee, TrendingUp } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip, CartesianGrid } from "recharts";
 import { adminStats, adminRevenueTrend, adminRequests } from "@/data/admin";
 import { inr } from "@/data/demo";
 
-export const Route = createFileRoute("/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — DroneZone" }] }),
+export const Page = definePage("/admin/dashboard")({
+  head: () => ({ meta: [{ title: "Admin Dashboard â€” DroneZone" }] }),
   component: Dashboard,
 });
 
@@ -32,11 +32,11 @@ function Dashboard() {
       <div>
         <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Welcome back — here's what's happening across the platform.
+          Welcome back â€” here's what's happening across the platform.
         </p>
       </div>
 
-      {/* Stat cards — 2 cols on mobile, 4 on desktop */}
+      {/* Stat cards â€” 2 cols on mobile, 4 on desktop */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {cards.map((c) => (
           <div key={c.label} className="rounded-xl border bg-card p-4 sm:p-5">
@@ -143,7 +143,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Bottom quick stats — 2 cols on mobile, 4 on desktop */}
+      {/* Bottom quick stats â€” 2 cols on mobile, 4 on desktop */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
           { label: "Active Jobs", value: adminStats.active },

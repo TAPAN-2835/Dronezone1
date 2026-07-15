@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
 import { providerApplications, providerDocs, grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/providers/$id")({
-  head: ({ params }) => ({ meta: [{ title: `${params.id} — Provider` }] }),
+export const Page = definePage("/admin/providers/$id")({
+  head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Provider` }] }),
   component: ProviderDetail,
 });
 
 function ProviderDetail() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const { providers, updateProviderStatus } = useAuth();
 
   // Also check original mock if not found in auth store
@@ -73,7 +73,8 @@ function ProviderDetail() {
                   ? "bg-warning/15 text-[oklch(0.45_0.15_75)]"
                   : provider.status === "Rejected"
                     ? "bg-destructive/15 text-destructive"
-                    : provider.status === "In Review" || provider.status === "Additional Documents Required"
+                    : provider.status === "In Review" ||
+                        provider.status === "Additional Documents Required"
                       ? "bg-primary/10 text-primary"
                       : "bg-success/15 text-success"
               }`}
@@ -192,31 +193,40 @@ function ProviderDetail() {
               <div>
                 <div className="mb-2 font-semibold text-muted-foreground">Class Assignment</div>
                 <div className="flex items-center gap-4">
-                  <span className={`rounded-full px-3 py-1 font-semibold ${
-                    (provider as any).equipmentClass === 1 ? 'bg-primary/10 text-primary' :
-                    (provider as any).equipmentClass === 2 ? 'bg-success/10 text-success' :
-                    (provider as any).equipmentClass === 3 ? 'bg-warning/10 text-[oklch(0.45_0.15_75)]' :
-                    'bg-muted text-muted-foreground'
-                  }`}>
-                    {(provider as any).equipmentClass ? `Class ${(provider as any).equipmentClass}` : 'Unassigned'}
+                  <span
+                    className={`rounded-full px-3 py-1 font-semibold ${
+                      (provider as any).equipmentClass === 1
+                        ? "bg-primary/10 text-primary"
+                        : (provider as any).equipmentClass === 2
+                          ? "bg-success/10 text-success"
+                          : (provider as any).equipmentClass === 3
+                            ? "bg-warning/10 text-[oklch(0.45_0.15_75)]"
+                            : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {(provider as any).equipmentClass
+                      ? `Class ${(provider as any).equipmentClass}`
+                      : "Unassigned"}
                   </span>
                   <select className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                     <option value="">Change Class...</option>
-                    <option value="1">Class 1 — Premium</option>
-                    <option value="2">Class 2 — Standard</option>
-                    <option value="3">Class 3 — Basic</option>
+                    <option value="1">Class 1 â€” Premium</option>
+                    <option value="2">Class 2 â€” Standard</option>
+                    <option value="3">Class 3 â€” Basic</option>
                   </select>
                 </div>
                 <div className="mt-4 text-xs text-muted-foreground">
                   <span className="font-semibold text-foreground">Site Verification: </span>
-                  {(provider as any).equipmentClass ? 'Verified by Sales Partner' : 'Pending Verification'}
+                  {(provider as any).equipmentClass
+                    ? "Verified by Sales Partner"
+                    : "Pending Verification"}
                 </div>
               </div>
               <div>
                 <div className="mb-2 font-semibold text-muted-foreground">Submitted Equipment</div>
-                {((provider as any).equipment && (provider as any).equipment.length > 0) ? (
+                {(provider as any).equipment && (provider as any).equipment.length > 0 ? (
                   <ul className="space-y-2">
-                    {((provider as any).equipment).map((eq: any, i: number) => (
+                    {(provider as any).equipment.map((eq: any, i: number) => (
                       <li key={i} className="flex items-center gap-3 rounded-lg border p-2">
                         <div className="h-10 w-10 flex-shrink-0 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
                           Img
@@ -289,7 +299,7 @@ function ProviderDetail() {
                     className="flex justify-between py-3 text-sm hover:text-primary"
                   >
                     <div>
-                      <span className="font-semibold">{g.id}</span> · {g.issue}
+                      <span className="font-semibold">{g.id}</span> Â· {g.issue}
                     </div>
                     <span className="text-xs">{g.status}</span>
                   </Link>

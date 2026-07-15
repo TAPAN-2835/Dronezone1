@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { adminJobs } from "@/data/admin";
@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getJobAgeDays } from "@/lib/job-aging";
 
-export const Route = createFileRoute("/admin/jobs")({
-  head: () => ({ meta: [{ title: "Jobs — DroneZone Admin" }] }),
+export const Page = definePage("/admin/jobs")({
+  head: () => ({ meta: [{ title: "Jobs â€” DroneZone Admin" }] }),
   component: AdminJobs,
 });
 
@@ -56,7 +56,7 @@ function AdminJobs() {
       <div>
         <h1 className="font-display text-2xl font-bold sm:text-3xl">Jobs Master</h1>
         <p className="text-sm text-muted-foreground">
-          Central jobs management — search, filter, and review all jobs
+          Central jobs management â€” search, filter, and review all jobs
         </p>
       </div>
 
@@ -64,7 +64,7 @@ function AdminJobs() {
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by ID, customer, provider, issue…"
+            placeholder="Search by ID, customer, provider, issueâ€¦"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="h-10 pl-9"

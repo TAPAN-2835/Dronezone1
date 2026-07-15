@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+﻿import { Link, useRouterState } from "@/lib/router";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, FileText, MessageSquare, Shield, User, ArrowLeft, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";

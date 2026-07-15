@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
+﻿import { Link, Outlet, useRouterState, useNavigate } from "@/lib/router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -130,7 +130,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
       <div className="relative ml-auto hidden max-w-md flex-1 sm:block">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
-          placeholder="Search jobs, customers, drones…"
+          placeholder="Search jobs, customers, dronesâ€¦"
           className="h-10 w-full rounded-lg border bg-card pl-9 pr-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
         />
       </div>

@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { Download } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { invoice, inr } from "@/data/customer";
 
-export const Route = createFileRoute("/customer/invoices")({
-  head: () => ({ meta: [{ title: "Invoice — DroneZone" }] }),
+export const Page = definePage("/customer/invoices")({
+  head: () => ({ meta: [{ title: "Invoice â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Invoice Details" showBack>
       <Invoice />

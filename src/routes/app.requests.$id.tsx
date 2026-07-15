@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, Link, useNavigate } from "@/lib/router";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -33,8 +33,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { jobs, inr } from "@/data/demo";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/app/requests/$id")({
-  head: ({ params }) => ({ meta: [{ title: `Review ${params.id} — DroneZone` }] }),
+export const Page = definePage("/app/requests/$id")({
+  head: ({ params }) => ({ meta: [{ title: `Review ${params.id} â€” DroneZone` }] }),
   component: RequestReview,
   notFoundComponent: () => (
     <div className="p-8 text-sm text-muted-foreground">Request not found.</div>
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/app/requests/$id")({
 });
 
 function RequestReview() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const navigate = useNavigate();
   const job = jobs.find((j) => j.id === id);
 
@@ -62,7 +62,9 @@ function RequestReview() {
   const [gst, setGst] = useState(18);
   const [quoteNotes, setQuoteNotes] = useState("");
   const [quoteSent, setQuoteSent] = useState(false);
-  const [customerResponse, setCustomerResponse] = useState<"pending" | "accepted" | "changes">("pending");
+  const [customerResponse, setCustomerResponse] = useState<"pending" | "accepted" | "changes">(
+    "pending",
+  );
 
   if (!job) {
     return (
@@ -134,7 +136,7 @@ function RequestReview() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          {/* ── Customer Info ── */}
+          {/* â”€â”€ Customer Info â”€â”€ */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -169,7 +171,7 @@ function RequestReview() {
             </CardContent>
           </Card>
 
-          {/* ── Drone Info ── */}
+          {/* â”€â”€ Drone Info â”€â”€ */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -179,13 +181,13 @@ function RequestReview() {
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Model" value={job.drone.model} />
               <Field label="Serial number" value={job.drone.serial} />
-              <Field label="Purchase date" value={job.drone.purchaseDate ?? "—"} />
-              <Field label="Warranty" value={job.drone.warranty ?? "—"} />
-              <Field label="Service category" value={job.serviceCategory ?? "—"} />
+              <Field label="Purchase date" value={job.drone.purchaseDate ?? "â€”"} />
+              <Field label="Warranty" value={job.drone.warranty ?? "â€”"} />
+              <Field label="Service category" value={job.serviceCategory ?? "â€”"} />
             </CardContent>
           </Card>
 
-          {/* ── ITEM 1: Issue Description (enhanced) ── */}
+          {/* â”€â”€ ITEM 1: Issue Description (enhanced) â”€â”€ */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -235,7 +237,7 @@ function RequestReview() {
             </CardContent>
           </Card>
 
-          {/* ── Attachments ── */}
+          {/* â”€â”€ Attachments â”€â”€ */}
           {job.attachments && job.attachments.length > 0 && (
             <Card>
               <CardHeader>
@@ -260,7 +262,7 @@ function RequestReview() {
             </Card>
           )}
 
-          {/* ── ITEM 3 & 4: More Days Required + Timeline Negotiation ── */}
+          {/* â”€â”€ ITEM 3 & 4: More Days Required + Timeline Negotiation â”€â”€ */}
           {isNew && (
             <Card className="border-primary/20">
               <CardHeader>
@@ -323,7 +325,7 @@ function RequestReview() {
                       <Textarea
                         value={timelineNotes}
                         onChange={(e) => setTimelineNotes(e.target.value)}
-                        placeholder="Explain why additional time is needed…"
+                        placeholder="Explain why additional time is neededâ€¦"
                         rows={2}
                         className="text-sm"
                       />
@@ -372,7 +374,7 @@ function RequestReview() {
                     <Button
                       className="w-full"
                       onClick={() => {
-                        toast.success("Timeline revision submitted — Awaiting Customer Approval");
+                        toast.success("Timeline revision submitted â€” Awaiting Customer Approval");
                       }}
                     >
                       <Send className="h-4 w-4" /> Submit Timeline Revision
@@ -388,7 +390,7 @@ function RequestReview() {
             </Card>
           )}
 
-          {/* ── Provider Notes ── */}
+          {/* â”€â”€ Provider Notes â”€â”€ */}
           {isNew && (
             <Card>
               <CardHeader>
@@ -398,14 +400,14 @@ function RequestReview() {
                 <Textarea
                   value={providerNotes}
                   onChange={(e) => setProviderNotes(e.target.value)}
-                  placeholder="Add your observations, special instructions, or requirements…"
+                  placeholder="Add your observations, special instructions, or requirementsâ€¦"
                   rows={3}
                 />
               </CardContent>
             </Card>
           )}
 
-          {/* ── ITEM 5 & 6: Inline Quotation Builder ── */}
+          {/* â”€â”€ ITEM 5 & 6: Inline Quotation Builder â”€â”€ */}
           {isNew && (
             <Card className="border-primary/20">
               <CardHeader
@@ -478,7 +480,7 @@ function RequestReview() {
                     {discountPct > 0 && (
                       <div className="flex justify-between text-success">
                         <span>Discount ({discountPct}%)</span>
-                        <span className="font-medium">− {inr(discountAmount)}</span>
+                        <span className="font-medium">âˆ’ {inr(discountAmount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-muted-foreground">
@@ -496,7 +498,7 @@ function RequestReview() {
                     <Textarea
                       value={quoteNotes}
                       onChange={(e) => setQuoteNotes(e.target.value)}
-                      placeholder="Optional terms, warranty, or instructions…"
+                      placeholder="Optional terms, warranty, or instructionsâ€¦"
                       rows={2}
                     />
                   </div>
@@ -506,7 +508,7 @@ function RequestReview() {
                       className="w-full"
                       onClick={() => {
                         setQuoteSent(true);
-                        toast.success("Quotation sent to customer — awaiting review");
+                        toast.success("Quotation sent to customer â€” awaiting review");
                       }}
                     >
                       <Send className="h-4 w-4" /> Send Quotation to Customer
@@ -518,13 +520,13 @@ function RequestReview() {
                           Quotation Sent
                         </div>
                         <div className="text-sm text-muted-foreground mt-1">
-                          Waiting for customer response…
+                          Waiting for customer responseâ€¦
                         </div>
                       </div>
 
                       <div className="mt-2 rounded-lg bg-muted/50 p-2 text-center text-xs text-muted-foreground border border-muted flex items-center justify-center gap-1">
                         <AlertCircle className="h-3.5 w-3.5" />
-                        Fixed pricing — customers cannot negotiate quotation amounts
+                        Fixed pricing â€” customers cannot negotiate quotation amounts
                       </div>
 
                       {/* Demo: simulate customer response */}
@@ -597,7 +599,7 @@ function RequestReview() {
             </Card>
           )}
 
-          {/* ── Request Timeline ── */}
+          {/* â”€â”€ Request Timeline â”€â”€ */}
           {job.timeline && (
             <Card>
               <CardHeader className="cursor-pointer" onClick={() => setShowTimeline(!showTimeline)}>
@@ -641,7 +643,7 @@ function RequestReview() {
           )}
         </div>
 
-        {/* ── Right sidebar ── */}
+        {/* â”€â”€ Right sidebar â”€â”€ */}
         <div className="space-y-4">
           <Card>
             <CardHeader>
@@ -649,7 +651,7 @@ function RequestReview() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-muted-foreground font-medium">•</span>
+                <span className="mt-0.5 text-muted-foreground font-medium">â€¢</span>
                 <span>{job.location}</span>
               </div>
               <div className="flex items-start gap-2">
@@ -707,7 +709,7 @@ function MoneyField({
       <Label className="text-xs">{label}</Label>
       <div className="relative">
         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-          ₹
+          â‚¹
         </span>
         <Input
           type="number"

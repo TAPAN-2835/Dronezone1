@@ -1,12 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { FileText, ArrowRight, Info } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { jobs, quotations, inr } from "@/data/demo";
 
-export const Route = createFileRoute("/app/quotations")({
-  head: () => ({ meta: [{ title: "Quotation History — DroneZone" }] }),
+export const Page = definePage("/app/quotations")({
+  head: () => ({ meta: [{ title: "Quotation History â€” DroneZone" }] }),
   component: QuotationHistory,
 });
 
@@ -28,7 +28,7 @@ function QuotationHistory() {
             <div>
               <div className="text-sm font-semibold">New quotation workflow</div>
               <div className="text-xs text-muted-foreground">
-                Quotations are now created inline within the request review page — linked directly
+                Quotations are now created inline within the request review page â€” linked directly
                 to each job.
               </div>
             </div>
@@ -82,7 +82,7 @@ function QuotationHistory() {
                     <td className="px-4 py-3">
                       <div className="font-medium">{j.issue}</div>
                       <div className="text-xs text-muted-foreground">
-                        {j.id} · {j.customer.name}
+                        {j.id} Â· {j.customer.name}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -95,7 +95,7 @@ function QuotationHistory() {
                     <td className="px-4 py-3 text-right">{inr(q.hardwareCost)}</td>
                     <td className="px-4 py-3 text-right">{inr(q.shippingCost)}</td>
                     <td className="px-4 py-3 text-right">
-                      {q.discountPercent > 0 ? `${q.discountPercent}%` : "—"}
+                      {q.discountPercent > 0 ? `${q.discountPercent}%` : "â€”"}
                     </td>
                     <td className="px-4 py-3 text-right font-semibold">{inr(total)}</td>
                   </tr>

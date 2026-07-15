@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { useState } from "react";
 import {
   Bell,
@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { notifications as initial } from "@/data/demo";
 
-export const Route = createFileRoute("/app/notifications")({
-  head: () => ({ meta: [{ title: "Notifications — DroneZone" }] }),
+export const Page = definePage("/app/notifications")({
+  head: () => ({ meta: [{ title: "Notifications â€” DroneZone" }] }),
   component: Notifications,
 });
 

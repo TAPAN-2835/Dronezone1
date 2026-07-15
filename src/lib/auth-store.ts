@@ -48,7 +48,9 @@ export function getStoredProviders(): ProviderUser[] {
     if (data) {
       return JSON.parse(data);
     }
-  } catch (e) {}
+  } catch {
+    // Ignore malformed local demo data and fall back to the built-in provider.
+  }
 
   // Return demo user initially
   return [DEMO_USER];

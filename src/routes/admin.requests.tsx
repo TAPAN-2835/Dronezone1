@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { adminRequests } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,8 @@ const activeRequests = adminRequests.filter(
 const priorityClass = (p: string) =>
   p === "High" ? "text-destructive" : p === "Medium" ? "text-warning" : "text-muted-foreground";
 
-export const Route = createFileRoute("/admin/requests")({
-  head: () => ({ meta: [{ title: "Requests — DroneZone Admin" }] }),
+export const Page = definePage("/admin/requests")({
+  head: () => ({ meta: [{ title: "Requests â€” DroneZone Admin" }] }),
   component: () => (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">All Requests</h1>

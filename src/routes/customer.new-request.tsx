@@ -1,11 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { definePage, useNavigate } from "@/lib/router";
 import { useState } from "react";
 import { ImagePlus, MapPin, Calendar, AlertTriangle } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/customer/new-request")({
-  head: () => ({ meta: [{ title: "New Request — DroneZone" }] }),
+export const Page = definePage("/customer/new-request")({
+  head: () => ({ meta: [{ title: "New Request â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Raise Service Request" showBack>
       <NewRequest />
@@ -46,7 +46,7 @@ function NewRequest() {
       <Field label="Problem Description">
         <textarea
           rows={4}
-          placeholder="Describe the issue…"
+          placeholder="Describe the issueâ€¦"
           className="w-full rounded-xl border bg-card p-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
         />
       </Field>

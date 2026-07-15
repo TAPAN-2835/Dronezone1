@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { Paperclip, Camera, Send } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { chatMessages } from "@/data/customer";
 
-export const Route = createFileRoute("/customer/chat")({
-  head: () => ({ meta: [{ title: "Chat — DroneZone" }] }),
+export const Page = definePage("/customer/chat")({
+  head: () => ({ meta: [{ title: "Chat â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="Rahul Kumar">
       <Chat />
@@ -14,16 +14,16 @@ export const Route = createFileRoute("/customer/chat")({
 
 import { useState } from "react";
 
-type ChatStatus = 
-    | "Draft"
-    | "Submitted"
-    | "Review"
-    | "Quotation Pending"
-    | "Awaiting Customer Approval"
-    | "Active Job"
-    | "Completed"
-    | "Feedback Submitted"
-    | "Closed";
+type ChatStatus =
+  | "Draft"
+  | "Submitted"
+  | "Review"
+  | "Quotation Pending"
+  | "Awaiting Customer Approval"
+  | "Active Job"
+  | "Completed"
+  | "Feedback Submitted"
+  | "Closed";
 
 function Chat() {
   const [demoStatus, setDemoStatus] = useState<ChatStatus>("Active Job");
@@ -103,7 +103,7 @@ function Chat() {
         </button>
         <input
           disabled={isPreActive || isPostActive}
-          placeholder="Type a message…"
+          placeholder="Type a messageâ€¦"
           className="h-10 flex-1 rounded-full border bg-background px-4 text-sm outline-none focus:border-primary/40 disabled:opacity-50"
         />
         <button

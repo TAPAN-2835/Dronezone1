@@ -1,12 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { Bell, Lock, Globe, Smartphone, HelpCircle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/app/settings")({
-  head: () => ({ meta: [{ title: "Settings — DroneZone" }] }),
+export const Page = definePage("/app/settings")({
+  head: () => ({ meta: [{ title: "Settings â€” DroneZone" }] }),
   component: Settings,
 });
 
@@ -36,7 +36,7 @@ function Settings() {
         <Section icon={Globe} title="Preferences">
           <Row label="Language" value="English (India)" cta="Change" />
           <Row label="Time zone" value="Asia/Kolkata" cta="Change" />
-          <Row label="Currency" value="INR (₹)" cta="Change" />
+          <Row label="Currency" value="INR (â‚¹)" cta="Change" />
         </Section>
 
         <Section icon={Smartphone} title="Mobile app">

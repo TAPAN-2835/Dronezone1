@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import {
   BadgeCheck,
   Building2,
@@ -17,8 +17,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { provider } from "@/data/demo";
 
-export const Route = createFileRoute("/app/profile")({
-  head: () => ({ meta: [{ title: "Profile — DroneZone" }] }),
+export const Page = definePage("/app/profile")({
+  head: () => ({ meta: [{ title: "Profile â€” DroneZone" }] }),
   component: Profile,
 });
 
@@ -54,7 +54,7 @@ function Profile() {
                 )}
               </div>
               <div className="text-sm text-muted-foreground">
-                {provider.business.name} · Member since {provider.joinedAt}
+                {provider.business.name} Â· Member since {provider.joinedAt}
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1">

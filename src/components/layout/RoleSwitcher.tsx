@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+﻿import { useState, useEffect, useRef } from "react";
+import { Link, useRouterState } from "@/lib/router";
 import { Smartphone, Wrench, Shield, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 

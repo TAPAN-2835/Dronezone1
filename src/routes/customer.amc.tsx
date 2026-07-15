@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { useState } from "react";
 import { ChevronRight, Calendar, FileText, Wrench, Check, Shield } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
@@ -7,8 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/customer/amc")({
-  head: () => ({ meta: [{ title: "My AMC — DroneZone" }] }),
+export const Page = definePage("/customer/amc")({
+  head: () => ({ meta: [{ title: "My AMC â€” DroneZone" }] }),
   component: () => (
     <CustomerShell title="My AMC">
       <AMC />
@@ -155,7 +155,7 @@ function AMC() {
             onClick={() => toast.success("AMC renewed successfully! Valid till Dec 2027.")}
             className="h-10 w-full rounded-lg bg-primary text-sm font-semibold text-primary-foreground"
           >
-            Confirm Renewal · {inr(14999)}
+            Confirm Renewal Â· {inr(14999)}
           </button>
           <button
             onClick={() => setShowRenew(false)}

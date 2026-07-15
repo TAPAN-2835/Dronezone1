@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { adminUsers } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/admin/users")({
-  head: () => ({ meta: [{ title: "Users — DroneZone Admin" }] }),
+export const Page = definePage("/admin/users")({
+  head: () => ({ meta: [{ title: "Users â€” DroneZone Admin" }] }),
   component: () => (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">Users</h1>

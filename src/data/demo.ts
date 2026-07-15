@@ -489,7 +489,7 @@ export const provider = {
   equipment: [
     { name: "DJI Mavic 3 Enterprise", image: "" },
     { name: "Thermal Imaging Camera", image: "" },
-    { name: "Diagnostic Toolkit", image: "" }
+    { name: "Diagnostic Toolkit", image: "" },
   ],
 };
 

@@ -212,7 +212,7 @@ export const providerApplications = [
     equipmentClass: 1,
     equipment: [
       { name: "DJI Inspire 3", image: "" },
-      { name: "Advanced Toolkit", image: "" }
+      { name: "Advanced Toolkit", image: "" },
     ],
   },
   {

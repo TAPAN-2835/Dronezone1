@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { Bell, IndianRupee, Star, Shield, AlertOctagon } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { customerNotifications } from "@/data/customer";
@@ -11,8 +11,8 @@ const iconMap = {
   grievance: AlertOctagon,
 } as const;
 
-export const Route = createFileRoute("/customer/notifications")({
-  head: () => ({ meta: [{ title: "Notifications — DroneZone" }] }),
+export const Page = definePage("/customer/notifications")({
+  head: () => ({ meta: [{ title: "Notifications â€” DroneZone" }] }),
   component: () => (
     <CustomerShell
       title="Notifications"

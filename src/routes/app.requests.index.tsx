@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { useMemo, useState } from "react";
 import { Search, Filter, MapPin, Clock, Check, X } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -11,8 +11,8 @@ import { jobs, type JobStatus } from "@/data/demo";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
-export const Route = createFileRoute("/app/requests/")({
-  head: () => ({ meta: [{ title: "Job Requests — DroneZone" }] }),
+export const Page = definePage("/app/requests/")({
+  head: () => ({ meta: [{ title: "Job Requests â€” DroneZone" }] }),
   component: Requests,
 });
 
@@ -75,7 +75,7 @@ function Requests() {
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by ID, customer, issue or location…"
+            placeholder="Search by ID, customer, issue or locationâ€¦"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="h-11 pl-9"
@@ -134,7 +134,7 @@ function Requests() {
                     </div>
                     <div className="mt-3 text-sm">
                       <span className="font-medium">{j.customer.name}</span>
-                      <span className="text-muted-foreground"> · {j.drone.model}</span>
+                      <span className="text-muted-foreground"> Â· {j.drone.model}</span>
                     </div>
                   </div>
                 </div>

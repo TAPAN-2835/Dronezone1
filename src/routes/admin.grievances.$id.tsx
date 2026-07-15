@@ -1,16 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft, Clock, User, Briefcase } from "lucide-react";
 import { grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const Route = createFileRoute("/admin/grievances/$id")({
-  head: ({ params }) => ({ meta: [{ title: `${params.id} — Grievance` }] }),
+export const Page = definePage("/admin/grievances/$id")({
+  head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Grievance` }] }),
   component: GrievanceDetail,
 });
 
 function GrievanceDetail() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const g = grievances.find((x) => x.id === id);
 
   if (!g) {

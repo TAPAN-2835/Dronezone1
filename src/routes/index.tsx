@@ -1,17 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Smartphone, Wrench, Shield, ArrowRight, Sparkles } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 
-export const Route = createFileRoute("/")({
+export const Page = definePage("/")({
   head: () => ({
     meta: [
-      { title: "DroneZone — Drone Service Ecosystem" },
+      { title: "DroneZone â€” Drone Service Ecosystem" },
       {
         name: "description",
         content:
-          "Customer App, Service Provider Panel and Admin Console — unified in one platform.",
+          "Customer App, Service Provider Panel and Admin Console â€” unified in one platform.",
       },
     ],
   }),
@@ -112,7 +112,7 @@ function Selector() {
         <Logo />
         <div className="hidden items-center gap-2 rounded-full border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground sm:flex">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
-          Demo Mode · No login required
+          Demo Mode Â· No login required
         </div>
       </header>
 
@@ -124,7 +124,7 @@ function Selector() {
           Choose your workspace
         </h1>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-          A complete drone service ecosystem. Pick the experience you want to explore — every
+          A complete drone service ecosystem. Pick the experience you want to explore â€” every
           workspace is one click away.
         </p>
       </div>
@@ -165,7 +165,7 @@ function Selector() {
 
       <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6 text-xs text-muted-foreground sm:mt-14">
         <div>
-          © {new Date().getFullYear()} DroneZone · Built for the modern drone services industry.
+          Â© {new Date().getFullYear()} DroneZone Â· Built for the modern drone services industry.
         </div>
         <div className="flex items-center gap-4">
           <Link to="/login" className="hover:text-foreground">

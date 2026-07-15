@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft, User, Wrench, IndianRupee, Shield, Clock } from "lucide-react";
 import { adminJobs, grievances } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { inr } from "@/data/demo";
 
-export const Route = createFileRoute("/admin/jobs/$id")({
-  head: ({ params }) => ({ meta: [{ title: `Job ${params.id} — Admin` }] }),
+export const Page = definePage("/admin/jobs/$id")({
+  head: ({ params }) => ({ meta: [{ title: `Job ${params.id} â€” Admin` }] }),
   component: AdminJobDetail,
 });
 
 function AdminJobDetail() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const job = adminJobs.find((j) => j.id === id);
   const relatedGrievances = grievances.filter((g) => g.jobId === id);
 
@@ -121,7 +121,7 @@ function AdminJobDetail() {
             </CardHeader>
             <CardContent className="text-sm font-semibold">
               {job.paymentStatus}
-              {job.amount ? ` · ${inr(job.amount)}` : ""}
+              {job.amount ? ` Â· ${inr(job.amount)}` : ""}
             </CardContent>
           </Card>
           <Card>

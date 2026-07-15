@@ -1,16 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
 import { adminUsers, grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const Route = createFileRoute("/admin/users/$id")({
-  head: ({ params }) => ({ meta: [{ title: `${params.id} — User` }] }),
+export const Page = definePage("/admin/users/$id")({
+  head: ({ params }) => ({ meta: [{ title: `${params.id} â€” User` }] }),
   component: UserDetail,
 });
 
 function UserDetail() {
-  const { id } = Route.useParams();
+  const { id } = Page.useParams();
   const user = adminUsers.find((u) => u.id === id);
   const userGrievances = grievances.filter((g) => g.raisedById === id || g.raisedBy === user?.name);
 
@@ -44,7 +44,7 @@ function UserDetail() {
           <h1 className="font-display text-2xl font-bold">{user.name}</h1>
           <p className="text-muted-foreground">{user.email}</p>
           <p className="text-sm text-muted-foreground">
-            {user.id} · Joined {user.joined}
+            {user.id} Â· Joined {user.joined}
           </p>
         </div>
       </div>
@@ -91,7 +91,7 @@ function UserDetail() {
                     className="flex justify-between py-2 text-sm hover:text-primary"
                   >
                     <span>
-                      {g.id} · {g.issue}
+                      {g.id} Â· {g.issue}
                     </span>
                     <span className="text-xs">{g.status}</span>
                   </Link>

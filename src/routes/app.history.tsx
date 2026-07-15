@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import { useMemo, useState } from "react";
 import {
   Search,
@@ -16,20 +16,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { jobs, inr, ratingLabels } from "@/data/demo";
 
-export const Route = createFileRoute("/app/history")({
-  head: () => ({ meta: [{ title: "Service History — DroneZone" }] }),
+export const Page = definePage("/app/history")({
+  head: () => ({ meta: [{ title: "Service History â€” DroneZone" }] }),
   component: History,
 });
 
-function getDelay(job: (typeof jobs)[number]): { days: number; label: string; color: string; bg: string } {
+function getDelay(job: (typeof jobs)[number]): {
+  days: number;
+  label: string;
+  color: string;
+  bg: string;
+} {
   if (!job.completedAt || !job.requestedCompletionDate)
     return { days: 0, label: "On Time", color: "text-success", bg: "bg-success/15" };
   const completed = new Date(job.completedAt);
   const requested = new Date(job.requestedCompletionDate);
   const diffMs = completed.getTime() - requested.getTime();
   const diffDays = Math.max(0, Math.ceil(diffMs / 86400000));
-  if (diffDays === 0) return { days: 0, label: "On Time", color: "text-success", bg: "bg-success/15" };
-  if (diffDays === 1) return { days: 1, label: "1 Day Delay", color: "text-destructive", bg: "bg-destructive/10" };
+  if (diffDays === 0)
+    return { days: 0, label: "On Time", color: "text-success", bg: "bg-success/15" };
+  if (diffDays === 1)
+    return { days: 1, label: "1 Day Delay", color: "text-destructive", bg: "bg-destructive/10" };
   return {
     days: diffDays,
     label: `${diffDays} Days Delay`,
@@ -79,7 +86,7 @@ function History() {
           completed.reduce((s, j) => s + (j.customerRating ?? 0), 0) /
           completed.filter((j) => j.customerRating).length
         ).toFixed(1)
-      : "—";
+      : "â€”";
 
   return (
     <>
@@ -120,7 +127,7 @@ function History() {
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search records…"
+              placeholder="Search recordsâ€¦"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="h-10 pl-9"
@@ -155,7 +162,7 @@ function History() {
                     <td className="px-4 py-3">
                       <div className="font-medium">{j.issue}</div>
                       <div className="font-mono text-xs text-muted-foreground">
-                        {j.id} · {j.drone.model}
+                        {j.id} Â· {j.drone.model}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -190,7 +197,7 @@ function History() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right font-semibold">
-                      {j.amount ? inr(j.amount) : "—"}
+                      {j.amount ? inr(j.amount) : "â€”"}
                     </td>
                   </tr>
                 );

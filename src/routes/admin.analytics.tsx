@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { definePage } from "@/lib/router";
 import {
   AreaChart,
   Area,
@@ -23,8 +23,8 @@ const PIE_COLORS = [
   "var(--chart-5)",
 ];
 
-export const Route = createFileRoute("/admin/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — DroneZone Admin" }] }),
+export const Page = definePage("/admin/analytics")({
+  head: () => ({ meta: [{ title: "Analytics â€” DroneZone Admin" }] }),
   component: () => (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold sm:text-3xl">Analytics &amp; Reports</h1>
@@ -75,7 +75,11 @@ export const Route = createFileRoute("/admin/analytics")({
                 layout="vertical"
                 margin={{ left: 40 }}
               >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="oklch(0.92 0.012 255)" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  horizontal={false}
+                  stroke="oklch(0.92 0.012 255)"
+                />
                 <XAxis type="number" tick={{ fontSize: 10 }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} />
                 <Tooltip />

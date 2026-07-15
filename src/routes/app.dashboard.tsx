@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import {
   Inbox,
   Briefcase,
@@ -28,8 +28,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { jobs, revenueTrend, weeklyJobs, provider, inr, notifications } from "@/data/demo";
 import { motion } from "framer-motion";
 
-export const Route = createFileRoute("/app/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — DroneZone" }] }),
+export const Page = definePage("/app/dashboard")({
+  head: () => ({ meta: [{ title: "Dashboard â€” DroneZone" }] }),
   component: Dashboard,
 });
 
@@ -91,7 +91,7 @@ function Dashboard() {
   return (
     <>
       <PageHeader
-        title={`Hi, ${provider.name.split(" ")[0]} 👋`}
+        title={`Hi, ${provider.name.split(" ")[0]} ðŸ‘‹`}
         description="Here's how your service business is performing today."
         actions={
           <Button asChild>
@@ -224,7 +224,7 @@ function Dashboard() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
-                  tickFormatter={(v) => `₹${v / 1000}k`}
+                  tickFormatter={(v) => `â‚¹${v / 1000}k`}
                 />
                 <Tooltip
                   contentStyle={{
@@ -323,7 +323,7 @@ function Dashboard() {
                   </div>
                   <div className="mt-1 truncate text-sm font-semibold">{j.issue}</div>
                   <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {j.drone.model} · {j.location}
+                    {j.drone.model} Â· {j.location}
                   </div>
                 </div>
                 <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />

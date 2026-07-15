@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { definePage, Link } from "@/lib/router";
 import { useState } from "react";
 import {
   CheckCircle2,
@@ -19,10 +19,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { VerificationStatus } from "@/data/demo";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/app/verification")({
+export const Page = definePage("/app/verification")({
   head: () => ({
     meta: [
-      { title: "Account Verification — DroneZone" },
+      { title: "Account Verification â€” DroneZone" },
       { name: "description", content: "Your DroneZone provider account verification status." },
     ],
   }),
@@ -205,7 +205,7 @@ function VerificationPage() {
                         className="w-full"
                         onClick={() => {
                           setStatus("pending");
-                          toast.success("Documents uploaded — resubmitted for review");
+                          toast.success("Documents uploaded â€” resubmitted for review");
                         }}
                       >
                         <Upload className="h-4 w-4" /> Upload & Resubmit
