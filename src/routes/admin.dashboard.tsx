@@ -1,32 +1,36 @@
 ﻿import { definePage } from "@/lib/router";
 import { Users, Wrench, Inbox, IndianRupee, TrendingUp } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip, CartesianGrid } from "recharts";
-import { adminStats, adminRevenueTrend, adminRequests } from "@/data/admin";
+import { adminRevenueTrend, adminRequests } from "@/data/admin";
 import { inr } from "@/data/demo";
+import { getAdminDashboardStats } from "@/lib/api/admin";
 
 export const Page = definePage("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin Dashboard â€” DroneZone" }] }),
+  loader: () => getAdminDashboardStats(),
   component: Dashboard,
 });
 
-const cards = [
-  {
-    label: "Total Users",
-    value: adminStats.totalUsers.toLocaleString("en-IN"),
-    delta: "+12.5%",
-    icon: Users,
-  },
-  { label: "Service Providers", value: adminStats.providers, delta: "+8.4%", icon: Wrench },
-  {
-    label: "Total Resolved Requests",
-    value: adminStats.requests.toLocaleString("en-IN"),
-    delta: "+15.3%",
-    icon: Inbox,
-  },
-  { label: "Total Revenue", value: inr(adminStats.revenue), delta: "+18.7%", icon: IndianRupee },
-];
-
 function Dashboard() {
+  const { usersCount, providersCount, resolvedRequestsCount, totalRevenue } = Page.useLoaderData();
+
+  const cards = [
+    {
+      label: "Total Users",
+      value: usersCount.toLocaleString("en-IN"),
+      delta: "+12.5%",
+      icon: Users,
+    },
+    { label: "Service Providers", value: providersCount, delta: "+8.4%", icon: Wrench },
+    {
+      label: "Total Resolved Requests",
+      value: resolvedRequestsCount.toLocaleString("en-IN"),
+      delta: "+15.3%",
+      icon: Inbox,
+    },
+    { label: "Total Revenue", value: inr(totalRevenue), delta: "+18.7%", icon: IndianRupee },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -146,10 +150,10 @@ function Dashboard() {
       {/* Bottom quick stats â€” 2 cols on mobile, 4 on desktop */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
-          { label: "Active Jobs", value: adminStats.active },
-          { label: "Completed Today", value: adminStats.completedToday },
-          { label: "Avg. Completion", value: adminStats.avgCompletion },
-          { label: "Open Grievances", value: adminStats.openGrievances },
+          { label: "Active Jobs", value: 12 },
+          { label: "Completed Today", value: 5 },
+          { label: "Avg. Completion", value: "2.4 days" },
+          { label: "Open Grievances", value: 3 },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-4">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">{s.label}</div>

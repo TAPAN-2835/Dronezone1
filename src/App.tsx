@@ -3,7 +3,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { RoleSwitcher } from "@/components/layout/RoleSwitcher";
 import { AppShell } from "@/components/layout/AppShell";
 import { AdminShell } from "@/components/layout/AdminShell";
-import { getCurrentUserEmail, getStoredProviders } from "@/lib/auth-store";
+import { useAuth, type AppRole } from "@/lib/auth-store";
+import { PageDataProvider } from "@/lib/router";
 
 import { Page as HomePage } from "@/routes/index";
 import { Page as LoginPage } from "@/routes/login";
@@ -53,17 +54,55 @@ import { Page as CustomerProfileSectionPage } from "@/routes/customer.profile.$s
 import { Page as CustomerRatePage } from "@/routes/customer.rate";
 import { Page as CustomerGrievancePage } from "@/routes/customer.grievances.new";
 
-type PageModule = { component?: React.ComponentType };
+type PageModule = {
+  component?: React.ComponentType;
+  loader?: (context?: unknown) => unknown | Promise<unknown>;
+};
 
 function PageView({ page }: { page: PageModule }) {
   const Component = page.component;
-  return Component ? <Component /> : null;
+  return Component ? (
+    <PageDataProvider page={page}>
+      <Component />
+    </PageDataProvider>
+  ) : null;
+}
+
+function ProtectedArea({ roles, children }: { roles: AppRole[]; children: React.ReactNode }) {
+  const { user, role, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="grid min-h-screen place-items-center text-muted-foreground">Loading…</div>
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  if (!role || !roles.includes(role))
+    return <Navigate to={role === "customer" ? "/customer/dashboard" : "/"} replace />;
+  return children;
 }
 
 function ProviderArea() {
-  const email = getCurrentUserEmail();
-  const user = getStoredProviders().find((provider) => provider.email === email);
-  return user?.status === "Approved" ? <AppShell /> : <Navigate to="/login" replace />;
+  return (
+    <ProtectedArea roles={["provider"]}>
+      <AppShell />
+    </ProtectedArea>
+  );
+}
+
+function AdminArea() {
+  return (
+    <ProtectedArea roles={["admin"]}>
+      <AdminShell />
+    </ProtectedArea>
+  );
+}
+
+function CustomerArea() {
+  return (
+    <ProtectedArea roles={["customer"]}>
+      <Outlet />
+    </ProtectedArea>
+  );
 }
 
 function NotFound() {
@@ -109,7 +148,7 @@ export default function App() {
           <Route path="verification" element={<PageView page={ProviderVerificationPage} />} />
         </Route>
 
-        <Route path="/admin" element={<AdminShell />}>
+        <Route path="/admin" element={<AdminArea />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<PageView page={AdminDashboardPage} />} />
           <Route path="requests" element={<PageView page={AdminRequestsPage} />} />
@@ -130,23 +169,28 @@ export default function App() {
           <Route path="profile" element={<PageView page={AdminProfilePage} />} />
         </Route>
 
-        <Route path="/customer" element={<Outlet />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="/customer">
           <Route path="onboarding" element={<PageView page={CustomerOnboardingPage} />} />
           <Route path="login" element={<PageView page={CustomerLoginPage} />} />
-          <Route path="dashboard" element={<PageView page={CustomerDashboardPage} />} />
-          <Route path="requests" element={<PageView page={CustomerRequestsPage} />}>
-            <Route path=":id" element={<PageView page={CustomerRequestPage} />} />
+          <Route element={<CustomerArea />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<PageView page={CustomerDashboardPage} />} />
+            <Route path="requests" element={<PageView page={CustomerRequestsPage} />}>
+              <Route path=":id" element={<PageView page={CustomerRequestPage} />} />
+            </Route>
+            <Route path="new-request" element={<PageView page={CustomerNewRequestPage} />} />
+            <Route path="chat" element={<PageView page={CustomerChatPage} />} />
+            <Route path="amc" element={<PageView page={CustomerAmcPage} />} />
+            <Route path="invoices" element={<PageView page={CustomerInvoicesPage} />} />
+            <Route path="notifications" element={<PageView page={CustomerNotificationsPage} />} />
+            <Route
+              path="profile/:section"
+              element={<PageView page={CustomerProfileSectionPage} />}
+            />
+            <Route path="profile" element={<PageView page={CustomerProfilePage} />} />
+            <Route path="rate" element={<PageView page={CustomerRatePage} />} />
+            <Route path="grievances/new" element={<PageView page={CustomerGrievancePage} />} />
           </Route>
-          <Route path="new-request" element={<PageView page={CustomerNewRequestPage} />} />
-          <Route path="chat" element={<PageView page={CustomerChatPage} />} />
-          <Route path="amc" element={<PageView page={CustomerAmcPage} />} />
-          <Route path="invoices" element={<PageView page={CustomerInvoicesPage} />} />
-          <Route path="notifications" element={<PageView page={CustomerNotificationsPage} />} />
-          <Route path="profile/:section" element={<PageView page={CustomerProfileSectionPage} />} />
-          <Route path="profile" element={<PageView page={CustomerProfilePage} />} />
-          <Route path="rate" element={<PageView page={CustomerRatePage} />} />
-          <Route path="grievances/new" element={<PageView page={CustomerGrievancePage} />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

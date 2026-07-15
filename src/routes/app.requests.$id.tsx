@@ -1,4 +1,4 @@
-﻿import { definePage, Link, useNavigate } from "@/lib/router";
+﻿import { definePage, Link, useRouter } from "@/lib/router";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -30,11 +30,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { jobs, inr } from "@/data/demo";
+import { inr } from "@/data/demo";
 import { toast } from "sonner";
+import { getProviderJobDetails, updateAssignmentStatus } from "@/lib/api/provider";
 
 export const Page = definePage("/app/requests/$id")({
   head: ({ params }) => ({ meta: [{ title: `Review ${params.id} â€” DroneZone` }] }),
+  loader: ({ params }) => getProviderJobDetails({ data: { assignmentId: params.id } }),
   component: RequestReview,
   notFoundComponent: () => (
     <div className="p-8 text-sm text-muted-foreground">Request not found.</div>
@@ -42,9 +44,9 @@ export const Page = definePage("/app/requests/$id")({
 });
 
 function RequestReview() {
-  const { id } = Page.useParams();
-  const navigate = useNavigate();
-  const job = jobs.find((j) => j.id === id);
+  const { assignment } = Page.useLoaderData();
+  const router = useRouter();
+  const job = assignment;
 
   /* --- local state --- */
   const [showTimeline, setShowTimeline] = useState(true);
@@ -69,7 +71,7 @@ function RequestReview() {
   if (!job) {
     return (
       <div className="rounded-lg border bg-card p-8 text-center">
-        <p className="text-sm text-muted-foreground">Request {id} not found.</p>
+        <p className="text-sm text-muted-foreground">Request not found.</p>
         <Button asChild className="mt-4">
           <Link to="/app/requests">Back to requests</Link>
         </Button>
@@ -77,10 +79,10 @@ function RequestReview() {
     );
   }
 
-  const isNew = job.status === "new";
-  const requestedDate = job.requestedCompletionDate
-    ? new Date(job.requestedCompletionDate)
-    : new Date(job.scheduledAt);
+  const isNew = job.status === "pending";
+  const requestedDate = job.service_requests?.requested_completion_date
+    ? new Date(job.service_requests?.requested_completion_date)
+    : new Date();
   const proposedDate = new Date(requestedDate.getTime() + additionalDays * 86400000);
 
   /* quotation calculations */
@@ -89,6 +91,18 @@ function RequestReview() {
   const afterDiscount = subtotal - discountAmount;
   const gstAmount = Math.round((afterDiscount * gst) / 100);
   const total = afterDiscount + gstAmount;
+
+  const handleStatusUpdate = (newStatus: "accepted" | "rejected") => {
+    toast.promise(updateAssignmentStatus({ data: { assignmentId: job.id, newStatus } }), {
+      loading: "Updating...",
+      success: () => {
+        if (newStatus === "accepted") router.navigate({ to: "/app/active" });
+        else router.navigate({ to: "/app/requests" });
+        return `Job ${newStatus}`;
+      },
+      error: "Failed to update status",
+    });
+  };
 
   return (
     <>
@@ -99,17 +113,12 @@ function RequestReview() {
       </Button>
 
       <PageHeader
-        title={isNew ? "Request Review" : job.issue}
+        title={isNew ? "Request Review" : job.service_requests?.title || "Request"}
         description={
           <span className="inline-flex flex-wrap items-center gap-2">
-            <span className="font-mono">{job.id}</span>
+            <span className="font-mono">{job.service_requests?.request_number}</span>
             <StatusBadge status={job.status} />
-            <JobAgeBadge createdAt={job.createdAt} />
-            {job.timelineStatus === "customer_pending" && (
-              <span className="rounded-full bg-warning/15 px-2.5 py-0.5 text-xs font-medium text-[oklch(0.45_0.15_75)]">
-                Awaiting Customer Approval
-              </span>
-            )}
+            <JobAgeBadge createdAt={job.created_at} />
           </span>
         }
         actions={
@@ -118,16 +127,18 @@ function RequestReview() {
               <Button
                 variant="ghost"
                 className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => toast.success(`${job.id} rejected`)}
+                onClick={() => handleStatusUpdate("rejected")}
               >
                 <X className="h-4 w-4" /> Reject
               </Button>
-              <Button onClick={() => toast.success(`${job.id} accepted`)}>
+              <Button onClick={() => handleStatusUpdate("accepted")}>
                 <Check className="h-4 w-4" /> Accept Request
               </Button>
             </>
           ) : (
-            <Button onClick={() => navigate({ to: "/app/jobs/$id", params: { id: job.id } })}>
+            <Button
+              onClick={() => router.navigate({ to: "/app/jobs/$id", params: { id: job.id } })}
+            >
               <FileText className="h-4 w-4" /> View Job Details
             </Button>
           )
@@ -147,23 +158,23 @@ function RequestReview() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarFallback className="bg-primary/10 font-semibold text-primary">
-                    {job.customer.name
-                      .split(" ")
-                      .map((p) => p[0])
-                      .join("")}
+                    {job.service_requests?.users?.first_name?.[0]}
+                    {job.service_requests?.users?.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-semibold">{job.customer.name}</div>
-                  <div className="text-sm text-muted-foreground">{job.customer.phone}</div>
-                  {job.customer.email && (
-                    <div className="text-xs text-muted-foreground">{job.customer.email}</div>
-                  )}
+                  <div className="font-semibold">
+                    {job.service_requests?.users?.first_name}{" "}
+                    {job.service_requests?.users?.last_name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {job.service_requests?.users?.phone}
+                  </div>
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" asChild>
-                  <a href={`tel:${job.customer.phone.replace(/\s/g, "")}`}>
+                  <a href={`tel:${job.service_requests?.users?.phone}`}>
                     <Phone className="h-4 w-4" /> Contact Customer
                   </a>
                 </Button>
@@ -179,15 +190,24 @@ function RequestReview() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
-              <Field label="Model" value={job.drone.model} />
-              <Field label="Serial number" value={job.drone.serial} />
-              <Field label="Purchase date" value={job.drone.purchaseDate ?? "â€”"} />
-              <Field label="Warranty" value={job.drone.warranty ?? "â€”"} />
-              <Field label="Service category" value={job.serviceCategory ?? "â€”"} />
+              <Field label="Model" value={job.service_requests?.drones?.model} />
+              <Field label="Serial number" value={job.service_requests?.drones?.serial_number} />
+              <Field
+                label="Purchase date"
+                value={job.service_requests?.drones?.purchase_date ?? "â€”"}
+              />
+              <Field
+                label="Warranty"
+                value={job.service_requests?.drones?.warranty_status ?? "â€”"}
+              />
+              <Field
+                label="Service category"
+                value={job.service_requests?.service_categories?.name ?? "â€”"}
+              />
             </CardContent>
           </Card>
 
-          {/* â”€â”€ ITEM 1: Issue Description (enhanced) â”€â”€ */}
+          {/* â”€â”€ Issue Description â”€â”€ */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -196,8 +216,10 @@ function RequestReview() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold text-base">{job.issue}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-foreground/90">{job.description}</p>
+                <h3 className="font-semibold text-base">{job.service_requests?.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/90">
+                  {job.service_requests?.description}
+                </p>
               </div>
 
               {/* Customer images placeholder grid */}
@@ -206,23 +228,14 @@ function RequestReview() {
                   Customer Images
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                  {(job.attachments ?? [])
-                    .filter((a) => a.type === "image")
-                    .map((a) => (
-                      <div
-                        key={a.id}
-                        className="flex aspect-video flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-gradient-to-br from-muted/60 to-muted/30 p-3 text-center transition hover:border-primary/30"
-                      >
-                        <ImageIcon className="h-6 w-6 text-muted-foreground/60" />
-                        <span className="mt-1 text-[10px] font-medium text-muted-foreground">
-                          {a.name}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="flex aspect-video flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-gradient-to-br from-muted/60 to-muted/30 p-3 text-center">
+                    <span className="mt-1 text-[10px] font-medium text-muted-foreground">
+                      No images attached
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* ITEM 2: Expected Completion Date (date only, no time) */}
               <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
                 <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-primary">
                   <Calendar className="h-3.5 w-3.5" /> Requested Completion Date
@@ -247,7 +260,7 @@ function RequestReview() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3 sm:grid-cols-3">
-                  {job.attachments.map((a) => (
+                  {job.attachments.map((a: any) => (
                     <div
                       key={a.id}
                       className="flex aspect-video flex-col items-center justify-center rounded-lg border bg-gradient-to-br from-muted to-card p-3 text-center"
@@ -563,7 +576,7 @@ function RequestReview() {
                           className="w-full bg-primary mt-3"
                           onClick={() => {
                             toast.success("Converted to active job!");
-                            navigate({ to: "/app/active" });
+                            router.navigate({ to: "/app/active" });
                           }}
                         >
                           <Check className="h-4 w-4 mr-2" /> Convert to Active Job
@@ -598,49 +611,6 @@ function RequestReview() {
               )}
             </Card>
           )}
-
-          {/* â”€â”€ Request Timeline â”€â”€ */}
-          {job.timeline && (
-            <Card>
-              <CardHeader className="cursor-pointer" onClick={() => setShowTimeline(!showTimeline)}>
-                <CardTitle className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-primary" /> Request Timeline
-                  </span>
-                  {showTimeline ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </CardTitle>
-              </CardHeader>
-              {showTimeline && (
-                <CardContent>
-                  <ol className="relative space-y-4 border-l-2 border-border pl-6">
-                    {job.timeline.map((event, i) => (
-                      <li key={event.id} className="relative">
-                        <span className="absolute -left-[34px] flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary bg-primary text-primary-foreground text-[10px] font-bold">
-                          {i + 1}
-                        </span>
-                        <div className="text-sm font-semibold">{event.label}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(event.timestamp).toLocaleString("en-IN", {
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          })}
-                        </div>
-                        {event.description && (
-                          <div className="mt-0.5 text-xs text-muted-foreground">
-                            {event.description}
-                          </div>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                </CardContent>
-              )}
-            </Card>
-          )}
         </div>
 
         {/* â”€â”€ Right sidebar â”€â”€ */}
@@ -652,12 +622,8 @@ function RequestReview() {
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-start gap-2">
                 <span className="mt-0.5 text-muted-foreground font-medium">â€¢</span>
-                <span>{job.location}</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
                 <span>
-                  {new Date(job.scheduledAt).toLocaleDateString("en-IN", { dateStyle: "full" })}
+                  {job.service_requests?.addresses?.city}, {job.service_requests?.addresses?.state}
                 </span>
               </div>
             </CardContent>
@@ -667,13 +633,13 @@ function RequestReview() {
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="p-4 space-y-3">
                 <p className="text-sm font-medium">Ready to take this job?</p>
-                <Button className="w-full" onClick={() => toast.success(`${job.id} accepted`)}>
+                <Button className="w-full" onClick={() => handleStatusUpdate("accepted")}>
                   <Check className="h-4 w-4" /> Accept Request
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full text-destructive hover:bg-destructive/10"
-                  onClick={() => toast.success(`${job.id} rejected`)}
+                  onClick={() => handleStatusUpdate("rejected")}
                 >
                   <X className="h-4 w-4" /> Reject Request
                 </Button>

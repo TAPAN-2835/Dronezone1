@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { resolveUserRole } from "@/lib/auth-store";
 
 export const Page = definePage("/customer/login")({
   head: () => ({ meta: [{ title: "Login â€” DroneZone" }] }),
@@ -12,6 +14,8 @@ export const Page = definePage("/customer/login")({
 function CustomerLogin() {
   const nav = useNavigate();
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <div className="min-h-screen bg-[oklch(0.97_0.012_255)]">
       <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-background px-8 pt-12 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:shadow-2xl sm:shadow-foreground/5">
@@ -21,10 +25,25 @@ function CustomerLogin() {
           <p className="mt-1 text-sm text-muted-foreground">Welcome back!</p>
         </div>
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            toast.success("Welcome back, John");
-            nav({ to: "/customer/dashboard" });
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
+            if (error) {
+              toast.error(error.message);
+            } else {
+              toast.success("Welcome back");
+              const role = data.user ? await resolveUserRole(data.user) : null;
+              if (role === "customer") {
+                nav({ to: "/customer/dashboard" });
+              } else if (role === "admin") {
+                nav({ to: "/admin/dashboard" });
+              } else {
+                nav({ to: "/app/dashboard" });
+              }
+            }
           }}
           className="mt-8 space-y-4"
         >
@@ -35,8 +54,12 @@ function CustomerLogin() {
             <div className="relative mt-1.5">
               <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
-                defaultValue="john.doe@email.com"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="john.doe@email.com"
                 className="h-12 w-full rounded-xl border bg-card pl-10 pr-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+                required
               />
             </div>
           </div>
@@ -49,8 +72,11 @@ function CustomerLogin() {
               <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type={show ? "text" : "password"}
-                defaultValue="Drone@123"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Drone@123"
                 className="h-12 w-full rounded-xl border bg-card pl-10 pr-10 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+                required
               />
               <button
                 type="button"

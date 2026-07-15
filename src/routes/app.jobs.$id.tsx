@@ -20,10 +20,11 @@ import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { jobs, quotations, inr } from "@/data/demo";
+import { getProviderJobDetails } from "@/lib/api/provider";
 
 export const Page = definePage("/app/jobs/$id")({
   head: ({ params }) => ({ meta: [{ title: `Job ${params.id} â€” DroneZone` }] }),
+  loader: ({ params }) => getProviderJobDetails({ data: { assignmentId: params.id } }),
   component: JobDetails,
   notFoundComponent: () => <div className="p-8 text-sm text-muted-foreground">Job not found.</div>,
 });
@@ -43,14 +44,13 @@ const amcLabels = {
 };
 
 function JobDetails() {
-  const { id } = Page.useParams();
-  const job = jobs.find((j) => j.id === id);
-  const quote = quotations.find((q) => q.jobId === id);
+  const { assignment } = Page.useLoaderData();
+  const job = assignment;
 
   if (!job) {
     return (
       <div className="rounded-lg border bg-card p-8 text-center">
-        <p className="text-sm text-muted-foreground">Job {id} not found.</p>
+        <p className="text-sm text-muted-foreground">Job not found.</p>
         <Button asChild className="mt-4">
           <Link to="/app/active">Back to active jobs</Link>
         </Button>
@@ -58,8 +58,8 @@ function JobDetails() {
     );
   }
 
-  const payment = paymentLabels[job.paymentStatus ?? "not_applicable"];
-  const amc = amcLabels[job.amcStatus ?? "not_covered"];
+  const payment = paymentLabels["not_applicable"];
+  const amc = amcLabels["not_covered"];
 
   return (
     <>
@@ -70,21 +70,16 @@ function JobDetails() {
       </Button>
 
       <PageHeader
-        title={job.issue}
+        title={job.service_requests?.title}
         description={
           <span className="inline-flex flex-wrap items-center gap-2">
-            <span className="font-mono">{job.id}</span>
+            <span className="font-mono">{job.service_requests?.request_number}</span>
             <StatusBadge status={job.status} />
-            <JobAgeBadge createdAt={job.createdAt} />
+            <JobAgeBadge createdAt={job.created_at} />
           </span>
         }
         actions={
           <>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/app/quotations">
-                <FileText className="h-4 w-4" /> Quotation
-              </Link>
-            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/app/chat">
                 <MessageSquare className="h-4 w-4" /> Chat
@@ -101,9 +96,9 @@ function JobDetails() {
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${amc.className}`}>
           <Shield className="mr-1 inline h-3 w-3" /> {amc.label}
         </span>
-        {job.serviceCategory && (
+        {job.service_requests?.service_categories?.name && (
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {job.serviceCategory}
+            {job.service_requests.service_categories.name}
           </span>
         )}
       </div>
@@ -120,28 +115,33 @@ function JobDetails() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarFallback className="bg-primary/10 font-semibold text-primary">
-                    {job.customer.name
-                      .split(" ")
-                      .map((p) => p[0])
-                      .join("")}
+                    {job.service_requests?.users?.first_name?.[0]}
+                    {job.service_requests?.users?.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-semibold">{job.customer.name}</div>
-                  <div className="text-sm text-muted-foreground">{job.customer.phone}</div>
+                  <div className="font-semibold">
+                    {job.service_requests?.users?.first_name}{" "}
+                    {job.service_requests?.users?.last_name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {job.service_requests?.users?.phone}
+                  </div>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <Field
                   label="Request date"
-                  value={new Date(job.createdAt).toLocaleString("en-IN", {
+                  value={new Date(job.service_requests?.created_at).toLocaleString("en-IN", {
                     dateStyle: "full",
                     timeStyle: "short",
                   })}
                 />
                 <Field label="Current status" value={job.status.replace("_", " ")} />
-                <Field label="Assigned engineer" value={job.assignedEngineer ?? "Not assigned"} />
-                <Field label="Service category" value={job.serviceCategory ?? "â€”"} />
+                <Field
+                  label="Service category"
+                  value={job.service_requests?.service_categories?.name ?? "â€”"}
+                />
               </div>
             </CardContent>
           </Card>
@@ -153,10 +153,16 @@ function JobDetails() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
-              <Field label="Model" value={job.drone.model} />
-              <Field label="Serial" value={job.drone.serial} />
-              <Field label="Purchase date" value={job.drone.purchaseDate ?? "â€”"} />
-              <Field label="Warranty" value={job.drone.warranty ?? "â€”"} />
+              <Field label="Model" value={job.service_requests?.drones?.model} />
+              <Field label="Serial" value={job.service_requests?.drones?.serial_number} />
+              <Field
+                label="Purchase date"
+                value={job.service_requests?.drones?.purchase_date ?? "â€”"}
+              />
+              <Field
+                label="Warranty"
+                value={job.service_requests?.drones?.warranty_status ?? "â€”"}
+              />
             </CardContent>
           </Card>
 
@@ -165,129 +171,12 @@ function JobDetails() {
               <CardTitle className="text-sm">Issue & Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm leading-relaxed">{job.description}</p>
+              <p className="text-sm leading-relaxed">{job.service_requests?.description}</p>
             </CardContent>
           </Card>
-
-          {job.attachments && job.attachments.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Paperclip className="h-4 w-4 text-primary" /> Attachments
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {job.attachments.map((a) => (
-                    <div
-                      key={a.id}
-                      className="flex aspect-video flex-col items-center justify-center rounded-lg border bg-muted/40 p-3 text-center"
-                    >
-                      <Paperclip className="h-5 w-5 text-muted-foreground" />
-                      <span className="mt-2 text-xs font-medium">{a.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {job.timeline && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Clock className="h-4 w-4 text-primary" /> Timeline
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ol className="relative space-y-4 border-l-2 border-border pl-6">
-                  {job.timeline.map((event, i) => (
-                    <li key={event.id} className="relative">
-                      <span className="absolute -left-[34px] flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary bg-primary text-[10px] font-bold text-primary-foreground">
-                        {i + 1}
-                      </span>
-                      <div className="text-sm font-semibold">{event.label}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(event.timestamp).toLocaleString("en-IN", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </CardContent>
-            </Card>
-          )}
-
-          {job.notes && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <StickyNote className="h-4 w-4 text-primary" /> Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{job.notes}</p>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         <div className="space-y-4">
-          {quote && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <FileText className="h-4 w-4 text-primary" /> Quotation
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Hardware Cost</span>
-                  <span>{inr(quote.hardwareCost)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Labour</span>
-                  <span>{inr(quote.laborCost)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{inr(quote.shippingCost)}</span>
-                </div>
-                {quote.discountPercent > 0 && (
-                  <div className="flex justify-between text-success">
-                    <span>Discount ({quote.discountPercent}%)</span>
-                    <span>
-                      âˆ’{" "}
-                      {inr(
-                        Math.round(
-                          ((quote.hardwareCost + quote.laborCost + quote.shippingCost) *
-                            quote.discountPercent) /
-                            100,
-                        ),
-                      )}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between border-t pt-2 font-semibold">
-                  <span>Total (incl. GST)</span>
-                  <span>
-                    {(() => {
-                      const sub = quote.hardwareCost + quote.laborCost + quote.shippingCost;
-                      const disc = Math.round((sub * quote.discountPercent) / 100);
-                      const after = sub - disc;
-                      return inr(after + Math.round((after * quote.gstPercent) / 100));
-                    })()}
-                  </span>
-                </div>
-                <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium capitalize text-primary">
-                  {quote.status.replace("_", " ")}
-                </span>
-              </CardContent>
-            </Card>
-          )}
-
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Location</CardTitle>
@@ -295,14 +184,14 @@ function JobDetails() {
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2 text-sm">
                 <span className="mt-0.5 text-muted-foreground font-medium">â€¢</span>
-                {job.location}
+                {job.service_requests?.addresses?.city}, {job.service_requests?.addresses?.state}
               </div>
             </CardContent>
           </Card>
 
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" size="sm" asChild>
-              <a href={`tel:${job.customer.phone.replace(/\s/g, "")}`}>
+              <a href={`tel:${job.service_requests?.users?.phone}`}>
                 <Phone className="h-4 w-4" /> Call
               </a>
             </Button>

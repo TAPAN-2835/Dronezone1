@@ -1,37 +1,35 @@
 ﻿import { definePage, Link } from "@/lib/router";
-import { providerDocs } from "@/data/admin";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-store";
-import type { VerificationStatus } from "@/lib/auth-store";
+import { getAdminProviders } from "@/lib/api/admin";
+import { providerDocs } from "@/data/admin";
 
 export const Page = definePage("/admin/providers")({
   head: () => ({ meta: [{ title: "Providers â€” DroneZone Admin" }] }),
+  loader: () => getAdminProviders(),
   component: AdminProvidersPage,
 });
 
-function statusBadgeClass(status: VerificationStatus | string): string {
-  if (status === "Pending Verification") return "bg-warning/15 text-[oklch(0.45_0.15_75)]";
-  if (status === "Rejected") return "bg-destructive/15 text-destructive";
-  if (status === "Additional Documents Required") return "bg-primary/10 text-primary";
+function statusBadgeClass(status: string): string {
+  if (status === "pending") return "bg-warning/15 text-[oklch(0.45_0.15_75)]";
+  if (status === "rejected") return "bg-destructive/15 text-destructive";
+  if (status === "in_review") return "bg-primary/10 text-primary";
   return "bg-success/15 text-success";
 }
 
-function AdminProvidersPage() {
-  const { providers } = useAuth();
+function statusLabel(status: string) {
+  return status.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
-  // Show all providers in the verification queue
-  // (exclude the main demo "Approved" user so queue focuses on pending applications)
-  const displayProviders = providers.filter(
-    (p) => p.email !== "provider@dronezone.com" || p.status !== "Approved",
-  );
+function AdminProvidersPage() {
+  const { providers } = Page.useLoaderData();
+
+  const displayProviders = providers;
 
   // Stats for the sidebar
-  const pendingCount = providers.filter((p) => p.status === "Pending Verification").length;
-  const approvedCount = providers.filter((p) => p.status === "Approved").length;
-  const rejectedCount = providers.filter((p) => p.status === "Rejected").length;
-  const docsRequiredCount = providers.filter(
-    (p) => p.status === "Additional Documents Required",
-  ).length;
+  const pendingCount = providers.filter((p: any) => p.status === "pending").length;
+  const approvedCount = providers.filter((p: any) => p.status === "approved").length;
+  const rejectedCount = providers.filter((p: any) => p.status === "rejected").length;
+  const docsRequiredCount = providers.filter((p: any) => p.status === "in_review").length;
 
   return (
     <div className="space-y-6">
@@ -69,26 +67,36 @@ function AdminProvidersPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayProviders.map((p) => (
-                      <tr key={p.id} className="border-t hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 font-semibold">{p.fullName}</td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {p.businessName || "N/A"}
+                    {displayProviders.map((p: any) => (
+                      <tr key={p.id} className="hover:bg-muted/30">
+                        <td className="px-4 py-4">
+                          <div className="font-medium">
+                            {p.users?.first_name} {p.users?.last_name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">{p.users?.email}</div>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {new Date(p.createdAt).toLocaleDateString()}
+                        <td className="px-4 py-4 text-muted-foreground">{p.users?.phone}</td>
+                        <td className="px-4 py-4 text-muted-foreground">
+                          {p.business_name || "â€”"}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-4 text-muted-foreground">
+                          {new Date(p.created_at).toLocaleDateString("en-IN", {
+                            dateStyle: "medium",
+                          })}
+                        </td>
+                        <td className="px-4 py-4">
                           <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(p.status)}`}
+                            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(
+                              p.status,
+                            )}`}
                           >
-                            {p.status}
+                            {statusLabel(p.status)}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-4 text-right">
                           <Button variant="outline" size="sm" asChild>
                             <Link to="/admin/providers/$id" params={{ id: p.id }}>
-                              View Details
+                              Review
                             </Link>
                           </Button>
                         </td>
@@ -100,7 +108,7 @@ function AdminProvidersPage() {
 
               {/* Mobile list */}
               <div className="divide-y sm:hidden">
-                {displayProviders.map((p) => (
+                {displayProviders.map((p: any) => (
                   <Link
                     key={p.id}
                     to="/admin/providers/$id"
@@ -109,19 +117,21 @@ function AdminProvidersPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="font-semibold">{p.fullName}</div>
+                        <div className="font-semibold">
+                          {p.users?.first_name} {p.users?.last_name}
+                        </div>
                         <div className="truncate text-xs text-muted-foreground">
-                          {p.businessName || "N/A"}
+                          {p.business_name || "N/A"}
                         </div>
                       </div>
                       <span
                         className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(p.status)}`}
                       >
-                        {p.status}
+                        {statusLabel(p.status)}
                       </span>
                     </div>
                     <div className="mt-2 text-xs text-muted-foreground">
-                      {new Date(p.createdAt).toLocaleDateString()}
+                      {new Date(p.created_at).toLocaleDateString()}
                     </div>
                   </Link>
                 ))}

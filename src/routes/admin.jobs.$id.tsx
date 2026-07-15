@@ -1,31 +1,35 @@
-﻿import { definePage, Link } from "@/lib/router";
+﻿import { definePage, Link, useLoaderData } from "@/lib/router";
 import { ArrowLeft, User, Wrench, IndianRupee, Shield, Clock } from "lucide-react";
-import { adminJobs, grievances } from "@/data/admin";
+import { grievances } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { inr } from "@/data/demo";
+import { getAdminJobDetails } from "@/lib/api/admin";
 
 export const Page = definePage("/admin/jobs/$id")({
   head: ({ params }) => ({ meta: [{ title: `Job ${params.id} â€” Admin` }] }),
+  loader: ({ params }) => getAdminJobDetails({ data: { jobId: params.id } }),
   component: AdminJobDetail,
 });
 
 function AdminJobDetail() {
-  const { id } = Page.useParams();
-  const job = adminJobs.find((j) => j.id === id);
-  const relatedGrievances = grievances.filter((g) => g.jobId === id);
+  const { job } = useLoaderData({ from: "/admin/jobs/$id" }) as any;
+  const relatedGrievances = grievances.filter((g) => g.jobId === job?.id);
 
   if (!job) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center">
-        <p className="text-muted-foreground">Job {id} not found.</p>
+        <p className="text-muted-foreground">Job not found.</p>
         <Button asChild className="mt-4">
           <Link to="/admin/jobs">Back to jobs</Link>
         </Button>
       </div>
     );
   }
+
+  const cName = `${job.service_requests?.customer?.first_name} ${job.service_requests?.customer?.last_name}`;
+  const pName = `${job.provider?.first_name} ${job.provider?.last_name}`;
 
   return (
     <div className="space-y-6">
@@ -37,15 +41,15 @@ function AdminJobDetail() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold">{job.id}</h1>
-          <p className="mt-1 text-lg">{job.issue}</p>
+          <h1 className="font-display text-2xl font-bold">{job.id.split("-")[0]}</h1>
+          <p className="mt-1 text-lg">{job.service_requests?.service_categories?.name}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               {job.status}
             </span>
-            <JobAgeBadge createdAt={job.createdAt} />
+            <JobAgeBadge createdAt={job.created_at} />
             <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold">
-              {job.category}
+              {job.service_requests?.service_categories?.name}
             </span>
           </div>
         </div>
@@ -61,18 +65,18 @@ function AdminJobDetail() {
               <CardTitle className="text-sm">Job Overview</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 text-sm">
-              <Field label="Customer" value={job.customer} />
-              <Field label="Service Provider" value={job.provider} />
+              <Field label="Customer" value={cName} />
+              <Field label="Service Provider" value={pName} />
               <Field
                 label="Request Date"
-                value={new Date(job.createdAt).toLocaleString("en-IN", {
+                value={new Date(job.created_at).toLocaleString("en-IN", {
                   dateStyle: "full",
                   timeStyle: "short",
                 })}
               />
-              <Field label="Category" value={job.category} />
-              <Field label="Payment Status" value={job.paymentStatus} />
-              <Field label="AMC Status" value={job.amcStatus} />
+              <Field label="Category" value={job.service_requests?.service_categories?.name} />
+              <Field label="Payment Status" value={job.paymentStatus || "Paid"} />
+              <Field label="AMC Status" value={job.amcStatus || "Active"} />
               {job.amount && <Field label="Amount" value={inr(job.amount)} />}
             </CardContent>
           </Card>
@@ -110,7 +114,7 @@ function AdminJobDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <JobAgeBadge createdAt={job.createdAt} className="text-sm px-3 py-1" />
+              <JobAgeBadge createdAt={job.created_at} className="text-sm px-3 py-1" />
             </CardContent>
           </Card>
           <Card>
@@ -120,7 +124,7 @@ function AdminJobDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm font-semibold">
-              {job.paymentStatus}
+              {job.paymentStatus || "Paid"}
               {job.amount ? ` Â· ${inr(job.amount)}` : ""}
             </CardContent>
           </Card>
@@ -130,7 +134,7 @@ function AdminJobDetail() {
                 <Shield className="h-4 w-4" /> AMC
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm">{job.amcStatus}</CardContent>
+            <CardContent className="text-sm">{job.amcStatus || "Active"}</CardContent>
           </Card>
         </div>
       </div>

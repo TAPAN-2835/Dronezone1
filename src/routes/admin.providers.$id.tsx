@@ -1,41 +1,42 @@
-﻿import { definePage, Link } from "@/lib/router";
+﻿import { definePage, Link, useRouter } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
-import { providerApplications, providerDocs, grievances } from "@/data/admin";
+import { providerDocs, grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
+import { getAdminProviderDetails, updateProviderVerification } from "@/lib/api/admin";
 
 export const Page = definePage("/admin/providers/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Provider` }] }),
+  loader: ({ params }) => getAdminProviderDetails({ data: { providerId: params.id } }),
   component: ProviderDetail,
 });
 
 function ProviderDetail() {
   const { id } = Page.useParams();
-  const { providers, updateProviderStatus } = useAuth();
+  const loaderData = Page.useLoaderData() as any;
+  const dbProvider = loaderData?.provider;
+  const router = useRouter();
 
-  // Also check original mock if not found in auth store
-  const mockProvider = providerApplications.find((p) => p.id === id);
-  const storeProvider = providers.find((p) => p.id === id);
-
-  const provider = storeProvider
-    ? {
-        id: storeProvider.id,
-        provider: storeProvider.fullName,
-        business: storeProvider.businessName || "N/A",
-        status: storeProvider.status,
-        email: storeProvider.email,
-        phone: storeProvider.phone,
-        city: storeProvider.address,
-        submitted: new Date(storeProvider.createdAt).toLocaleDateString(),
-        experience: storeProvider.experienceDetails,
-        categories: storeProvider.serviceCategories,
-      }
-    : mockProvider;
+  const provider = {
+    id: dbProvider.id,
+    provider: `${dbProvider.users?.first_name} ${dbProvider.users?.last_name}`,
+    business: dbProvider.business_name || "N/A",
+    status: dbProvider.status,
+    email: dbProvider.users?.email,
+    phone: dbProvider.users?.phone,
+    city:
+      [dbProvider.service_area_city, dbProvider.service_area_state].filter(Boolean).join(", ") ||
+      "Unknown",
+    submitted: new Date(dbProvider.created_at).toLocaleDateString(),
+    experience: dbProvider.years_of_experience
+      ? `${dbProvider.years_of_experience} years`
+      : "Not provided",
+    categories: dbProvider.specializations || "Not provided",
+  };
 
   const providerGrievances = grievances.filter(
-    (g) => g.raisedById === id || g.against === provider?.business,
+    (g) => g.raisedById === provider.id || g.against === provider.business,
   );
 
   if (!provider) {
@@ -69,17 +70,16 @@ function ProviderDetail() {
           <div className="mt-2 flex gap-2">
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                provider.status === "Pending" || provider.status === "Pending Verification"
+                provider.status === "pending"
                   ? "bg-warning/15 text-[oklch(0.45_0.15_75)]"
-                  : provider.status === "Rejected"
+                  : provider.status === "rejected"
                     ? "bg-destructive/15 text-destructive"
-                    : provider.status === "In Review" ||
-                        provider.status === "Additional Documents Required"
+                    : provider.status === "in_review"
                       ? "bg-primary/10 text-primary"
                       : "bg-success/15 text-success"
               }`}
             >
-              {provider.status}
+              {provider.status.replaceAll("_", " ")}
             </span>
             <span className="rounded-full bg-muted px-3 py-1 text-xs">{provider.id}</span>
           </div>
@@ -87,8 +87,11 @@ function ProviderDetail() {
         <div className="flex gap-2 flex-wrap print:hidden">
           <Button
             className="bg-success text-success-foreground hover:bg-success/90"
-            onClick={() => {
-              if (storeProvider) updateProviderStatus(provider.id, "Approved");
+            onClick={async () => {
+              await updateProviderVerification({
+                data: { providerId: provider.id, status: "Approved" },
+              });
+              router.invalidate();
               toast.success("Provider Approved", {
                 description:
                   "Email sent: Your account has been verified successfully. You may now log in and access DroneZone services.",
@@ -99,11 +102,14 @@ function ProviderDetail() {
           </Button>
           <Button
             variant="destructive"
-            onClick={() => {
-              if (storeProvider) updateProviderStatus(provider.id, "Rejected");
-              toast.error("Provider Rejected", {
+            onClick={async () => {
+              await updateProviderVerification({
+                data: { providerId: provider.id, status: "Rejected" },
+              });
+              router.invalidate();
+              toast.success("Provider Rejected", {
                 description:
-                  "Email sent: Your verification request was rejected. Please contact support or resubmit valid documents.",
+                  "Email sent: Unfortunately, your application does not meet our requirements at this time.",
               });
             }}
           >
@@ -111,11 +117,14 @@ function ProviderDetail() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => {
-              if (storeProvider) updateProviderStatus(provider.id, "Additional Documents Required");
-              toast.info("Request Docs", {
+            onClick={async () => {
+              await updateProviderVerification({
+                data: { providerId: provider.id, status: "In Review" },
+              });
+              router.invalidate();
+              toast.success("Info Requested", {
                 description:
-                  "Email sent: Additional documents are required before your account can be approved.",
+                  "Email sent: We need a bit more information to complete your verification.",
               });
             }}
           >
@@ -144,7 +153,7 @@ function ProviderDetail() {
             </div>
             <div className="sm:col-span-2">
               <span className="text-muted-foreground">Address: </span>
-              {storeProvider ? provider.city : `123 Drone Street, ${provider.city}, India 500001`}
+              {provider.city}
             </div>
             <div className="sm:col-span-2">
               <span className="text-muted-foreground">Service Areas: </span>

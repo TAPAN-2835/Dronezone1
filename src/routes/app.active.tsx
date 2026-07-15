@@ -1,25 +1,33 @@
-﻿import { definePage, Link } from "@/lib/router";
-import { Check, Circle, MapPin, MessageSquare, Phone, ArrowUpRight } from "lucide-react";
+﻿import { definePage, Link, useRouter } from "@/lib/router";
+import { Check, Circle, MapPin, Phone, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { jobs, stages } from "@/data/demo";
 import { useState } from "react";
+import { getProviderActiveJobs, updateAssignmentStatus } from "@/lib/api/provider";
+import { toast } from "sonner";
 
 export const Page = definePage("/app/active")({
   head: () => ({ meta: [{ title: "Active Jobs â€” DroneZone" }] }),
+  loader: () => getProviderActiveJobs(),
   component: Active,
 });
 
+const activeStages = [
+  { key: "accepted", label: "Job Accepted" },
+  { key: "in_progress", label: "Service in Progress" },
+  { key: "on_hold", label: "On Hold (Awaiting Parts)" },
+  { key: "completed", label: "Completed" },
+];
+
 function Active() {
-  const active = jobs.filter((j) =>
-    ["accepted", "en_route", "on_site", "in_progress", "testing"].includes(j.status),
-  );
+  const { jobs: active } = Page.useLoaderData();
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState(active[0]?.id);
-  const selected = active.find((j) => j.id === selectedId) ?? active[0];
+  const selected = active.find((j: any) => j.id === selectedId) ?? active[0];
 
   if (!selected) {
     return (
@@ -29,7 +37,7 @@ function Active() {
     );
   }
 
-  const currentIdx = stages.findIndex((s) => s.key === selected.status);
+  const currentIdx = activeStages.findIndex((s) => s.key === selected.status);
 
   return (
     <>
@@ -51,7 +59,7 @@ function Active() {
             <CardTitle className="text-sm">In progress Â· {active.length}</CardTitle>
           </CardHeader>
           <CardContent className="divide-y p-0">
-            {active.map((j) => (
+            {active.map((j: any) => (
               <button
                 key={j.id}
                 onClick={() => setSelectedId(j.id)}
@@ -60,14 +68,18 @@ function Active() {
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-muted-foreground">{j.id}</span>
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {j.service_requests?.request_number}
+                  </span>
                   <StatusBadge status={j.status} />
                 </div>
-                <div className="mt-1 truncate text-sm font-semibold">{j.issue}</div>
-                <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {j.customer.name}
+                <div className="mt-1 truncate text-sm font-semibold">
+                  {j.service_requests?.title}
                 </div>
-                <JobAgeBadge createdAt={j.createdAt} className="mt-1.5" />
+                <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {j.service_requests?.users?.first_name} {j.service_requests?.users?.last_name}
+                </div>
+                <JobAgeBadge createdAt={j.created_at} className="mt-1.5" />
               </button>
             ))}
           </CardContent>
@@ -79,30 +91,24 @@ function Active() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs text-muted-foreground">{selected.id}</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {selected.service_requests?.request_number}
+                    </span>
                     <StatusBadge status={selected.status} />
-                    <JobAgeBadge createdAt={selected.createdAt} />
+                    <JobAgeBadge createdAt={selected.created_at} />
                   </div>
-                  <h2 className="mt-1 font-display text-xl font-semibold">{selected.issue}</h2>
+                  <h2 className="mt-1 font-display text-xl font-semibold">
+                    {selected.service_requests?.title}
+                  </h2>
                   <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5" /> {selected.location}
+                    <MapPin className="h-3.5 w-3.5" /> {selected.service_requests?.addresses?.city}
                   </div>
-                  {selected.assignedEngineer && (
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      Engineer: {selected.assignedEngineer}
-                    </div>
-                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" asChild>
-                    <a href={`tel:${selected.customer.phone.replace(/\s/g, "")}`}>
+                    <a href={`tel:${selected.service_requests?.users?.phone}`}>
                       <Phone className="h-4 w-4" /> Call
                     </a>
-                  </Button>
-                  <Button size="sm" variant="outline" asChild>
-                    <Link to="/app/chat">
-                      <MessageSquare className="h-4 w-4" /> Chat
-                    </Link>
                   </Button>
                   <Button size="sm" asChild>
                     <Link to="/app/jobs/$id" params={{ id: selected.id }}>
@@ -120,8 +126,8 @@ function Active() {
             </CardHeader>
             <CardContent>
               <ol className="relative space-y-6 border-l-2 border-border pl-6">
-                {stages.map((s, i) => {
-                  const done = i < currentIdx;
+                {activeStages.map((s, i) => {
+                  const done = i < currentIdx || currentIdx === activeStages.length - 1; // if completed, all are done
                   const current = i === currentIdx;
                   return (
                     <li key={s.key} className="relative">
@@ -154,14 +160,9 @@ function Active() {
                             {s.label}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {done ? "Completed" : current ? "In progress" : "Pending"}
+                            {done ? "Completed" : current ? "Current stage" : "Pending"}
                           </div>
                         </div>
-                        {current && i < stages.length - 1 && (
-                          <Button size="sm" variant="outline">
-                            Update status
-                          </Button>
-                        )}
                       </div>
                     </li>
                   );
@@ -169,10 +170,83 @@ function Active() {
               </ol>
 
               <div className="mt-6 flex flex-wrap gap-2 border-t pt-5">
-                <Button>
-                  <Check className="h-4 w-4" /> Mark as completed
-                </Button>
-                <Button variant="outline">Move to next stage</Button>
+                {selected.status === "accepted" && (
+                  <Button
+                    onClick={() => {
+                      toast.promise(
+                        updateAssignmentStatus({
+                          data: { assignmentId: selected.id, newStatus: "in_progress" },
+                        }),
+                        {
+                          loading: "Updating...",
+                          success: "Started service!",
+                          error: "Failed to update",
+                          finally: () => router.invalidate(),
+                        },
+                      );
+                    }}
+                  >
+                    Start Service (In Progress)
+                  </Button>
+                )}
+                {selected.status === "in_progress" && (
+                  <>
+                    <Button
+                      onClick={() => {
+                        toast.promise(
+                          updateAssignmentStatus({
+                            data: { assignmentId: selected.id, newStatus: "completed" },
+                          }),
+                          {
+                            loading: "Marking completed...",
+                            success: "Job marked as completed!",
+                            error: "Failed to update",
+                            finally: () => router.invalidate(),
+                          },
+                        );
+                      }}
+                    >
+                      <Check className="h-4 w-4 mr-2" /> Mark as Completed
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        toast.promise(
+                          updateAssignmentStatus({
+                            data: { assignmentId: selected.id, newStatus: "on_hold" },
+                          }),
+                          {
+                            loading: "Updating...",
+                            success: "Put job on hold",
+                            error: "Failed to update",
+                            finally: () => router.invalidate(),
+                          },
+                        );
+                      }}
+                    >
+                      Put On Hold
+                    </Button>
+                  </>
+                )}
+                {selected.status === "on_hold" && (
+                  <Button
+                    onClick={() => {
+                      toast.promise(
+                        updateAssignmentStatus({
+                          data: { assignmentId: selected.id, newStatus: "in_progress" },
+                        }),
+                        {
+                          loading: "Resuming...",
+                          success: "Job resumed!",
+                          error: "Failed to update",
+                          finally: () => router.invalidate(),
+                        },
+                      );
+                    }}
+                  >
+                    Resume Service
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

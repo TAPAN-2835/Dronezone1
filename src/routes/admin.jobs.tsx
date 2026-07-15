@@ -1,14 +1,15 @@
-﻿import { definePage, Link } from "@/lib/router";
+﻿import { definePage, Link, useLoaderData } from "@/lib/router";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { adminJobs } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getJobAgeDays } from "@/lib/job-aging";
+import { getAdminJobs } from "@/lib/api/admin";
 
 export const Page = definePage("/admin/jobs")({
   head: () => ({ meta: [{ title: "Jobs â€” DroneZone Admin" }] }),
+  loader: () => getAdminJobs(),
   component: AdminJobs,
 });
 
@@ -16,25 +17,31 @@ type SortKey = "date" | "status" | "aging";
 type AgeFilter = "all" | "fresh" | "moderate" | "stale" | "critical";
 
 function AdminJobs() {
+  const { jobs: rawJobs } = useLoaderData({ from: "/admin/jobs" });
+
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [ageFilter, setAgeFilter] = useState<AgeFilter>("all");
   const [sort, setSort] = useState<SortKey>("date");
 
   const filtered = useMemo(() => {
-    let list = adminJobs.filter(
-      (j) =>
+    let list = rawJobs.filter((j: any) => {
+      const cName = `${j.service_requests?.customer?.first_name} ${j.service_requests?.customer?.last_name}`;
+      const pName = `${j.provider?.first_name} ${j.provider?.last_name}`;
+      const issue = j.service_requests?.service_categories?.name || "";
+      return (
         (statusFilter === "all" || j.status === statusFilter) &&
         (q === "" ||
           j.id.toLowerCase().includes(q.toLowerCase()) ||
-          j.customer.toLowerCase().includes(q.toLowerCase()) ||
-          j.issue.toLowerCase().includes(q.toLowerCase()) ||
-          j.provider.toLowerCase().includes(q.toLowerCase())),
-    );
+          cName.toLowerCase().includes(q.toLowerCase()) ||
+          issue.toLowerCase().includes(q.toLowerCase()) ||
+          pName.toLowerCase().includes(q.toLowerCase()))
+      );
+    });
 
     if (ageFilter !== "all") {
-      list = list.filter((j) => {
-        const days = getJobAgeDays(j.createdAt);
+      list = list.filter((j: any) => {
+        const days = getJobAgeDays(j.created_at);
         if (ageFilter === "fresh") return days <= 2;
         if (ageFilter === "moderate") return days > 2 && days <= 7;
         if (ageFilter === "stale") return days > 7 && days <= 14;
@@ -42,14 +49,14 @@ function AdminJobs() {
       });
     }
 
-    return [...list].sort((a, b) => {
-      if (sort === "aging") return getJobAgeDays(b.createdAt) - getJobAgeDays(a.createdAt);
+    return [...list].sort((a: any, b: any) => {
+      if (sort === "aging") return getJobAgeDays(b.created_at) - getJobAgeDays(a.created_at);
       if (sort === "status") return a.status.localeCompare(b.status);
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-  }, [q, statusFilter, ageFilter, sort]);
+  }, [rawJobs, q, statusFilter, ageFilter, sort]);
 
-  const statuses = ["all", ...new Set(adminJobs.map((j) => j.status))];
+  const statuses = ["all", ...new Set(rawJobs.map((j: any) => j.status))];
 
   return (
     <div className="space-y-6">
@@ -85,15 +92,18 @@ function AdminJobs() {
 
       <div className="flex flex-wrap gap-2">
         <span className="text-xs font-medium text-muted-foreground self-center">Status:</span>
-        {statuses.map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
-            className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${statusFilter === s ? "bg-primary text-primary-foreground" : "border bg-card text-muted-foreground"}`}
-          >
-            {s}
-          </button>
-        ))}
+        {statuses.map((s: unknown) => {
+          const str = s as string;
+          return (
+            <button
+              key={str}
+              onClick={() => setStatusFilter(str)}
+              className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${statusFilter === str ? "bg-primary text-primary-foreground" : "border bg-card text-muted-foreground"}`}
+            >
+              {str}
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -124,21 +134,30 @@ function AdminJobs() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((j) => (
+            {filtered.map((j: any) => (
               <tr key={j.id} className="border-t hover:bg-muted/20">
-                <td className="px-4 py-3 font-semibold">{j.id}</td>
-                <td className="px-4 py-3">{j.customer}</td>
-                <td className="px-4 py-3">{j.provider}</td>
-                <td className="px-4 py-3 text-muted-foreground">{j.issue}</td>
+                <td className="px-4 py-3 font-semibold">
+                  <span className="truncate block w-24">{j.id.split("-")[0]}</span>
+                </td>
+                <td className="px-4 py-3">
+                  {j.service_requests?.customer?.first_name}{" "}
+                  {j.service_requests?.customer?.last_name}
+                </td>
+                <td className="px-4 py-3">
+                  {j.provider?.first_name} {j.provider?.last_name}
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {j.service_requests?.service_categories?.name}
+                </td>
                 <td className="px-4 py-3">
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                     {j.status}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <JobAgeBadge createdAt={j.createdAt} />
+                  <JobAgeBadge createdAt={j.created_at} />
                 </td>
-                <td className="px-4 py-3 text-xs">{j.paymentStatus}</td>
+                <td className="px-4 py-3 text-xs">{j.paymentStatus || "Paid"}</td>
                 <td className="px-4 py-3 text-right">
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/admin/jobs/$id" params={{ id: j.id }}>
@@ -153,7 +172,7 @@ function AdminJobs() {
       </div>
 
       <div className="space-y-3 sm:hidden">
-        {filtered.map((j) => (
+        {filtered.map((j: any) => (
           <Link
             key={j.id}
             to="/admin/jobs/$id"
@@ -161,15 +180,17 @@ function AdminJobs() {
             className="block rounded-xl border bg-card p-4"
           >
             <div className="flex justify-between gap-2">
-              <div className="font-semibold">{j.id}</div>
+              <div className="font-semibold">{j.id.split("-")[0]}</div>
               <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
                 {j.status}
               </span>
             </div>
-            <div className="mt-1 text-sm">{j.issue}</div>
+            <div className="mt-1 text-sm">{j.service_requests?.service_categories?.name}</div>
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{j.customer}</span>
-              <JobAgeBadge createdAt={j.createdAt} />
+              <span className="text-xs text-muted-foreground">
+                {j.service_requests?.customer?.first_name} {j.service_requests?.customer?.last_name}
+              </span>
+              <JobAgeBadge createdAt={j.created_at} />
             </div>
           </Link>
         ))}

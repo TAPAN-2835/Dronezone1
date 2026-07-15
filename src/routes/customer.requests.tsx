@@ -1,11 +1,13 @@
 ﻿import { definePage, Link, Outlet, useRouterState } from "@/lib/router";
 import { CustomerShell } from "@/components/layout/CustomerShell";
-import { customerRequests } from "@/data/customer";
 import { StatusPill } from "./customer.dashboard";
 import { useState } from "react";
+import { getCustomerRequests } from "@/lib/api/customer";
+import { format } from "date-fns";
 
 export const Page = definePage("/customer/requests")({
   head: () => ({ meta: [{ title: "My Requests â€” DroneZone" }] }),
+  loader: () => getCustomerRequests(),
   component: RequestsRoute,
 });
 
@@ -20,10 +22,17 @@ function RequestsRoute() {
 }
 
 function RequestsList() {
+  const requests = Page.useLoaderData();
   const [tab, setTab] = useState<"all" | "active" | "resolved">("all");
-  const filtered = customerRequests.filter((r) =>
-    tab === "all" ? true : tab === "resolved" ? r.status === "resolved" : r.status !== "resolved",
+
+  const filtered = requests.filter((r: any) =>
+    tab === "all"
+      ? true
+      : tab === "resolved"
+        ? r.status === "completed" || r.status === "resolved"
+        : r.status !== "completed" && r.status !== "resolved",
   );
+
   return (
     <div className="px-5 py-4">
       <div className="mb-4 inline-flex rounded-xl border bg-card p-1 text-xs">
@@ -38,25 +47,32 @@ function RequestsList() {
         ))}
       </div>
       <div className="space-y-2">
-        {filtered.map((r) => (
-          <Link
-            key={r.id}
-            to="/customer/requests/$id"
-            params={{ id: r.id }}
-            className="block rounded-xl border bg-card p-4 hover:bg-accent/40"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-sm font-semibold">{r.id}</div>
-                <div className="mt-0.5 text-sm">{r.issue}</div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  {r.drone} Â· {r.createdAt}
+        {filtered.length === 0 ? (
+          <div className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+            No requests found in this category.
+          </div>
+        ) : (
+          filtered.map((r: any) => (
+            <Link
+              key={r.id}
+              to="/customer/requests/$id"
+              params={{ id: r.id }}
+              className="block rounded-xl border bg-card p-4 hover:bg-accent/40"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="text-sm font-semibold">{r.request_number}</div>
+                  <div className="mt-0.5 text-sm">{r.title}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {r.drones?.model || "Unknown Drone"} Â·{" "}
+                    {format(new Date(r.created_at), "MMM d, yyyy")}
+                  </div>
                 </div>
+                <StatusPill status={r.status} />
               </div>
-              <StatusPill status={r.status} />
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))
+        )}
       </div>
     </div>
   );

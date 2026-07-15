@@ -3,8 +3,12 @@ import { ChevronRight, Plus, Shield, Sparkles } from "lucide-react";
 import { CustomerShell } from "@/components/layout/CustomerShell";
 import { amc, customer, customerRequests, inr } from "@/data/customer";
 
+import { getCustomerDashboard } from "@/lib/api/customer";
+import { format } from "date-fns";
+
 export const Page = definePage("/customer/dashboard")({
   head: () => ({ meta: [{ title: "Home â€” DroneZone" }] }),
+  loader: () => getCustomerDashboard(),
   component: () => (
     <CustomerShell title="">
       <Home />
@@ -13,13 +17,15 @@ export const Page = definePage("/customer/dashboard")({
 });
 
 function Home() {
-  const recent = customerRequests.slice(0, 3);
+  const data = Page.useLoaderData();
+  const recent = data.requests;
+
   return (
     <div className="space-y-5 px-5 pb-6 pt-4">
       <div>
         <div className="text-sm text-muted-foreground">Good morning,</div>
         <h1 className="font-display text-2xl font-bold tracking-tight">
-          Hello, {customer.name.split(" ")[0]} ðŸ‘‹
+          Hello, {data.profile.display_name.split(" ")[0]} ðŸ‘‹
         </h1>
       </div>
 
@@ -69,20 +75,26 @@ function Home() {
           </Link>
         </div>
         <div className="space-y-2">
-          {recent.map((r) => (
-            <Link
-              key={r.id}
-              to="/customer/requests/$id"
-              params={{ id: r.id }}
-              className="flex items-center justify-between rounded-xl border bg-card p-3 hover:bg-accent/40"
-            >
-              <div>
-                <div className="text-sm font-semibold">{r.id}</div>
-                <div className="text-xs text-muted-foreground">{r.issue}</div>
-              </div>
-              <StatusPill status={r.status} />
-            </Link>
-          ))}
+          {recent.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+              No recent requests found. Let's get your drone flying again!
+            </div>
+          ) : (
+            recent.map((r: any) => (
+              <Link
+                key={r.id}
+                to="/customer/requests/$id"
+                params={{ id: r.id }}
+                className="flex items-center justify-between rounded-xl border bg-card p-3 hover:bg-accent/40"
+              >
+                <div>
+                  <div className="text-sm font-semibold">{r.request_number}</div>
+                  <div className="text-xs text-muted-foreground">{r.title}</div>
+                </div>
+                <StatusPill status={r.status} />
+              </Link>
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { useAuth } from "@/lib/auth-store";
+import { resolveUserRole } from "@/lib/auth-store";
+import { supabase } from "@/lib/supabase";
 
 export const Page = definePage("/login")({
   head: () => ({
@@ -24,53 +25,38 @@ function LoginPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"email" | "mobile">("email");
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("provider@dronezone.com");
-  const [password, setPassword] = useState("Drone@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
-
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      if (mode === "mobile") {
-        toast.success("Welcome back");
-        navigate({ to: "/app/dashboard" });
-        return;
-      }
-      try {
-        const user = login(email);
+    if (mode === "mobile") {
+      toast.info("Mobile login is not available yet. Please use email.");
+      setLoading(false);
+      return;
+    }
 
-        if (user.status === "Pending Verification") {
-          toast.error("Access Denied", {
-            description:
-              "Your account is currently under verification. You will receive an email once verification is completed.",
-          });
-          setLoading(false);
-        } else if (user.status === "Rejected") {
-          toast.error("Access Denied", {
-            description:
-              "Your verification request was rejected. Please contact support or resubmit valid documents.",
-          });
-          setLoading(false);
-        } else if (user.status === "Additional Documents Required") {
-          toast.error("Access Denied", {
-            description:
-              "Additional documents are required before your account can be approved. Please resubmit.",
-          });
-          setLoading(false);
-        } else if (user.status === "Approved") {
-          toast.success(`Welcome back, ${user.fullName.split(" ")[0]}`);
-          navigate({ to: "/app/dashboard" });
-        } else {
-          setLoading(false);
-        }
-      } catch (_err: unknown) {
-        toast.error("Invalid credentials. Use the demo credentials.");
-        setLoading(false);
-      }
-    }, 700);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    setLoading(false);
+    if (error || !data.user) {
+      toast.error(error?.message || "Unable to sign in");
+      return;
+    }
+    toast.success("Welcome back");
+    const role = await resolveUserRole(data.user);
+    navigate({
+      to:
+        role === "customer"
+          ? "/customer/dashboard"
+          : role === "admin"
+            ? "/admin/dashboard"
+            : "/app/dashboard",
+    });
   }
 
   return (
@@ -183,9 +169,12 @@ function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <button
                   type="button"
-                  onClick={() =>
-                    toast.info("Demo mode: Password reset instructions have been sent.")
-                  }
+                  onClick={async () => {
+                    if (!email) return toast.error("Enter your email first.");
+                    const { error } = await supabase.auth.resetPasswordForEmail(email);
+                    if (error) toast.error(error.message);
+                    else toast.success("Password reset instructions sent.");
+                  }}
                   className="text-xs font-medium text-primary hover:underline cursor-pointer"
                 >
                   Forgot password?
@@ -231,11 +220,6 @@ function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 rounded-lg border bg-muted/50 p-3 text-xs text-muted-foreground">
-            <div className="font-semibold text-foreground">Demo credentials</div>
-            provider@dronezone.com Â· Drone@123
-          </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}

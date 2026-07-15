@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useAuth } from "@/lib/auth-store";
+import { supabase } from "@/lib/supabase";
 
 export const Page = definePage("/signup")({
   head: () => ({
@@ -21,12 +21,12 @@ export const Page = definePage("/signup")({
 
 function SignupPage() {
   const navigate = useNavigate();
-  const { registerProvider } = useAuth();
   const [loading, setLoading] = useState(false);
 
   // Form states
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [govId, setGovId] = useState("");
@@ -36,7 +36,7 @@ function SignupPage() {
   const [serviceCategories, setServiceCategories] = useState("");
   const [experienceDetails, setExperienceDetails] = useState("");
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
@@ -64,42 +64,52 @@ function SignupPage() {
         setLoading(false);
         return;
       }
-
+      if (!password || password.length < 6) {
+        toast.error("Password must be at least 6 characters.");
+        setLoading(false);
+        return;
+      }
       if (phone.length < 10) {
         toast.error("Invalid phone number.");
         setLoading(false);
         return;
       }
 
-      setTimeout(() => {
-        try {
-          registerProvider({
-            fullName,
-            email,
+      // Supabase Signup
+      const [first_name, ...last_name_parts] = fullName.split(" ");
+      const last_name = last_name_parts.join(" ");
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name,
+            last_name,
             phone,
+            role: "provider",
             address,
-            govId,
-            certifications,
-            professionalDocs,
             businessName,
             serviceCategories,
             experienceDetails,
-          });
+            govId,
+            certifications,
+            professionalDocs,
+          },
+        },
+      });
 
-          // Simulated Email Notification
-          toast.success("Verification Submitted", {
-            description:
-              "Your account has been submitted for verification. You will receive an update once our team reviews your documents.",
-            duration: 6000,
-          });
+      if (error) throw error;
 
-          navigate({ to: "/login" });
-        } catch (error: any) {
-          toast.error(error.message || "Registration failed");
-          setLoading(false);
-        }
-      }, 1000);
-    } catch (err) {
+      toast.success("Account created successfully", {
+        description: "Your account is pending verification by our team.",
+        duration: 6000,
+      });
+
+      navigate({ to: "/login" });
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed");
+    } finally {
       setLoading(false);
     }
   }
@@ -187,6 +197,19 @@ function SignupPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
+                  <Label htmlFor="password">
+                    Password <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div className="space-y-1.5">
                   <Label htmlFor="phone">
                     Phone Number <span className="text-destructive">*</span>
                   </Label>
@@ -260,23 +283,23 @@ function SignupPage() {
                   <div className="flex gap-2 items-center">
                     <Input
                       id="govId"
-                      value={govId}
-                      onChange={(e) => setGovId(e.target.value)}
-                      required
-                      placeholder="Enter ID Number or Document Name"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() => {
-                        setGovId("Uploaded-ID.pdf");
-                        toast.success("Simulated ID Upload");
+                      type="file"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        toast.info("Uploading ID...");
+                        const { data, error } = await supabase.storage
+                          .from("verification_docs")
+                          .upload(`${Date.now()}_${file.name}`, file);
+                        if (error) {
+                          toast.error("Upload failed");
+                          return;
+                        }
+                        setGovId(data.path);
+                        toast.success("ID Uploaded");
                       }}
-                    >
-                      <UploadCloud className="w-4 h-4" />
-                    </Button>
+                      required
+                    />
                   </div>
                 </div>
                 <div className="space-y-1.5">
@@ -286,23 +309,23 @@ function SignupPage() {
                   <div className="flex gap-2 items-center">
                     <Input
                       id="certifications"
-                      value={certifications}
-                      onChange={(e) => setCertifications(e.target.value)}
-                      required
-                      placeholder="Certification docs"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() => {
-                        setCertifications("Uploaded-Certs.pdf");
-                        toast.success("Simulated Certs Upload");
+                      type="file"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        toast.info("Uploading certs...");
+                        const { data, error } = await supabase.storage
+                          .from("verification_docs")
+                          .upload(`${Date.now()}_${file.name}`, file);
+                        if (error) {
+                          toast.error("Upload failed");
+                          return;
+                        }
+                        setCertifications(data.path);
+                        toast.success("Certs Uploaded");
                       }}
-                    >
-                      <UploadCloud className="w-4 h-4" />
-                    </Button>
+                      required
+                    />
                   </div>
                 </div>
                 <div className="space-y-1.5">
@@ -312,23 +335,23 @@ function SignupPage() {
                   <div className="flex gap-2 items-center">
                     <Input
                       id="professionalDocs"
-                      value={professionalDocs}
-                      onChange={(e) => setProfessionalDocs(e.target.value)}
-                      required
-                      placeholder="Business Reg, GST, etc."
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() => {
-                        setProfessionalDocs("Uploaded-ProfDocs.zip");
-                        toast.success("Simulated Docs Upload");
+                      type="file"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        toast.info("Uploading docs...");
+                        const { data, error } = await supabase.storage
+                          .from("verification_docs")
+                          .upload(`${Date.now()}_${file.name}`, file);
+                        if (error) {
+                          toast.error("Upload failed");
+                          return;
+                        }
+                        setProfessionalDocs(data.path);
+                        toast.success("Docs Uploaded");
                       }}
-                    >
-                      <UploadCloud className="w-4 h-4" />
-                    </Button>
+                      required
+                    />
                   </div>
                 </div>
               </div>

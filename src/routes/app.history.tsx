@@ -14,23 +14,20 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { jobs, inr, ratingLabels } from "@/data/demo";
+import { inr, ratingLabels } from "@/data/demo";
+import { getProviderHistory } from "@/lib/api/provider";
 
 export const Page = definePage("/app/history")({
   head: () => ({ meta: [{ title: "Service History â€” DroneZone" }] }),
+  loader: () => getProviderHistory(),
   component: History,
 });
 
-function getDelay(job: (typeof jobs)[number]): {
-  days: number;
-  label: string;
-  color: string;
-  bg: string;
-} {
-  if (!job.completedAt || !job.requestedCompletionDate)
+function getDelay(job: any): { days: number; label: string; color: string; bg: string } {
+  if (!job.updated_at || !job.service_requests?.requested_completion_date)
     return { days: 0, label: "On Time", color: "text-success", bg: "bg-success/15" };
-  const completed = new Date(job.completedAt);
-  const requested = new Date(job.requestedCompletionDate);
+  const completed = new Date(job.updated_at);
+  const requested = new Date(job.service_requests?.requested_completion_date);
   const diffMs = completed.getTime() - requested.getTime();
   const diffDays = Math.max(0, Math.ceil(diffMs / 86400000));
   if (diffDays === 0)
@@ -59,32 +56,40 @@ function RatingStars({ rating }: { rating: number }) {
 }
 
 function History() {
+  const { jobs } = Page.useLoaderData();
   const [q, setQ] = useState("");
+
   const completed = useMemo(
     () =>
       jobs
-        .filter((j) => j.status === "completed" || j.status === "cancelled")
         .filter(
-          (j) =>
+          (j: any) =>
+            j.status === "completed" || j.status === "cancelled" || j.status === "rejected",
+        )
+        .filter(
+          (j: any) =>
             q === "" ||
-            j.id.toLowerCase().includes(q.toLowerCase()) ||
-            j.issue.toLowerCase().includes(q.toLowerCase()) ||
-            j.customer.name.toLowerCase().includes(q.toLowerCase()),
+            j.service_requests?.request_number?.toLowerCase().includes(q.toLowerCase()) ||
+            j.service_requests?.title?.toLowerCase().includes(q.toLowerCase()) ||
+            j.service_requests?.users?.first_name?.toLowerCase().includes(q.toLowerCase()),
         ),
-    [q],
+    [jobs, q],
   );
 
-  const totalRevenue = completed.reduce((s, j) => s + (j.amount ?? 0), 0);
+  const totalRevenue = completed.reduce(
+    (s: number, j: any) => s + Number(j.estimated_cost ?? 0),
+    0,
+  );
   const avg = completed.length ? Math.round(totalRevenue / completed.length) : 0;
 
-  const onTimeCount = completed.filter((j) => getDelay(j).days === 0).length;
+  const onTimeCount = completed.filter((j: any) => getDelay(j).days === 0).length;
   const onTimeRate = completed.length ? Math.round((onTimeCount / completed.length) * 100) : 0;
 
   const avgRating =
-    completed.filter((j) => j.customerRating).length > 0
+    completed.filter((j: any) => j.customerRating).length > 0
       ? (
-          completed.reduce((s, j) => s + (j.customerRating ?? 0), 0) /
-          completed.filter((j) => j.customerRating).length
+          completed.reduce((s: number, j: any) => s + (j.customerRating ?? 0), 0) /
+          completed.filter((j: any) => j.customerRating).length
         ).toFixed(1)
       : "â€”";
 
@@ -155,22 +160,27 @@ function History() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {completed.map((j) => {
+              {completed.map((j: any) => {
                 const delay = getDelay(j);
                 return (
                   <tr key={j.id} className="hover:bg-muted/30">
                     <td className="px-4 py-3">
-                      <div className="font-medium">{j.issue}</div>
+                      <div className="font-medium">{j.service_requests?.title}</div>
                       <div className="font-mono text-xs text-muted-foreground">
-                        {j.id} Â· {j.drone.model}
+                        {j.service_requests?.request_number} Â· {j.service_requests?.drones?.model}
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-medium">{j.customer.name}</div>
-                      <div className="text-xs text-muted-foreground">{j.location}</div>
+                      <div className="font-medium">
+                        {j.service_requests?.users?.first_name}{" "}
+                        {j.service_requests?.users?.last_name}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {j.service_requests?.addresses?.city}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {new Date(j.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                      {new Date(j.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                     </td>
                     <td className="px-4 py-3">
                       {j.customerRating ? (

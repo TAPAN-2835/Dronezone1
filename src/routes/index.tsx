@@ -112,7 +112,7 @@ function Selector() {
         <Logo />
         <div className="hidden items-center gap-2 rounded-full border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground sm:flex">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
-          Demo Mode Â· No login required
+          Secure Supabase authentication
         </div>
       </header>
 
@@ -124,8 +124,8 @@ function Selector() {
           Choose your workspace
         </h1>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-          A complete drone service ecosystem. Pick the experience you want to explore â€” every
-          workspace is one click away.
+          A complete drone service ecosystem. Choose your role and sign in to the appropriate
+          workspace.
         </p>
       </div>
 

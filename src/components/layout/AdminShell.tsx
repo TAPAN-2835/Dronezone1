@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Link, Outlet, useRouterState } from "@/lib/router";
+import { Link, Outlet, useNavigate, useRouterState } from "@/lib/router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import logoJp from "@/assets/logo.jpeg";
+import { useAuth } from "@/lib/auth-store";
 
 const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -41,6 +42,8 @@ interface AdminSidebarContentProps {
 }
 
 function AdminSidebarContent({ pathname, onNavigate }: AdminSidebarContentProps) {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   return (
     <div className="flex h-full flex-col bg-[oklch(0.22_0.05_264)] text-white">
       <div className="flex h-16 items-center gap-2.5 border-b border-white/10 px-5">
@@ -83,13 +86,17 @@ function AdminSidebarContent({ pathname, onNavigate }: AdminSidebarContentProps)
         })}
       </nav>
       <div className="border-t border-white/10 p-3">
-        <Link
-          to="/"
-          onClick={onNavigate}
+        <button
+          type="button"
+          onClick={async () => {
+            await signOut();
+            onNavigate?.();
+            navigate({ to: "/login", replace: true });
+          }}
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/65 hover:bg-white/5 hover:text-white"
         >
           <LogOut className="h-4 w-4" /> Exit Console
-        </Link>
+        </button>
       </div>
     </div>
   );

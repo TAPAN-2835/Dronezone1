@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { provider, notifications } from "@/data/demo";
+import { useAuth } from "@/lib/auth-store";
 
 const navItems = [
   { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -44,6 +45,8 @@ const mobileNav = [
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const unread = notifications.filter((n) => !n.read).length;
   return (
     <div className="flex h-full flex-col">
@@ -100,12 +103,18 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             <div className="truncate text-sm font-semibold">{provider.name}</div>
             <div className="truncate text-xs text-muted-foreground">{provider.business.name}</div>
           </div>
-          <Link
-            to="/login"
+          <button
+            type="button"
+            aria-label="Sign out"
+            onClick={async () => {
+              await signOut();
+              onNavigate?.();
+              navigate({ to: "/login", replace: true });
+            }}
             className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

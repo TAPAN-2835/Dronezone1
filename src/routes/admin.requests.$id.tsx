@@ -1,12 +1,13 @@
-﻿import { definePage, Link } from "@/lib/router";
+﻿import { definePage, Link, useLoaderData } from "@/lib/router";
 import { ArrowLeft, Check, Clock, AlertCircle, Circle } from "lucide-react";
-import { adminRequests } from "@/data/admin";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getAdminRequestDetails } from "@/lib/api/admin";
 
 export const Page = definePage("/admin/requests/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} â€” Request` }] }),
+  loader: ({ params }) => getAdminRequestDetails({ data: { requestId: params.id } }),
   component: AdminRequestDetail,
 });
 
@@ -85,13 +86,12 @@ const bottleneckStyles = {
 };
 
 function AdminRequestDetail() {
-  const { id } = Page.useParams();
-  const req = adminRequests.find((r) => r.id === id);
+  const { request: req } = useLoaderData({ from: "/admin/requests/$id" }) as any;
 
   if (!req) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center">
-        <p className="text-muted-foreground">Request {id} not found.</p>
+        <p className="text-muted-foreground">Request not found.</p>
         <Button asChild className="mt-4">
           <Link to="/admin/requests">Back</Link>
         </Button>
@@ -112,18 +112,18 @@ function AdminRequestDetail() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold">{req.id}</h1>
-          <p className="mt-1 text-lg">{req.issue}</p>
+          <h1 className="font-display text-2xl font-bold">{req.id.split("-")[0]}</h1>
+          <p className="mt-1 text-lg">{req.service_categories?.name}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               {req.status}
             </span>
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${req.priority === "High" ? "bg-destructive/10 text-destructive" : "bg-muted"}`}
+              className={`rounded-full px-3 py-1 text-xs font-semibold bg-warning/10 text-warning`}
             >
-              {req.priority} Priority
+              Medium Priority
             </span>
-            <JobAgeBadge createdAt={req.createdAt} />
+            <JobAgeBadge createdAt={req.created_at} />
           </div>
         </div>
         <Button>Assign Provider</Button>
@@ -140,23 +140,23 @@ function AdminRequestDetail() {
               <span className="text-muted-foreground">User: </span>
               <Link
                 to="/admin/users/$id"
-                params={{ id: req.userId }}
+                params={{ id: req.customer_id }}
                 className="font-semibold text-primary hover:underline"
               >
-                {req.user}
+                {req.users?.first_name} {req.users?.last_name}
               </Link>
             </div>
             <div>
               <span className="text-muted-foreground">Drone: </span>
-              {req.drone}
+              {req.drones?.model}
             </div>
             <div>
               <span className="text-muted-foreground">Location: </span>
-              {req.location}
+              {req.addresses?.city}
             </div>
             <div>
               <span className="text-muted-foreground">Submitted: </span>
-              {new Date(req.createdAt).toLocaleString("en-IN", {
+              {new Date(req.created_at).toLocaleString("en-IN", {
                 dateStyle: "full",
                 timeStyle: "short",
               })}
@@ -245,11 +245,13 @@ function AdminRequestDetail() {
             <CardTitle className="text-sm">Actions</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link to="/admin/jobs/$id" params={{ id: req.id }}>
-                View as Job
-              </Link>
-            </Button>
+            {req.job_assignments?.[0]?.id && (
+              <Button asChild variant="outline">
+                <Link to="/admin/jobs/$id" params={{ id: req.job_assignments[0].id }}>
+                  View as Job
+                </Link>
+              </Button>
+            )}
             <Button asChild variant="outline">
               <Link to="/admin/grievances/new">Raise Grievance</Link>
             </Button>

@@ -1,29 +1,37 @@
-﻿import { definePage, Link } from "@/lib/router";
+﻿import { definePage, Link, useLoaderData } from "@/lib/router";
 import { ArrowLeft } from "lucide-react";
-import { adminUsers, grievances } from "@/data/admin";
+import { grievances } from "@/data/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getAdminUserDetails } from "@/lib/api/admin";
 
 export const Page = definePage("/admin/users/$id")({
   head: ({ params }) => ({ meta: [{ title: `${params.id} â€” User` }] }),
+  loader: ({ params }) => getAdminUserDetails({ data: { userId: params.id } }),
   component: UserDetail,
 });
 
 function UserDetail() {
-  const { id } = Page.useParams();
-  const user = adminUsers.find((u) => u.id === id);
-  const userGrievances = grievances.filter((g) => g.raisedById === id || g.raisedBy === user?.name);
+  const loaderData = useLoaderData({ from: "/admin/users/$id" }) as any;
+  const dbUser = loaderData?.user;
+  const requests = loaderData?.requests;
+  const userGrievances = grievances.filter(
+    (g) =>
+      g.raisedById === dbUser?.id || g.raisedBy === `${dbUser?.first_name} ${dbUser?.last_name}`,
+  );
 
-  if (!user) {
+  if (!dbUser) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center">
-        <p className="text-muted-foreground">User {id} not found.</p>
+        <p className="text-muted-foreground">User not found.</p>
         <Button asChild className="mt-4">
           <Link to="/admin/users">Back</Link>
         </Button>
       </div>
     );
   }
+
+  const fullName = `${dbUser.first_name} ${dbUser.last_name}`;
 
   return (
     <div className="space-y-6">
@@ -35,16 +43,15 @@ function UserDetail() {
 
       <div className="flex items-start gap-4">
         <div className="grid h-16 w-16 place-items-center rounded-full bg-primary/10 text-xl font-bold text-primary">
-          {user.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")}
+          {dbUser.first_name?.[0]}
+          {dbUser.last_name?.[0]}
         </div>
         <div>
-          <h1 className="font-display text-2xl font-bold">{user.name}</h1>
-          <p className="text-muted-foreground">{user.email}</p>
+          <h1 className="font-display text-2xl font-bold">{fullName}</h1>
+          <p className="text-muted-foreground">{dbUser.email}</p>
           <p className="text-sm text-muted-foreground">
-            {user.id} Â· Joined {user.joined}
+            {dbUser.id} Â· Joined{" "}
+            {new Date(dbUser.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
           </p>
         </div>
       </div>
@@ -57,19 +64,19 @@ function UserDetail() {
           <CardContent className="space-y-2 text-sm">
             <div>
               <span className="text-muted-foreground">Phone: </span>
-              {user.phone}
+              {dbUser.phone}
             </div>
             <div>
               <span className="text-muted-foreground">City: </span>
-              {user.city}
+              {"N/A"}
             </div>
             <div>
               <span className="text-muted-foreground">Total Requests: </span>
-              <span className="font-semibold">{user.requests}</span>
+              <span className="font-semibold">{requests?.length || 0}</span>
             </div>
             <div>
               <span className="text-muted-foreground">AMC Plan: </span>
-              {user.amcPlan}
+              {"Basic Plan"}
             </div>
           </CardContent>
         </Card>

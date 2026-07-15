@@ -1,4 +1,4 @@
-﻿import { definePage, Link } from "@/lib/router";
+import { definePage, Link } from "@/lib/router";
 import {
   Inbox,
   Briefcase,
@@ -25,54 +25,15 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { jobs, revenueTrend, weeklyJobs, provider, inr, notifications } from "@/data/demo";
+import { revenueTrend, weeklyJobs, inr, notifications } from "@/data/demo";
 import { motion } from "framer-motion";
+import { getProviderDashboard } from "@/lib/api/provider";
 
 export const Page = definePage("/app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard â€” DroneZone" }] }),
+  loader: () => getProviderDashboard(),
   component: Dashboard,
 });
-
-const newCount = jobs.filter((j) => j.status === "new").length;
-const activeCount = jobs.filter((j) =>
-  ["accepted", "en_route", "on_site", "in_progress", "testing"].includes(j.status),
-).length;
-const completedCount = jobs.filter((j) => j.status === "completed").length;
-
-const stats = [
-  {
-    label: "New Requests",
-    value: newCount,
-    delta: "+3 today",
-    icon: Inbox,
-    tone: "primary",
-    to: "/app/requests" as const,
-  },
-  {
-    label: "Active Jobs",
-    value: activeCount,
-    delta: "2 in progress",
-    icon: Briefcase,
-    tone: "warning",
-    to: "/app/active" as const,
-  },
-  {
-    label: "Completed (Mo)",
-    value: completedCount,
-    delta: "+12% vs last",
-    icon: CheckCircle2,
-    tone: "success",
-    to: "/app/history" as const,
-  },
-  {
-    label: "Revenue (Mo)",
-    value: inr(64750),
-    delta: "+9.4%",
-    icon: IndianRupee,
-    tone: "primary",
-    to: "/app/history" as const,
-  },
-] as const;
 
 const toneStyles: Record<string, string> = {
   primary: "bg-primary/10 text-primary",
@@ -81,29 +42,64 @@ const toneStyles: Record<string, string> = {
 };
 
 function Dashboard() {
-  const newJobs = jobs.filter((j) => j.status === "new").slice(0, 4);
-  const activeJobs = jobs
-    .filter((j) => ["accepted", "en_route", "on_site", "in_progress", "testing"].includes(j.status))
-    .slice(0, 4);
+  const { profile, newRequests, activeJobs, stats } = Page.useLoaderData();
+
   const recentNotifs = notifications.slice(0, 4);
   const unreadNotifs = notifications.filter((n) => !n.read).length;
+
+  const statCards = [
+    {
+      label: "New Requests",
+      value: stats.newCount,
+      delta: "Pending assignment",
+      icon: Inbox,
+      tone: "primary",
+      to: "/app/requests" as const,
+    },
+    {
+      label: "Active Jobs",
+      value: stats.activeCount,
+      delta: "In progress",
+      icon: Briefcase,
+      tone: "warning",
+      to: "/app/active" as const,
+    },
+    {
+      label: "Completed",
+      value: stats.completedCount,
+      delta: "All time",
+      icon: CheckCircle2,
+      tone: "success",
+      to: "/app/history" as const,
+    },
+    {
+      label: "Revenue",
+      value: inr(stats.revenueMonth),
+      delta: "This month",
+      icon: IndianRupee,
+      tone: "primary",
+      to: "/app/history" as const,
+    },
+  ] as const;
 
   return (
     <>
       <PageHeader
-        title={`Hi, ${provider.name.split(" ")[0]} ðŸ‘‹`}
+        title={`Hi, ${profile?.users?.first_name || "Provider"} ðŸ‘‹`}
         description="Here's how your service business is performing today."
         actions={
-          <Button asChild>
-            <Link to="/app/requests">
-              <Plus className="h-4 w-4" /> View requests
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild>
+              <Link to="/app/requests">
+                <Plus className="h-4 w-4 mr-2" /> View requests
+              </Link>
+            </Button>
+          </div>
         }
       />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        {stats.map((s, i) => {
+        {statCards.map((s, i) => {
           const Icon = s.icon;
           return (
             <motion.div
@@ -308,7 +304,7 @@ function Dashboard() {
             </Button>
           </CardHeader>
           <CardContent className="divide-y">
-            {newJobs.map((j) => (
+            {newRequests.slice(0, 4).map((j: any) => (
               <Link
                 key={j.id}
                 to="/app/requests/$id"
@@ -317,18 +313,27 @@ function Dashboard() {
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono text-muted-foreground">{j.id}</span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {j.service_requests?.request_number}
+                    </span>
                     <StatusBadge status={j.status} />
-                    <JobAgeBadge createdAt={j.createdAt} />
+                    <JobAgeBadge createdAt={j.created_at} />
                   </div>
-                  <div className="mt-1 truncate text-sm font-semibold">{j.issue}</div>
+                  <div className="mt-1 truncate text-sm font-semibold">
+                    {j.service_requests?.title}
+                  </div>
                   <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {j.drone.model} Â· {j.location}
+                    {j.service_requests?.drones?.model} Â· {j.service_requests?.addresses?.city}
                   </div>
                 </div>
                 <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </Link>
             ))}
+            {newRequests.length === 0 && (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                No new requests are currently assigned to you.
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -342,7 +347,7 @@ function Dashboard() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
-            {activeJobs.map((j) => (
+            {activeJobs.slice(0, 4).map((j: any) => (
               <Link
                 key={j.id}
                 to="/app/jobs/$id"
@@ -350,13 +355,18 @@ function Dashboard() {
                 className="flex gap-3 rounded-lg border bg-muted/40 p-3 transition hover:bg-muted/60"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold">{j.issue}</div>
-                  <div className="truncate text-xs text-muted-foreground">{j.location}</div>
-                  <JobAgeBadge createdAt={j.createdAt} className="mt-1.5" />
+                  <div className="truncate text-sm font-semibold">{j.service_requests?.title}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {j.service_requests?.addresses?.city}
+                  </div>
+                  <JobAgeBadge createdAt={j.created_at} className="mt-1.5" />
                 </div>
                 <StatusBadge status={j.status} />
               </Link>
             ))}
+            {activeJobs.length === 0 && (
+              <div className="py-6 text-center text-sm text-muted-foreground">No active jobs.</div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -1,9 +1,11 @@
 ﻿import { Link, useRouterState } from "@/lib/router";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, FileText, MessageSquare, Shield, User, ArrowLeft, Bell } from "lucide-react";
+import { Home, FileText, MessageSquare, Shield, User, ArrowLeft, Bell, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
 import type { ReactNode } from "react";
+import { useNavigate } from "@/lib/router";
+import { useAuth } from "@/lib/auth-store";
 
 const tabs = [
   { to: "/customer/dashboard", label: "Home", icon: Home },
@@ -25,6 +27,8 @@ export function CustomerShell({
   children: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   return (
     <div className="min-h-screen bg-[oklch(0.97_0.012_255)]">
       <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-background shadow-2xl shadow-foreground/5 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:overflow-hidden">
@@ -43,6 +47,17 @@ export function CustomerShell({
           <div className="font-display text-base font-semibold tracking-tight">
             {title ?? "DroneZone"}
           </div>
+          <button
+            type="button"
+            className="ml-auto grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-accent"
+            aria-label="Sign out"
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/customer/login", replace: true });
+            }}
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
           <div className="ml-auto flex items-center gap-1">
             {rightSlot ?? (
               <Link

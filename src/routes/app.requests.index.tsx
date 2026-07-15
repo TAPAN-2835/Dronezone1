@@ -1,75 +1,52 @@
-﻿import { definePage, Link } from "@/lib/router";
+﻿import { definePage, Link, useRouter } from "@/lib/router";
 import { useMemo, useState } from "react";
-import { Search, Filter, MapPin, Clock, Check, X } from "lucide-react";
+import { Search, MapPin, Clock, Check, X } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { JobAgeBadge } from "@/components/shared/JobAgeBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { jobs, type JobStatus } from "@/data/demo";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { getProviderRequests, updateAssignmentStatus } from "@/lib/api/provider";
 
 export const Page = definePage("/app/requests/")({
-  head: () => ({ meta: [{ title: "Job Requests â€” DroneZone" }] }),
+  head: () => ({ meta: [{ title: "New Requests â€” DroneZone" }] }),
+  loader: () => getProviderRequests(),
   component: Requests,
 });
 
-const tabs: {
-  id: "all" | "new" | "accepted" | "rejected";
-  label: string;
-  filter: (s: JobStatus) => boolean;
-}[] = [
-  { id: "all", label: "All", filter: () => true },
-  { id: "new", label: "New", filter: (s) => s === "new" },
-  {
-    id: "accepted",
-    label: "Accepted",
-    filter: (s) => ["accepted", "in_progress", "en_route", "on_site", "testing"].includes(s),
-  },
-  { id: "rejected", label: "Rejected", filter: (s) => s === "rejected" || s === "cancelled" },
-];
-
 function Requests() {
-  const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("all");
+  const { requests } = Page.useLoaderData();
   const [q, setQ] = useState("");
+  const router = useRouter();
 
-  const filter = tabs.find((t) => t.id === tab)!.filter;
   const filtered = useMemo(
     () =>
-      jobs.filter(
-        (j) =>
-          filter(j.status) &&
-          (q === "" ||
-            j.id.toLowerCase().includes(q.toLowerCase()) ||
-            j.issue.toLowerCase().includes(q.toLowerCase()) ||
-            j.customer.name.toLowerCase().includes(q.toLowerCase()) ||
-            j.location.toLowerCase().includes(q.toLowerCase())),
+      requests.filter(
+        (j: any) =>
+          q === "" ||
+          j.service_requests?.request_number?.toLowerCase().includes(q.toLowerCase()) ||
+          j.service_requests?.title?.toLowerCase().includes(q.toLowerCase()) ||
+          j.service_requests?.users?.first_name?.toLowerCase().includes(q.toLowerCase()) ||
+          j.service_requests?.addresses?.city?.toLowerCase().includes(q.toLowerCase()),
       ),
-    [tab, q, filter],
+    [requests, q],
   );
 
-  const counts = {
-    all: jobs.length,
-    new: jobs.filter((j) => j.status === "new").length,
-    accepted: jobs.filter((j) =>
-      ["accepted", "in_progress", "en_route", "on_site", "testing"].includes(j.status),
-    ).length,
-    rejected: jobs.filter((j) => j.status === "rejected" || j.status === "cancelled").length,
-  } as const;
+  const handleAction = (assignmentId: string, newStatus: "accepted" | "rejected") => {
+    toast.promise(updateAssignmentStatus({ data: { assignmentId, newStatus } }), {
+      loading: "Updating status...",
+      success: `Request ${newStatus}`,
+      error: "Failed to update status",
+      finally: () => router.invalidate(),
+    });
+  };
 
   return (
     <>
-      <PageHeader
-        title="Job Requests"
-        description="Review incoming requests and decide which jobs to accept."
-        actions={
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4" /> Filters
-          </Button>
-        }
-      />
+      <PageHeader title="New Requests" description="Review incoming requests assigned to you." />
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
@@ -81,26 +58,10 @@ function Requests() {
             className="h-11 pl-9"
           />
         </div>
-        <div className="flex overflow-x-auto rounded-lg border bg-card p-1 text-sm">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`relative whitespace-nowrap rounded-md px-3 py-1.5 font-medium transition ${
-                tab === t.id
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-              <span className="ml-1.5 text-[10px] opacity-70">{counts[t.id]}</span>
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-        {filtered.map((j, i) => (
+        {filtered.map((j: any, i: number) => (
           <motion.div
             key={j.id}
             initial={{ opacity: 0, y: 6 }}
@@ -112,62 +73,57 @@ function Requests() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs text-muted-foreground">{j.id}</span>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {j.service_requests?.request_number}
+                      </span>
                       <StatusBadge status={j.status} />
-                      <JobAgeBadge createdAt={j.createdAt} />
+                      <JobAgeBadge createdAt={j.created_at} />
                     </div>
                     <h3 className="mt-1 truncate font-display text-base font-semibold">
-                      {j.issue}
+                      {j.service_requests?.title}
                     </h3>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />
-                        {j.location}
+                        {j.service_requests?.addresses?.city}
                       </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        {new Date(j.scheduledAt).toLocaleString("en-IN", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </span>
+                      {j.service_requests?.requested_completion_date && (
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5" />
+                          Expected:{" "}
+                          {new Date(
+                            j.service_requests?.requested_completion_date,
+                          ).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
                     <div className="mt-3 text-sm">
-                      <span className="font-medium">{j.customer.name}</span>
-                      <span className="text-muted-foreground"> Â· {j.drone.model}</span>
+                      <span className="font-medium">{j.service_requests?.users?.first_name}</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        Â· {j.service_requests?.drones?.model}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-4 flex items-center gap-2 border-t pt-4">
-                  {j.status === "new" ? (
-                    <Button asChild size="sm" className="flex-1 sm:flex-none">
-                      <Link to="/app/requests/$id" params={{ id: j.id }}>
-                        Review request
-                      </Link>
-                    </Button>
-                  ) : (
-                    <Button asChild size="sm" variant="outline" className="flex-1 sm:flex-none">
-                      <Link to="/app/jobs/$id" params={{ id: j.id }}>
-                        View details
-                      </Link>
-                    </Button>
-                  )}
-                  {j.status === "new" && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => toast.success(`${j.id} rejected`)}
-                      >
-                        <X className="h-4 w-4" /> Reject
-                      </Button>
-                      <Button size="sm" onClick={() => toast.success(`${j.id} accepted`)}>
-                        <Check className="h-4 w-4" /> Accept
-                      </Button>
-                    </>
-                  )}
+                  <Button asChild size="sm" className="flex-1 sm:flex-none">
+                    <Link to="/app/requests/$id" params={{ id: j.id }}>
+                      Review request
+                    </Link>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => handleAction(j.id, "rejected")}
+                  >
+                    <X className="h-4 w-4" /> Reject
+                  </Button>
+                  <Button size="sm" onClick={() => handleAction(j.id, "accepted")}>
+                    <Check className="h-4 w-4" /> Accept
+                  </Button>
                 </div>
               </CardContent>
             </Card>
